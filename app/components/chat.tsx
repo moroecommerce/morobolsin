@@ -6,6 +6,12 @@ type Message = { text: string; sender: "user" | "bot" };
 
 const Chat: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
+  const [selectedType, setSelectedType] = useState<
+    "chef" | "kitchen" | "waiter" | "bar"
+  >("chef");
+  const [selectedColor, setSelectedColor] = useState<
+    "white" | "black" | "sand" | "brand"
+  >("white");
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -17,17 +23,51 @@ const Chat: React.FC = () => {
     }
   }, [chatHistory]);
 
-  const sendMessageToGPT = async (text: string) => {
+  const buildContextIntro = () => {
+    const typeLabel =
+      selectedType === "chef"
+        ? "форма для шеф-повара"
+        : selectedType === "kitchen"
+        ? "форма для поваров кухни"
+        : selectedType === "waiter"
+        ? "форма для официантов"
+        : "форма для бариста / бара";
+
+    const colorLabel =
+      selectedColor === "white"
+        ? "в светлых тонах"
+        : selectedColor === "black"
+        ? "в тёмных тонах"
+        : selectedColor === "sand"
+        ? "в бежевых / тёплых тонах"
+        : "в фирменных цветах бренда";
+
+    return `Контекст: клиент выбирает ${typeLabel}, ${colorLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
+  };
+
+  const sendMessageToGPT = async (text: string, withContext = false) => {
     setLoading(true);
-    const newHistory: Message[] = [...chatHistory, { text, sender: "user" }];
-    setChatHistory(newHistory);
+
+    let historyToSend: Message[] = [...chatHistory, {
+      text,
+      sender: "user",
+    }];
+
+    if (withContext && chatHistory.length === 0) {
+      historyToSend = [
+        { text: buildContextIntro(), sender: "user" },
+        ...historyToSend,
+      ];
+    }
+
+    setChatHistory(historyToSend);
 
     try {
       const res = await fetch("/api/gpt", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: newHistory.map((m) => ({
+          messages: historyToSend.map((m) => ({
             role: m.sender === "user" ? "user" : "assistant",
             content: m.text,
           })),
@@ -56,7 +96,8 @@ const Chat: React.FC = () => {
 
   const handleSend = () => {
     if (!message.trim() || loading) return;
-    sendMessageToGPT(message.trim());
+    const withContext = chatHistory.length === 0;
+    sendMessageToGPT(message.trim(), withContext);
     setMessage("");
   };
 
@@ -72,6 +113,265 @@ const Chat: React.FC = () => {
           boxSizing: "border-box",
         }}
       >
+        {/* ШАПКА */}
+        <div
+          style={{
+            maxWidth: 560,
+            margin: "0 auto 14px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column" }}>
+            <span
+              style={{
+                fontWeight: 800,
+                fontSize: 18,
+                color: "#111827",
+                letterSpacing: "0.04em",
+                textTransform: "uppercase",
+              }}
+            >
+              Morobolsin
+            </span>
+            <span style={{ fontSize: 12, color: "#6b7280" }}>
+              умный подбор формы для HoReCa
+            </span>
+          </div>
+
+          <div style={{ display: "flex", gap: 8 }}>
+            <button
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                border: "1px solid #e5e7eb",
+                background: "#ffffff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: 16,
+              }}
+              onClick={() => alert("Спасибо за оценку!")}
+            >
+              👍
+            </button>
+            <button
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                border: "1px solid #e5e7eb",
+                background: "#ffffff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: 16,
+              }}
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: "Morobolsin — подбор формы",
+                    text: "Помощник для подбора формы для команды HoReCa",
+                    url: window.location.href,
+                  });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert("Ссылка скопирована в буфер обмена");
+                }
+              }}
+            >
+              ↗
+            </button>
+            <button
+              style={{
+                width: 36,
+                height: 36,
+                borderRadius: 999,
+                border: "1px solid #e5e7eb",
+                background: "#ffffff",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                cursor: "pointer",
+                fontSize: 16,
+              }}
+              onClick={() => window.open("https://t.me/morobolsin", "_blank")}
+            >
+              ✉
+            </button>
+          </div>
+        </div>
+
+        {/* ВЫБОР ТИПА И ЦВЕТА */}
+        <div
+          style={{
+            maxWidth: 560,
+            margin: "0 auto 16px",
+            background: "#ffffff",
+            borderRadius: 22,
+            padding: "14px 14px 16px",
+            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 12,
+              gap: 10,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#111827",
+                  marginBottom: 4,
+                }}
+              >
+                Выберите тип формы
+              </div>
+              <div style={{ fontSize: 12, color: "#6b7280" }}>
+                Ассистент учтёт это в подборе комплектов
+              </div>
+            </div>
+            <div
+              style={{
+                width: 80,
+                height: 80,
+                borderRadius: 20,
+                background:
+                  selectedColor === "white"
+                    ? "#f9fafb"
+                    : selectedColor === "black"
+                    ? "#030712"
+                    : selectedColor === "sand"
+                    ? "#f5e7d6"
+                    : "#111827",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color:
+                  selectedColor === "white" || selectedColor === "sand"
+                    ? "#111827"
+                    : "#f9fafb",
+                fontWeight: 700,
+                fontSize: 11,
+                textAlign: "center",
+                padding: "0 6px",
+              }}
+            >
+              {selectedType === "chef"
+                ? "ШЕФ-ПОВАР"
+                : selectedType === "kitchen"
+                ? "КУХНЯ"
+                : selectedType === "waiter"
+                ? "ЗАЛ"
+                : "БАР / КОФЕ"}
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 10,
+              flexWrap: "wrap",
+            }}
+          >
+            {[
+              { id: "chef", label: "Шеф-повар" },
+              { id: "kitchen", label: "Кухня" },
+              { id: "waiter", label: "Официанты" },
+              { id: "bar", label: "Бар / бариста" },
+            ].map((item) => (
+              <button
+                key={item.id}
+                onClick={() =>
+                  setSelectedType(
+                    item.id as "chef" | "kitchen" | "waiter" | "bar"
+                  )
+                }
+                style={{
+                  flex: "1 1 40%",
+                  minWidth: 110,
+                  borderRadius: 999,
+                  border:
+                    selectedType === item.id
+                      ? "1px solid #111827"
+                      : "1px solid #e5e7eb",
+                  background: selectedType === item.id ? "#111827" : "#ffffff",
+                  color: selectedType === item.id ? "#f9fafb" : "#111827",
+                  fontSize: 13,
+                  padding: "8px 10px",
+                  cursor: "pointer",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
+          <div
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: "#4b5563",
+              marginBottom: 8,
+            }}
+          >
+            Цвет формы
+          </div>
+
+          <div style={{ display: "flex", gap: 10 }}>
+            {[
+              { id: "white", label: "Светлая", bg: "#f9fafb", border: "#e5e7eb" },
+              { id: "black", label: "Тёмная", bg: "#030712", border: "#030712" },
+              { id: "sand", label: "Бежевая", bg: "#f5e7d6", border: "#eabf7a" },
+              { id: "brand", label: "Фирменный", bg: "#111827", border: "#4f46e5" },
+            ].map((c) => (
+              <button
+                key={c.id}
+                onClick={() =>
+                  setSelectedColor(
+                    c.id as "white" | "black" | "sand" | "brand"
+                  )
+                }
+                style={{
+                  flex: 1,
+                  borderRadius: 16,
+                  border:
+                    selectedColor === c.id
+                      ? `2px solid ${c.border}`
+                      : "1px solid #e5e7eb",
+                  background: c.bg,
+                  height: 42,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  color:
+                    c.id === "white" || c.id === "sand"
+                      ? "#111827"
+                      : "#f9fafb",
+                  fontSize: 12,
+                  fontWeight: 600,
+                }}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* ЛЕНДИНГ-БЛОК */}
         <div
           style={{
             maxWidth: 560,
@@ -100,8 +400,8 @@ const Chat: React.FC = () => {
               lineHeight: 1.6,
             }}
           >
-            Расскажите об уровне заведения, стиле кухни и задачах персонала —
-            ассистент подберёт комплекты одежды для шефов, кухни и зала.
+            Укажите формат заведения, роли сотрудников и выбранный стиль —
+            ассистент подберёт комплекты формы под бренд и задачи кухни.
           </p>
 
           <div
@@ -131,8 +431,8 @@ const Chat: React.FC = () => {
                 Быстрый подбор по параметрам
               </div>
               <div style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.5 }}>
-                Учитываем формат заведения, сезон, цвет бренда и бюджет, чтобы
-                не тратить время на бесконечный каталог.
+                Вместо долгого поиска по каталогу вы сразу получаете готовые
+                наборы с артикулами и ссылками.
               </div>
             </div>
 
@@ -152,11 +452,11 @@ const Chat: React.FC = () => {
                   color: "#111827",
                 }}
               >
-                Комплекты для всей команды
+                В едином стиле бренда
               </div>
               <div style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.5 }}>
-                Ассистент сразу предлагает наборы для шефа, линии, пиццаёлов,
-                кондитеров и официантов в одном стиле.
+                Ассистент подбирает форму для шефа, кухни и зала так, чтобы вся
+                команда выглядела как единая концепция.
               </div>
             </div>
 
@@ -179,8 +479,8 @@ const Chat: React.FC = () => {
                 Практичность и безопасность
               </div>
               <div style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.5 }}>
-                Подбираем ткани под жаркую кухню, открытый огонь, частые стирки
-                и требования по безопасности.
+                Учитываем жаркую кухню, открытый огонь, частые стирки и
+                специфику смен, чтобы форма жила долго.
               </div>
             </div>
           </div>
@@ -202,7 +502,7 @@ const Chat: React.FC = () => {
               boxShadow: "0 3px 16px rgba(0,0,0,0.25)",
             }}
           >
-            Выбрать одежду для поваров
+            Выбрать комплекты и перейти к ассистенту
           </button>
 
           <p
@@ -213,8 +513,8 @@ const Chat: React.FC = () => {
               marginTop: 10,
             }}
           >
-            Чат подберёт модели и отправит вам список с артикулами для заказа в
-            Morobolsin.
+            Чат подберёт модели и сформирует список позиций Morobolsin для
+            заказа.
           </p>
         </div>
       </div>
@@ -297,9 +597,13 @@ const Chat: React.FC = () => {
             Как начать:
           </div>
           <ul style={{ paddingLeft: 18, margin: 0, lineHeight: 1.6 }}>
-            <li>Напишите, для какого заведения подбираете форму.</li>
-            <li>Укажите количество людей и роли (шеф, су‑шеф, линия, зал).</li>
-            <li>Добавьте бюджет и пожелания к стилю / цветам.</li>
+            <li>Опишите заведение (формат, кухня, уровень цен).</li>
+            <li>
+              Укажите количество людей и роли (шеф, кухня, официанты, бар).
+            </li>
+            <li>
+              Добавьте бюджет и пожелания по стилю, крою и посадке формы.
+            </li>
           </ul>
         </div>
 
@@ -313,10 +617,10 @@ const Chat: React.FC = () => {
             color: "#6b7280",
           }}
         >
-          Примеры запросов:{" "}
+          Пример запроса:{" "}
           <span style={{ color: "#111827" }}>
-            «Нужна форма для команды в итальянском ресторане, 8 человек, тёмные
-            цвета, средний бюджет»
+            «Новый ресторан узбекской кухни, 12 человек (шеф, кухня, зал), нужен
+            современный тёмный стиль, средний бюджет»
           </span>
         </div>
 
@@ -386,7 +690,7 @@ const Chat: React.FC = () => {
               onKeyDown={(e) => {
                 if (e.key === "Enter") handleSend();
               }}
-              placeholder="Опишите заведение и задачу, например: форма для новой команды кафе..."
+              placeholder="Опишите заведение и задачу, например: форма для команды нового кафе..."
               style={{
                 flex: 1,
                 height: 44,
