@@ -1,17 +1,11 @@
 "use client";
+import React, { useState, useEffect, useRef } from "react";
 
-export default function Chat() {
-  return (
-    <div
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontSize: 24,
-      }}
-    >
-      Morobolsin Assistant
-    </div>
-  );
-}
+// весь твой большой код Morobolsin Assistant из paste.txt
+// (константы, компоненты HowItWorks, WhyMoroBlock, ReviewBlock, Footer, сам Chat и т.д.)
+
+const Chat = () => {
+  // ...вся логика чата...
+};
+
+export default Chat;
