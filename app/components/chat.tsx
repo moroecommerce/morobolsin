@@ -4,6 +4,20 @@ import React, { useState, useEffect, useRef } from "react";
 
 type Message = { text: string; sender: "user" | "bot" };
 
+type UniformVariant = {
+  id: number;
+  name: string;
+  image: string;
+};
+
+const UNIFORMS: UniformVariant[] = [
+  { id: 1, name: "Классический китель", image: "/uniforms/chef-1.png" },
+  { id: 2, name: "Современный китель", image: "/uniforms/chef-2.png" },
+  { id: 3, name: "Минималистичный", image: "/uniforms/chef-3.png" },
+  { id: 4, name: "Узбекская кухня", image: "/uniforms/chef-4.png" },
+  { id: 5, name: "Street-food", image: "/uniforms/chef-5.png" },
+];
+
 const Chat: React.FC = () => {
   const [showWelcome, setShowWelcome] = useState(true);
   const [selectedType, setSelectedType] = useState<
@@ -12,6 +26,10 @@ const Chat: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState<
     "white" | "black" | "sand" | "brand"
   >("white");
+
+  const [selectedUniformId, setSelectedUniformId] = useState<number>(1);
+  const [chefName, setChefName] = useState<string>("Шеф Алиджан");
+
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
@@ -48,10 +66,13 @@ const Chat: React.FC = () => {
   const sendMessageToGPT = async (text: string, withContext = false) => {
     setLoading(true);
 
-    let historyToSend: Message[] = [...chatHistory, {
-      text,
-      sender: "user",
-    }];
+    let historyToSend: Message[] = [
+      ...chatHistory,
+      {
+        text,
+        sender: "user",
+      },
+    ];
 
     if (withContext && chatHistory.length === 0) {
       historyToSend = [
@@ -371,6 +392,197 @@ const Chat: React.FC = () => {
           </div>
         </div>
 
+        {/* ПОВАРСКАЯ ОДЕЖДА: 5 ВАРИАНТОВ + ИМЯ */}
+        <div
+          style={{
+            maxWidth: 560,
+            margin: "0 auto 16px",
+            background: "#ffffff",
+            borderRadius: 22,
+            padding: "14px 14px 16px",
+            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 12,
+              gap: 10,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#111827",
+                  marginBottom: 4,
+                }}
+              >
+                Варианты поварской формы
+              </div>
+              <div style={{ fontSize: 12, color: "#6b7280" }}>
+                Выберите модель кителя и введите имя шефа
+              </div>
+            </div>
+
+            {/* ПРЕВЬЮ КИТЕЛЯ С ИМЕНЕМ */}
+            <div
+              style={{
+                width: 96,
+                height: 120,
+                borderRadius: 18,
+                background:
+                  selectedColor === "white"
+                    ? "#f9fafb"
+                    : selectedColor === "black"
+                    ? "#030712"
+                    : selectedColor === "sand"
+                    ? "#f5e7d6"
+                    : "#111827",
+                position: "relative",
+                overflow: "hidden",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <img
+                src={
+                  UNIFORMS.find((u) => u.id === selectedUniformId)?.image ??
+                  "/uniforms/chef-1.png"
+                }
+                alt="Поварская форма"
+                style={{
+                  width: "90%",
+                  height: "auto",
+                  objectFit: "contain",
+                }}
+              />
+
+              <div
+                style={{
+                  position: "absolute",
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  textAlign: "center",
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color:
+                    selectedColor === "white" || selectedColor === "sand"
+                      ? "#111827"
+                      : "#f9fafb",
+                  textShadow:
+                    selectedColor === "white" || selectedColor === "sand"
+                      ? "0 1px 2px rgba(0,0,0,0.18)"
+                      : "0 1px 2px rgba(0,0,0,0.45)",
+                  padding: "0 4px",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                }}
+              >
+                {chefName || "Имя шефа"}
+              </div>
+            </div>
+          </div>
+
+          {/* 5 ВАРИАНТОВ КИТЕЛЕЙ */}
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 10,
+              overflowX: "auto",
+              paddingBottom: 4,
+            }}
+          >
+            {UNIFORMS.map((u) => (
+              <button
+                key={u.id}
+                onClick={() => setSelectedUniformId(u.id)}
+                style={{
+                  flex: "0 0 96px",
+                  borderRadius: 18,
+                  border:
+                    selectedUniformId === u.id
+                      ? "2px solid #111827"
+                      : "1px solid #e5e7eb",
+                  background: "#f9fafb",
+                  padding: 6,
+                  cursor: "pointer",
+                }}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    height: 70,
+                    borderRadius: 14,
+                    background: "#e5e7eb",
+                    marginBottom: 4,
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src={u.image}
+                    alt={u.name}
+                    style={{
+                      width: "90%",
+                      height: "auto",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+                <div
+                  style={{
+                    fontSize: 11,
+                    color: "#111827",
+                    textAlign: "center",
+                    lineHeight: 1.3,
+                  }}
+                >
+                  {u.name}
+                </div>
+              </button>
+            ))}
+          </div>
+
+          {/* ИМЯ ПОВАРА */}
+          <div style={{ marginTop: 6 }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#4b5563",
+                marginBottom: 4,
+              }}
+            >
+              Имя шеф-повара
+            </div>
+            <input
+              type="text"
+              value={chefName}
+              onChange={(e) => setChefName(e.target.value)}
+              placeholder="Например, Шеф Алиджан"
+              style={{
+                width: "100%",
+                height: 38,
+                borderRadius: 999,
+                border: "1px solid #d1d5db",
+                padding: "0 12px",
+                fontSize: 13,
+                outline: "none",
+              }}
+            />
+          </div>
+        </div>
+
         {/* ЛЕНДИНГ-БЛОК */}
         <div
           style={{
@@ -490,8 +702,7 @@ const Chat: React.FC = () => {
             style={{
               width: "100%",
               marginTop: 6,
-              background:
-                "linear-gradient(135deg, #1f242b 0%, #3a4250 100%)",
+              background: "linear-gradient(135deg, #1f242b 0%, #3a4250 100%)",
               color: "#fff",
               border: "none",
               borderRadius: 18,
