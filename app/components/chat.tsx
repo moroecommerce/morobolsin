@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef } from "react";
 
 const MORO_COLOR = "#1f242b";
-const ICON_SIZE = 23;
+const ICON_SIZE = 22;
 const borderRadius = 22;
 const panelHeight = 62;
 const maxWidth = 560;
