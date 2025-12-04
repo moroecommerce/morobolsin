@@ -1,57 +1,101 @@
-// app/api/assistants/files/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-// ВАЖНО: запрещаем статическую оптимизацию, чтобы роут выполнялся только на рантайме
-export const dynamic = "force-dynamic";
+export const dynamic = "force-dynamic"; // отключаем статическую оптимизацию
 
-export async function POST(req: NextRequest) {
+const OPENAI_BASE_URL = "https://api.openai.com/v1";
+
+export async function POST(
+  req: NextRequest,
+  { params }: { params: { threadId: string } }
+) {
+  const { threadId } = params;
+
+  if (!threadId) {
+    return NextResponse.json(
+      { error: "threadId не передан в URL" },
+      { status: 400 }
+    );
+  }
+
+  const apiKey = process.env.OPENAI_API_KEY;
+  const assistantId = process.env.OPENAI_ASSISTANT_ID;
+
+  if (!apiKey || !assistantId) {
+    return NextResponse.json(
+      { error: "Нет OPENAI_API_KEY или OPENAI_ASSISTANT_ID" },
+      { status: 500 }
+    );
+  }
+
   try {
-    // ожидаем formData с файлом и доп. полями
-    const formData = await req.formData();
-    const file = formData.get("file") as File | null;
+    const body = await req.json().catch(() => ({}));
+    const { message } = body as { message?: string };
 
-    if (!file) {
+    if (!message) {
       return NextResponse.json(
-        { error: "Файл не передан" },
+        { error: "Поле message обязательно" },
         { status: 400 }
       );
     }
 
-    // пример: загрузка файла в OpenAI Assistants API
-    const openaiApiKey = process.env.OPENAI_API_KEY;
-    if (!openaiApiKey) {
+    // 1. Добавляем сообщение пользователя в тред
+    const msgRes = await fetch(
+      `${OPENAI_BASE_URL}/threads/${threadId}/messages`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "OpenAI-Beta": "assistants=v2",
+        },
+        body: JSON.stringify({
+          role: "user",
+          content: message,
+        }),
+      }
+    );
+
+    if (!msgRes.ok) {
+      const err = await msgRes.json().catch(() => ({}));
       return NextResponse.json(
-        { error: "OPENAI_API_KEY не настроен" },
-        { status: 500 }
+        { error: err.error?.message || "Ошибка добавления сообщения в тред" },
+        { status: msgRes.status }
       );
     }
 
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    // 2. Запускаем run для этого треда
+    const runRes = await fetch(
+      `${OPENAI_BASE_URL}/threads/${threadId}/runs`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+          "OpenAI-Beta": "assistants=v2",
+        },
+        body: JSON.stringify({
+          assistant_id: assistantId,
+        }),
+      }
+    );
 
-    const uploadRes = await fetch("https://api.openai.com/v1/files", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${openaiApiKey}`,
+    if (!runRes.ok) {
+      const err = await runRes.json().catch(() => ({}));
+      return NextResponse.json(
+        { error: err.error?.message || "Ошибка запуска run" },
+        { status: runRes.status }
+      );
+    }
+
+    const run = await runRes.json();
+
+    return NextResponse.json(
+      {
+        run_id: run.id,
+        status: run.status,
       },
-      body: (() => {
-        const form = new FormData();
-        // @ts-ignore – Node FormData тип отличается
-        form.append("file", new Blob([buffer]), file.name);
-        form.append("purpose", "assistants");
-        return form;
-      })(),
-    });
-
-    const json = await uploadRes.json();
-    if (!uploadRes.ok) {
-      return NextResponse.json(
-        { error: json.error?.message || "Ошибка загрузки файла в OpenAI" },
-        { status: uploadRes.status }
-      );
-    }
-
-    return NextResponse.json({ file_id: json.id }, { status: 200 });
+      { status: 200 }
+    );
   } catch (e: any) {
     return NextResponse.json(
       { error: e?.message || "Неизвестная ошибка сервера" },
@@ -62,7 +106,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET() {
   return NextResponse.json(
-    { message: "Используйте POST для загрузки файлов" },
+    { message: "Используйте POST для действий с тредом" },
     { status: 200 }
   );
 }
