@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, FormEvent } from 'react';
 import { useChat } from '@ai-sdk/react';
 
 type CategoryId = 'chef' | 'kitchen' | 'hall' | 'bar';
@@ -14,7 +14,7 @@ interface Product {
 }
 
 const categories: { id: CategoryId; label: string }[] = [
-  { id: 'chef', kitchen: 'chef', label: 'Шеф‑кители' },
+  { id: 'chef', label: 'Шеф‑кители' },
   { id: 'kitchen', label: 'Кухня' },
   { id: 'hall', label: 'Зал / официанты' },
   { id: 'bar', label: 'Бар / бариста' },
@@ -59,18 +59,16 @@ const products: Product[] = [
 ];
 
 export default function Chat() {
-  const {
-    messages,
-    input,
-    handleInputChange,
-    handleSubmit,
-    isLoading,
-  } = useChat();
+  const { messages, input, handleInputChange, handleSubmit, isLoading } =
+    useChat();
 
   const [showWelcome, setShowWelcome] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState<CategoryId>('chef');
-  const [selectedProductId, setSelectedProductId] = useState<string>('chef-classic');
+  const [selectedCategory, setSelectedCategory] =
+    useState<CategoryId>('chef');
+  const [selectedProductId, setSelectedProductId] =
+    useState<string>('chef-classic');
   const [chefName, setChefName] = useState<string>('');
+
   const chatRef = useRef<HTMLDivElement | null>(null);
 
   const filteredProducts = products.filter(
@@ -81,15 +79,33 @@ export default function Chat() {
 
   useEffect(() => {
     if (!filteredProducts.find((p) => p.id === selectedProductId)) {
-      setSelectedProductId(filteredProducts[0]?.id ?? '');
+      if (filteredProducts[0]) {
+        setSelectedProductId(filteredProducts[0].id);
+      }
     }
-  }, [selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [selectedCategory, filteredProducts, selectedProductId]);
 
   const startChat = () => {
     setShowWelcome(false);
     setTimeout(() => {
-      chatRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      chatRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
     }, 50);
+  };
+
+  const onSubmit = (e: FormEvent) => {
+    if (showWelcome) {
+      setShowWelcome(false);
+      setTimeout(() => {
+        chatRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        });
+      }, 50);
+    }
+    handleSubmit(e);
   };
 
   return (
@@ -99,8 +115,7 @@ export default function Chat() {
           {/* HEADER */}
           <header className="max-w-5xl mx-auto mb-6 flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-slate-900">
-                {/* логотип‑иконка Morobolsin */}
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900">
                 <img
                   src="/logo-morobolsin.svg"
                   alt="Morobolsin"
@@ -141,17 +156,17 @@ export default function Chat() {
 
           {/* BANNER */}
           <section className="max-w-5xl mx-auto mb-6">
-            <div className="rounded-3xl bg-slate-900 px-5 py-5 md:px-8 md:py-6 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex flex-col gap-4 rounded-3xl bg-slate-900 px-5 py-5 text-white md:flex-row md:items-center md:justify-between md:px-8 md:py-6">
               <div>
-                <p className="text-xs uppercase tracking-[0.24em] text-slate-300 mb-1">
+                <p className="mb-1 text-xs uppercase tracking-[0.24em] text-slate-300">
                   онлайн‑примерка формы
                 </p>
-                <h1 className="text-xl md:text-2xl font-semibold mb-2">
+                <h1 className="mb-2 text-xl font-semibold md:text-2xl">
                   Подберите форму Morobolsin в 3 шага
                 </h1>
                 <p className="text-sm text-slate-200">
-                  Выберите категорию и модель, посмотрите, как она смотрится на
-                  3D‑манекене и обсудите детали с ассистентом.
+                  Выберите категорию и модель, посмотрите, как она смотрится
+                  на 3D‑манекене и обсудите детали с ассистентом.
                 </p>
               </div>
               <button
@@ -164,13 +179,13 @@ export default function Chat() {
             </div>
           </section>
 
-          {/* MAIN GRID: left – выбор, right – 3D */}
-          <section className="max-w-5xl mx-auto grid gap-6 md:grid-cols-[1.1fr,0.9fr] items-start">
+          {/* MAIN GRID */}
+          <section className="max-w-5xl mx-auto grid items-start gap-6 md:grid-cols-[1.1fr,0.9fr]">
             {/* LEFT: CATEGORY + PRODUCT + NAME */}
             <div className="space-y-5">
               {/* Категории */}
-              <div className="rounded-3xl bg-white p-4 shadow-sm border border-slate-100">
-                <p className="text-xs font-medium text-slate-500 mb-3">
+              <div className="rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+                <p className="mb-3 text-xs font-medium text-slate-500">
                   1. Категория формы
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -179,10 +194,10 @@ export default function Chat() {
                       key={cat.id}
                       type="button"
                       onClick={() => setSelectedCategory(cat.id)}
-                      className={`rounded-2xl px-3 py-1.5 text-xs font-medium border transition ${
+                      className={`rounded-2xl border px-3 py-1.5 text-xs font-medium transition ${
                         selectedCategory === cat.id
-                          ? 'bg-slate-900 text-white border-slate-900'
-                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                          ? 'border-slate-900 bg-slate-900 text-white'
+                          : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
                       }`}
                     >
                       {cat.label}
@@ -192,11 +207,11 @@ export default function Chat() {
               </div>
 
               {/* Продукты */}
-              <div className="rounded-3xl bg-white p-4 shadow-sm border border-slate-100">
-                <p className="text-xs font-medium text-slate-500 mb-3">
+              <div className="rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+                <p className="mb-3 text-xs font-medium text-slate-500">
                   2. Выберите модель
                 </p>
-                <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
                   {filteredProducts.map((product) => (
                     <button
                       key={product.id}
@@ -208,9 +223,7 @@ export default function Chat() {
                           : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'
                       }`}
                     >
-                      <div className="font-semibold">
-                        {product.name}
-                      </div>
+                      <div className="font-semibold">{product.name}</div>
                       <div className="text-[11px] opacity-80">
                         {product.description}
                       </div>
@@ -218,4 +231,53 @@ export default function Chat() {
                   ))}
                   {filteredProducts.length === 0 && (
                     <p className="text-xs text-slate-500">
-                      Для этой категории пока нет
+                      Для этой категории пока нет моделей.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Имя шефа / заведения */}
+              <div className="rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+                <p className="mb-2 text-xs font-medium text-slate-500">
+                  3. Как к вам обращаться?
+                </p>
+                <input
+                  type="text"
+                  value={chefName}
+                  onChange={(e) => setChefName(e.target.value)}
+                  placeholder="Например: Шеф Азиз, кофейня в Ташкенте"
+                  className="w-full rounded-2xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs focus:border-slate-900 focus:outline-none focus:ring-1 focus:ring-slate-900"
+                />
+                <p className="mt-1 text-[11px] text-slate-400">
+                  Ассистент будет использовать это имя в общении.
+                </p>
+              </div>
+            </div>
+
+            {/* RIGHT: 3D PREVIEW + CTA */}
+            <aside className="flex flex-col justify-between gap-4 rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
+              <div>
+                <p className="mb-3 text-xs font-medium text-slate-500">
+                  3D‑примерка
+                </p>
+                <div className="relative overflow-hidden rounded-2xl bg-slate-100">
+                  {/* сюда позже можно вставить настоящий 3D viewer */}
+                  <div className="aspect-[3/4] w-full">
+                    {selectedProduct?.image ? (
+                      <img
+                        src={selectedProduct.image}
+                        alt={selectedProduct.name}
+                        className="h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
+                        3D‑модель скоро будет
+                      </div>
+                    )}
+                  </div>
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/60 to-transparent px-3 pb-3 pt-8 text-xs text-white">
+                    <div className="font-semibold">
+                      {selectedProduct?.name}
+                    </div>
+                    <div className="opacity
