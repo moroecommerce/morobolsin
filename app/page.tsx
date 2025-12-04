@@ -1,4 +1,4 @@
-import Chat from "./chat"; // маленькая c, как в названии файла
+import Chat from "./components/chat";
 
 export default function Home() {
   return <Chat />;
