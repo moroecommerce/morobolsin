@@ -1,152 +1,68 @@
-import { NextResponse } from "next/server";
-import { assistantId } from "@/app/assistant-config";
-import { openai } from "@/app/openai";
+// app/api/assistants/files/route.ts
+import { NextRequest, NextResponse } from "next/server";
 
-// POST /api/assistants/files — загрузка файла в vector store ассистента
-export async function POST(req: Request) {
+// ВАЖНО: запрещаем статическую оптимизацию, чтобы роут выполнялся только на рантайме
+export const dynamic = "force-dynamic";
+
+export async function POST(req: NextRequest) {
   try {
-    const contentType = req.headers.get("content-type") || "";
-    if (!contentType.includes("multipart/form-data")) {
-      return NextResponse.json(
-        { error: "Expected multipart/form-data" },
-        { status: 400 }
-      );
-    }
-
+    // ожидаем formData с файлом и доп. полями
     const formData = await req.formData();
-    const file = formData.get("file");
+    const file = formData.get("file") as File | null;
 
-    if (!file || !(file instanceof File)) {
+    if (!file) {
       return NextResponse.json(
-        { error: "File is required" },
+        { error: "Файл не передан" },
         { status: 400 }
       );
     }
 
-    const vectorStoreId = await getOrCreateVectorStore();
+    // пример: загрузка файла в OpenAI Assistants API
+    const openaiApiKey = process.env.OPENAI_API_KEY;
+    if (!openaiApiKey) {
+      return NextResponse.json(
+        { error: "OPENAI_API_KEY не настроен" },
+        { status: 500 }
+      );
+    }
 
-    // загрузка файла в OpenAI
-    const openaiFile = await openai.files.create({
-      file,
-      purpose: "assistants",
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    const uploadRes = await fetch("https://api.openai.com/v1/files", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${openaiApiKey}`,
+      },
+      body: (() => {
+        const form = new FormData();
+        // @ts-ignore – Node FormData тип отличается
+        form.append("file", new Blob([buffer]), file.name);
+        form.append("purpose", "assistants");
+        return form;
+      })(),
     });
 
-    // привязка файла к vector store
-    await openai.beta.vectorStores.files.create(vectorStoreId, {
-      file_id: openaiFile.id,
-    });
+    const json = await uploadRes.json();
+    if (!uploadRes.ok) {
+      return NextResponse.json(
+        { error: json.error?.message || "Ошибка загрузки файла в OpenAI" },
+        { status: uploadRes.status }
+      );
+    }
 
+    return NextResponse.json({ file_id: json.id }, { status: 200 });
+  } catch (e: any) {
     return NextResponse.json(
-      {
-        ok: true,
-        file_id: openaiFile.id,
-        filename: (file as File).name,
-        size: (file as File).size,
-        type: (file as File).type,
-      },
-      { status: 200 }
-    );
-  } catch (err: any) {
-    console.error("FILES POST error:", err);
-    return NextResponse.json(
-      {
-        error: "Internal error",
-        detail: String(err?.message ?? err),
-      },
+      { error: e?.message || "Неизвестная ошибка сервера" },
       { status: 500 }
     );
   }
 }
 
-// GET /api/assistants/files — список файлов vector store ассистента
 export async function GET() {
-  try {
-    const vectorStoreId = await getOrCreateVectorStore();
-    const fileList = await openai.beta.vectorStores.files.list(vectorStoreId);
-
-    const filesArray = await Promise.all(
-      fileList.data.map(async (file: any) => {
-        const fileDetails = await openai.files.retrieve(file.id);
-        const vectorFileDetails =
-          await openai.beta.vectorStores.files.retrieve(
-            vectorStoreId,
-            file.id
-          );
-
-        return {
-          file_id: file.id,
-          filename: fileDetails.filename,
-          status: vectorFileDetails.status,
-        };
-      })
-    );
-
-    return NextResponse.json(filesArray, { status: 200 });
-  } catch (err: any) {
-    console.error("FILES GET error:", err);
-    return NextResponse.json(
-      {
-        error: "Internal error",
-        detail: String(err?.message ?? err),
-      },
-      { status: 500 }
-    );
-  }
+  return NextResponse.json(
+    { message: "Используйте POST для загрузки файлов" },
+    { status: 200 }
+  );
 }
-
-// DELETE /api/assistants/files — удалить файл из vector store ассистента
-export async function DELETE(req: Request) {
-  try {
-    const body = await req.json();
-    const fileId = body.fileId as string | undefined;
-
-    if (!fileId) {
-      return NextResponse.json(
-        { error: "fileId is required" },
-        { status: 400 }
-      );
-    }
-
-    const vectorStoreId = await getOrCreateVectorStore();
-
-    await openai.beta.vectorStores.files.del(vectorStoreId, fileId);
-
-    return NextResponse.json({ ok: true }, { status: 200 });
-  } catch (err: any) {
-    console.error("FILES DELETE error:", err);
-    return NextResponse.json(
-      {
-        error: "Internal error",
-        detail: String(err?.message ?? err),
-      },
-      { status: 500 }
-    );
-  }
-}
-
-/* Helper functions */
-
-const getOrCreateVectorStore = async (): Promise<string> => {
-  const assistant = await openai.beta.assistants.retrieve(assistantId);
-
-  const existingIds =
-    assistant.tool_resources?.file_search?.vector_store_ids;
-
-  if (existingIds && existingIds.length > 0) {
-    return existingIds[0];
-  }
-
-  const vectorStore = await openai.beta.vectorStores.create({
-    name: "sample-assistant-vector-store",
-  });
-
-  await openai.beta.assistants.update(assistantId, {
-    tool_resources: {
-      file_search: {
-        vector_store_ids: [vectorStore.id],
-      },
-    },
-  });
-
-  return vectorStore.id;
-};
