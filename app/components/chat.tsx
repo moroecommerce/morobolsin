@@ -1,942 +1,221 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from 'react';
+import { useChat } from '@ai-sdk/react';
 
-type Message = { text: string; sender: "user" | "bot" };
+type CategoryId = 'chef' | 'kitchen' | 'hall' | 'bar';
 
-type UniformVariant = {
-  id: number;
+interface Product {
+  id: string;
   name: string;
-  image: string;
-};
+  category: CategoryId;
+  description: string;
+  image: string; // временно вместо 3D
+}
 
-const UNIFORMS: UniformVariant[] = [
-  { id: 1, name: "Классический китель", image: "/uniforms/chef-1.png" },
-  { id: 2, name: "Современный китель", image: "/uniforms/chef-2.png" },
-  { id: 3, name: "Минималистичный", image: "/uniforms/chef-3.png" },
-  { id: 4, name: "Узбекская кухня", image: "/uniforms/chef-4.png" },
-  { id: 5, name: "Street-food", image: "/uniforms/chef-5.png" },
+const categories: { id: CategoryId; label: string }[] = [
+  { id: 'chef', kitchen: 'chef', label: 'Шеф‑кители' },
+  { id: 'kitchen', label: 'Кухня' },
+  { id: 'hall', label: 'Зал / официанты' },
+  { id: 'bar', label: 'Бар / бариста' },
 ];
 
-const Chat: React.FC = () => {
+const products: Product[] = [
+  {
+    id: 'chef-classic',
+    name: 'Китель Morobolsin Classic',
+    category: 'chef',
+    description: 'Базовый шеф‑китель для горячего цеха.',
+    image: '/3d/chef-classic-placeholder.png',
+  },
+  {
+    id: 'chef-premium',
+    name: 'Китель Morobolsin Premium',
+    category: 'chef',
+    description: 'Премиальный китель для бренд‑шефа.',
+    image: '/3d/chef-premium-placeholder.png',
+  },
+  {
+    id: 'kitchen-basic',
+    name: 'Комплект кухни Basic',
+    category: 'kitchen',
+    description: 'Китель + штаны для поваров линии.',
+    image: '/3d/kitchen-basic-placeholder.png',
+  },
+  {
+    id: 'hall-smart',
+    name: 'Форма для зала Smart',
+    category: 'hall',
+    description: 'Рубашка, фартук и брюки для официантов.',
+    image: '/3d/hall-smart-placeholder.png',
+  },
+  {
+    id: 'barista-set',
+    name: 'Бариста‑сет',
+    category: 'bar',
+    description: 'Фартук и рубашка для бариста.',
+    image: '/3d/barista-set-placeholder.png',
+  },
+];
+
+export default function Chat() {
+  const {
+    messages,
+    input,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+  } = useChat();
+
   const [showWelcome, setShowWelcome] = useState(true);
-  const [selectedType, setSelectedType] = useState<
-    "chef" | "kitchen" | "waiter" | "bar"
-  >("chef");
-  const [selectedColor, setSelectedColor] = useState<
-    "white" | "black" | "sand" | "brand"
-  >("white");
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId>('chef');
+  const [selectedProductId, setSelectedProductId] = useState<string>('chef-classic');
+  const [chefName, setChefName] = useState<string>('');
+  const chatRef = useRef<HTMLDivElement | null>(null);
 
-  const [selectedUniformId, setSelectedUniformId] = useState<number>(1);
-  const [chefName, setChefName] = useState<string>("Шеф Алиджан");
-
-  const [message, setMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<Message[]>([]);
-  const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const filteredProducts = products.filter(
+    (p) => p.category === selectedCategory,
+  );
+  const selectedProduct =
+    products.find((p) => p.id === selectedProductId) ?? filteredProducts[0];
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (!filteredProducts.find((p) => p.id === selectedProductId)) {
+      setSelectedProductId(filteredProducts[0]?.id ?? '');
     }
-  }, [chatHistory]);
+  }, [selectedCategory]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const buildContextIntro = () => {
-    const typeLabel =
-      selectedType === "chef"
-        ? "форма для шеф-повара"
-        : selectedType === "kitchen"
-        ? "форма для поваров кухни"
-        : selectedType === "waiter"
-        ? "форма для официантов"
-        : "форма для бариста / бара";
-
-    const colorLabel =
-      selectedColor === "white"
-        ? "в светлых тонах"
-        : selectedColor === "black"
-        ? "в тёмных тонах"
-        : selectedColor === "sand"
-        ? "в бежевых / тёплых тонах"
-        : "в фирменных цветах бренда";
-
-    return `Контекст: клиент выбирает ${typeLabel}, ${colorLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
+  const startChat = () => {
+    setShowWelcome(false);
+    setTimeout(() => {
+      chatRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 50);
   };
 
-  const sendMessageToGPT = async (text: string, withContext = false) => {
-    setLoading(true);
-
-    let historyToSend: Message[] = [
-      ...chatHistory,
-      {
-        text,
-        sender: "user",
-      },
-    ];
-
-    if (withContext && chatHistory.length === 0) {
-      historyToSend = [
-        { text: buildContextIntro(), sender: "user" },
-        ...historyToSend,
-      ];
-    }
-
-    setChatHistory(historyToSend);
-
-    try {
-      const res = await fetch("/api/gpt", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          messages: historyToSend.map((m) => ({
-            role: m.sender === "user" ? "user" : "assistant",
-            content: m.text,
-          })),
-        }),
-      });
-
-      const data = await res.json();
-      const botReply =
-        typeof data.reply === "string" && data.reply.length > 0
-          ? data.reply
-          : "Ассистент сейчас недоступен. Попробуйте ещё раз чуть позже.";
-
-      setChatHistory((prev) => [...prev, { text: botReply, sender: "bot" }]);
-    } catch (e) {
-      setChatHistory((prev) => [
-        ...prev,
-        {
-          text: "Произошла ошибка при обращении к ассистенту. Попробуйте ещё раз.",
-          sender: "bot",
-        },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSend = () => {
-    if (!message.trim() || loading) return;
-    const withContext = chatHistory.length === 0;
-    sendMessageToGPT(message.trim(), withContext);
-    setMessage("");
-  };
-
-  // ЛЕНДИНГ
-  if (showWelcome) {
-    return (
-      <div
-        style={{
-          fontFamily: "Manrope, Arial, sans-serif",
-          background: "#f8fdff",
-          minHeight: "100vh",
-          padding: "20px 16px 40px",
-          boxSizing: "border-box",
-        }}
-      >
-        {/* ШАПКА */}
-        <div
-          style={{
-            maxWidth: 560,
-            margin: "0 auto 14px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span
-              style={{
-                fontWeight: 800,
-                fontSize: 18,
-                color: "#111827",
-                letterSpacing: "0.04em",
-                textTransform: "uppercase",
-              }}
-            >
-              Morobolsin
-            </span>
-            <span style={{ fontSize: 12, color: "#6b7280" }}>
-              умный подбор формы для HoReCa
-            </span>
-          </div>
-
-          <div style={{ display: "flex", gap: 8 }}>
-            <button
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 999,
-                border: "1px solid #e5e7eb",
-                background: "#ffffff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                fontSize: 16,
-              }}
-              onClick={() => alert("Спасибо за оценку!")}
-            >
-              👍
-            </button>
-            <button
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 999,
-                border: "1px solid #e5e7eb",
-                background: "#ffffff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                fontSize: 16,
-              }}
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: "Morobolsin — подбор формы",
-                    text: "Помощник для подбора формы для команды HoReCa",
-                    url: window.location.href,
-                  });
-                } else {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert("Ссылка скопирована в буфер обмена");
-                }
-              }}
-            >
-              ↗
-            </button>
-            <button
-              style={{
-                width: 36,
-                height: 36,
-                borderRadius: 999,
-                border: "1px solid #e5e7eb",
-                background: "#ffffff",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-                fontSize: 16,
-              }}
-              onClick={() => window.open("https://t.me/morobolsin", "_blank")}
-            >
-              ✉
-            </button>
-          </div>
-        </div>
-
-        {/* ВЫБОР ТИПА И ЦВЕТА */}
-        <div
-          style={{
-            maxWidth: 560,
-            margin: "0 auto 16px",
-            background: "#ffffff",
-            borderRadius: 22,
-            padding: "14px 14px 16px",
-            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 12,
-              gap: 10,
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: "#111827",
-                  marginBottom: 4,
-                }}
-              >
-                Выберите тип формы
-              </div>
-              <div style={{ fontSize: 12, color: "#6b7280" }}>
-                Ассистент учтёт это в подборе комплектов
-              </div>
-            </div>
-            <div
-              style={{
-                width: 80,
-                height: 80,
-                borderRadius: 20,
-                background:
-                  selectedColor === "white"
-                    ? "#f9fafb"
-                    : selectedColor === "black"
-                    ? "#030712"
-                    : selectedColor === "sand"
-                    ? "#f5e7d6"
-                    : "#111827",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                color:
-                  selectedColor === "white" || selectedColor === "sand"
-                    ? "#111827"
-                    : "#f9fafb",
-                fontWeight: 700,
-                fontSize: 11,
-                textAlign: "center",
-                padding: "0 6px",
-              }}
-            >
-              {selectedType === "chef"
-                ? "ШЕФ-ПОВАР"
-                : selectedType === "kitchen"
-                ? "КУХНЯ"
-                : selectedType === "waiter"
-                ? "ЗАЛ"
-                : "БАР / КОФЕ"}
-            </div>
-          </div>
-
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              marginBottom: 10,
-              flexWrap: "wrap",
-            }}
-          >
-            {[
-              { id: "chef", label: "Шеф-повар" },
-              { id: "kitchen", label: "Кухня" },
-              { id: "waiter", label: "Официанты" },
-              { id: "bar", label: "Бар / бариста" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                onClick={() =>
-                  setSelectedType(
-                    item.id as "chef" | "kitchen" | "waiter" | "bar"
-                  )
-                }
-                style={{
-                  flex: "1 1 40%",
-                  minWidth: 110,
-                  borderRadius: 999,
-                  border:
-                    selectedType === item.id
-                      ? "1px solid #111827"
-                      : "1px solid #e5e7eb",
-                  background: selectedType === item.id ? "#111827" : "#ffffff",
-                  color: selectedType === item.id ? "#f9fafb" : "#111827",
-                  fontSize: 13,
-                  padding: "8px 10px",
-                  cursor: "pointer",
-                  whiteSpace: "nowrap",
-                }}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
-
-          <div
-            style={{
-              fontSize: 12,
-              fontWeight: 600,
-              color: "#4b5563",
-              marginBottom: 8,
-            }}
-          >
-            Цвет формы
-          </div>
-
-          <div style={{ display: "flex", gap: 10 }}>
-            {[
-              { id: "white", label: "Светлая", bg: "#f9fafb", border: "#e5e7eb" },
-              { id: "black", label: "Тёмная", bg: "#030712", border: "#030712" },
-              { id: "sand", label: "Бежевая", bg: "#f5e7d6", border: "#eabf7a" },
-              { id: "brand", label: "Фирменный", bg: "#111827", border: "#4f46e5" },
-            ].map((c) => (
-              <button
-                key={c.id}
-                onClick={() =>
-                  setSelectedColor(
-                    c.id as "white" | "black" | "sand" | "brand"
-                  )
-                }
-                style={{
-                  flex: 1,
-                  borderRadius: 16,
-                  border:
-                    selectedColor === c.id
-                      ? `2px solid ${c.border}`
-                      : "1px solid #e5e7eb",
-                  background: c.bg,
-                  height: 42,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  color:
-                    c.id === "white" || c.id === "sand"
-                      ? "#111827"
-                      : "#f9fafb",
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* ПОВАРСКАЯ ОДЕЖДА: 5 ВАРИАНТОВ + ИМЯ */}
-        <div
-          style={{
-            maxWidth: 560,
-            margin: "0 auto 16px",
-            background: "#ffffff",
-            borderRadius: 22,
-            padding: "14px 14px 16px",
-            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-          }}
-        >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 12,
-              gap: 10,
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: "#111827",
-                  marginBottom: 4,
-                }}
-              >
-                Варианты поварской формы
-              </div>
-              <div style={{ fontSize: 12, color: "#6b7280" }}>
-                Выберите модель кителя и введите имя шефа
-              </div>
-            </div>
-
-            {/* ПРЕВЬЮ КИТЕЛЯ С ИМЕНЕМ */}
-            <div
-              style={{
-                width: 96,
-                height: 120,
-                borderRadius: 18,
-                background:
-                  selectedColor === "white"
-                    ? "#f9fafb"
-                    : selectedColor === "black"
-                    ? "#030712"
-                    : selectedColor === "sand"
-                    ? "#f5e7d6"
-                    : "#111827",
-                position: "relative",
-                overflow: "hidden",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <img
-                src={
-                  UNIFORMS.find((u) => u.id === selectedUniformId)?.image ??
-                  "/uniforms/chef-1.png"
-                }
-                alt="Поварская форма"
-                style={{
-                  width: "90%",
-                  height: "auto",
-                  objectFit: "contain",
-                }}
-              />
-
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 16,
-                  left: 0,
-                  right: 0,
-                  textAlign: "center",
-                  fontSize: 11,
-                  fontWeight: 700,
-                  color:
-                    selectedColor === "white" || selectedColor === "sand"
-                      ? "#111827"
-                      : "#f9fafb",
-                  textShadow:
-                    selectedColor === "white" || selectedColor === "sand"
-                      ? "0 1px 2px rgba(0,0,0,0.18)"
-                      : "0 1px 2px rgba(0,0,0,0.45)",
-                  padding: "0 4px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {chefName || "Имя шефа"}
-              </div>
-            </div>
-          </div>
-
-          {/* 5 ВАРИАНТОВ КИТЕЛЕЙ */}
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              marginBottom: 10,
-              overflowX: "auto",
-              paddingBottom: 4,
-            }}
-          >
-            {UNIFORMS.map((u) => (
-              <button
-                key={u.id}
-                onClick={() => setSelectedUniformId(u.id)}
-                style={{
-                  flex: "0 0 96px",
-                  borderRadius: 18,
-                  border:
-                    selectedUniformId === u.id
-                      ? "2px solid #111827"
-                      : "1px solid #e5e7eb",
-                  background: "#f9fafb",
-                  padding: 6,
-                  cursor: "pointer",
-                }}
-              >
-                <div
-                  style={{
-                    width: "100%",
-                    height: 70,
-                    borderRadius: 14,
-                    background: "#e5e7eb",
-                    marginBottom: 4,
-                    overflow: "hidden",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <img
-                    src={u.image}
-                    alt={u.name}
-                    style={{
-                      width: "90%",
-                      height: "auto",
-                      objectFit: "contain",
-                    }}
-                  />
-                </div>
-                <div
-                  style={{
-                    fontSize: 11,
-                    color: "#111827",
-                    textAlign: "center",
-                    lineHeight: 1.3,
-                  }}
-                >
-                  {u.name}
-                </div>
-              </button>
-            ))}
-          </div>
-
-          {/* ИМЯ ПОВАРА */}
-          <div style={{ marginTop: 6 }}>
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: "#4b5563",
-                marginBottom: 4,
-              }}
-            >
-              Имя шеф-повара
-            </div>
-            <input
-              type="text"
-              value={chefName}
-              onChange={(e) => setChefName(e.target.value)}
-              placeholder="Например, Шеф Алиджан"
-              style={{
-                width: "100%",
-                height: 38,
-                borderRadius: 999,
-                border: "1px solid #d1d5db",
-                padding: "0 12px",
-                fontSize: 13,
-                outline: "none",
-              }}
-            />
-          </div>
-        </div>
-
-        {/* ЛЕНДИНГ-БЛОК */}
-        <div
-          style={{
-            maxWidth: 560,
-            margin: "0 auto",
-            background: "linear-gradient(135deg,#f4f5f7,#e5e7eb)",
-            borderRadius: 22,
-            padding: "20px 18px 22px",
-            boxShadow: "0 6px 20px rgba(150,175,205,0.12)",
-          }}
-        >
-          <h1
-            style={{
-              fontSize: 22,
-              fontWeight: 800,
-              margin: "0 0 10px",
-              color: "#1f242b",
-            }}
-          >
-            Подбор формы для вашей команды
-          </h1>
-          <p
-            style={{
-              fontSize: 14,
-              margin: "0 0 18px",
-              color: "#4b5563",
-              lineHeight: 1.6,
-            }}
-          >
-            Укажите формат заведения, роли сотрудников и выбранный стиль —
-            ассистент подберёт комплекты формы под бренд и задачи кухни.
-          </p>
-
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              marginBottom: 18,
-            }}
-          >
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: "12px 12px",
-                boxShadow: "0 2px 10px rgba(150,175,205,0.12)",
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: 600,
-                  fontSize: 14,
-                  marginBottom: 4,
-                  color: "#111827",
-                }}
-              >
-                Быстрый подбор по параметрам
-              </div>
-              <div style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.5 }}>
-                Вместо долгого поиска по каталогу вы сразу получаете готовые
-                наборы с артикулами и ссылками.
-              </div>
-            </div>
-
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: "12px 12px",
-                boxShadow: "0 2px 10px rgba(150,175,205,0.12)",
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: 600,
-                  fontSize: 14,
-                  marginBottom: 4,
-                  color: "#111827",
-                }}
-              >
-                В едином стиле бренда
-              </div>
-              <div style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.5 }}>
-                Ассистент подбирает форму для шефа, кухни и зала так, чтобы вся
-                команда выглядела как единая концепция.
-              </div>
-            </div>
-
-            <div
-              style={{
-                background: "#fff",
-                borderRadius: 16,
-                padding: "12px 12px",
-                boxShadow: "0 2px 10px rgba(150,175,205,0.12)",
-              }}
-            >
-              <div
-                style={{
-                  fontWeight: 600,
-                  fontSize: 14,
-                  marginBottom: 4,
-                  color: "#111827",
-                }}
-              >
-                Практичность и безопасность
-              </div>
-              <div style={{ fontSize: 13, color: "#4b5563", lineHeight: 1.5 }}>
-                Учитываем жаркую кухню, открытый огонь, частые стирки и
-                специфику смен, чтобы форма жила долго.
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={() => setShowWelcome(false)}
-            style={{
-              width: "100%",
-              marginTop: 6,
-              background: "linear-gradient(135deg, #1f242b 0%, #3a4250 100%)",
-              color: "#fff",
-              border: "none",
-              borderRadius: 18,
-              padding: "14px 0",
-              fontSize: 16,
-              fontWeight: 700,
-              cursor: "pointer",
-              boxShadow: "0 3px 16px rgba(0,0,0,0.25)",
-            }}
-          >
-            Выбрать комплекты и перейти к ассистенту
-          </button>
-
-          <p
-            style={{
-              fontSize: 11,
-              color: "#6b7280",
-              textAlign: "center",
-              marginTop: 10,
-            }}
-          >
-            Чат подберёт модели и сформирует список позиций Morobolsin для
-            заказа.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ЭКРАН С ЧАТОМ
   return (
-    <div
-      style={{
-        fontFamily: "Manrope, Arial, sans-serif",
-        background: "#f8fdff",
-        minHeight: "100vh",
-        padding: "20px 0 90px",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          maxWidth: 560,
-          margin: "0 auto",
-          padding: "0 16px",
-          boxSizing: "border-box",
-        }}
-      >
-        <div
-          style={{
-            background: "linear-gradient(135deg,#f4f5f7,#e5e7eb)",
-            borderRadius: 20,
-            padding: "10px 14px",
-            marginBottom: 14,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            boxShadow: "0 4px 14px rgba(150,175,205,0.16)",
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <span
-              style={{
-                fontSize: 16,
-                fontWeight: 800,
-                color: "#1f242b",
-                marginBottom: 3,
-              }}
-            >
-              Morobolsin Assistant
-            </span>
-            <span style={{ fontSize: 12, color: "#6b7280" }}>
-              Подбор формы для HoReCa
-            </span>
-          </div>
-          <button
-            onClick={() => setShowWelcome(true)}
-            style={{
-              fontSize: 11,
-              padding: "6px 10px",
-              borderRadius: 999,
-              border: "1px solid #d1d5db",
-              background: "#fff",
-              cursor: "pointer",
-            }}
-          >
-            Вернуться на лендинг
-          </button>
-        </div>
-
-        <div
-          style={{
-            background: "#ffffff",
-            borderRadius: 18,
-            padding: "14px 12px 16px",
-            marginBottom: 12,
-            boxShadow: "0 2px 10px rgba(150,175,205,0.10)",
-            fontSize: 13,
-            color: "#4b5563",
-          }}
-        >
-          <div style={{ fontWeight: 600, marginBottom: 6, color: "#111827" }}>
-            Как начать:
-          </div>
-          <ul style={{ paddingLeft: 18, margin: 0, lineHeight: 1.6 }}>
-            <li>Опишите заведение (формат, кухня, уровень цен).</li>
-            <li>
-              Укажите количество людей и роли (шеф, кухня, официанты, бар).
-            </li>
-            <li>
-              Добавьте бюджет и пожелания по стилю, крою и посадке формы.
-            </li>
-          </ul>
-        </div>
-
-        <div
-          style={{
-            background: "#f9fafb",
-            borderRadius: 18,
-            padding: "10px 10px 14px",
-            marginBottom: 10,
-            fontSize: 12,
-            color: "#6b7280",
-          }}
-        >
-          Пример запроса:{" "}
-          <span style={{ color: "#111827" }}>
-            «Новый ресторан узбекской кухни, 12 человек (шеф, кухня, зал), нужен
-            современный тёмный стиль, средний бюджет»
-          </span>
-        </div>
-
-        <div
-          style={{
-            marginTop: 10,
-            marginBottom: 70,
-            minHeight: 120,
-          }}
-        >
-          {chatHistory.map((msg, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                justifyContent:
-                  msg.sender === "user" ? "flex-end" : "flex-start",
-                marginBottom: 10,
-              }}
-            >
-              <div
-                style={{
-                  maxWidth: "80%",
-                  padding: "10px 12px",
-                  borderRadius:
-                    msg.sender === "user"
-                      ? "16px 16px 4px 16px"
-                      : "16px 16px 16px 4px",
-                  background:
-                    msg.sender === "user" ? "#1f2937" : "#e5f0ff",
-                  color: msg.sender === "user" ? "#fff" : "#111827",
-                  fontSize: 14,
-                  lineHeight: 1.5,
-                  whiteSpace: "pre-wrap",
-                }}
-              >
-                {msg.text}
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      {showWelcome && (
+        <div className="px-4 py-8 md:py-12">
+          {/* HEADER */}
+          <header className="max-w-5xl mx-auto mb-6 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex items-center justify-center h-10 w-10 rounded-xl bg-slate-900">
+                {/* логотип‑иконка Morobolsin */}
+                <img
+                  src="/logo-morobolsin.svg"
+                  alt="Morobolsin"
+                  className="h-6 w-auto"
+                />
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
+                  Morobolsin
+                </span>
+                <span className="text-sm font-medium text-slate-900">
+                  Подбор униформы для HoReCa
+                </span>
               </div>
             </div>
-          ))}
-          <div ref={messagesEndRef} />
-        </div>
 
-        <div
-          style={{
-            position: "fixed",
-            left: 0,
-            right: 0,
-            bottom: 16,
-            padding: "0 16px",
-            boxSizing: "border-box",
-          }}
-        >
-          <div
-            style={{
-              maxWidth: 560,
-              margin: "0 auto",
-              display: "flex",
-              gap: 8,
-              background: "transparent",
-            }}
-          >
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSend();
-              }}
-              placeholder="Опишите заведение и задачу, например: форма для команды нового кафе..."
-              style={{
-                flex: 1,
-                height: 44,
-                borderRadius: 999,
-                border: "1px solid #d1d5db",
-                padding: "0 14px",
-                fontSize: 14,
-                outline: "none",
-              }}
-              disabled={loading}
-            />
-            <button
-              onClick={handleSend}
-              disabled={loading || !message.trim()}
-              style={{
-                width: 46,
-                height: 44,
-                borderRadius: 999,
-                border: "none",
-                background:
-                  "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
-                color: "#fff",
-                fontSize: 18,
-                cursor:
-                  loading || !message.trim() ? "not-allowed" : "pointer",
-                opacity: loading || !message.trim() ? 0.6 : 1,
-              }}
-            >
-              →
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1 hover:bg-slate-50"
+              >
+                ❤ Нравится
+              </button>
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1 hover:bg-slate-50"
+              >
+                ↗ Поделиться
+              </button>
+              <button
+                type="button"
+                className="rounded-full border border-slate-200 bg-white px-3 py-1 hover:bg-slate-50"
+              >
+                💬 Написать
+              </button>
+            </div>
+          </header>
 
-export default Chat;
+          {/* BANNER */}
+          <section className="max-w-5xl mx-auto mb-6">
+            <div className="rounded-3xl bg-slate-900 px-5 py-5 md:px-8 md:py-6 text-white flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <p className="text-xs uppercase tracking-[0.24em] text-slate-300 mb-1">
+                  онлайн‑примерка формы
+                </p>
+                <h1 className="text-xl md:text-2xl font-semibold mb-2">
+                  Подберите форму Morobolsin в 3 шага
+                </h1>
+                <p className="text-sm text-slate-200">
+                  Выберите категорию и модель, посмотрите, как она смотрится на
+                  3D‑манекене и обсудите детали с ассистентом.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={startChat}
+                className="inline-flex items-center justify-center rounded-2xl bg-white px-4 py-2 text-xs font-semibold text-slate-900 shadow-sm hover:bg-slate-100"
+              >
+                Сразу к ассистенту
+              </button>
+            </div>
+          </section>
+
+          {/* MAIN GRID: left – выбор, right – 3D */}
+          <section className="max-w-5xl mx-auto grid gap-6 md:grid-cols-[1.1fr,0.9fr] items-start">
+            {/* LEFT: CATEGORY + PRODUCT + NAME */}
+            <div className="space-y-5">
+              {/* Категории */}
+              <div className="rounded-3xl bg-white p-4 shadow-sm border border-slate-100">
+                <p className="text-xs font-medium text-slate-500 mb-3">
+                  1. Категория формы
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSelectedCategory(cat.id)}
+                      className={`rounded-2xl px-3 py-1.5 text-xs font-medium border transition ${
+                        selectedCategory === cat.id
+                          ? 'bg-slate-900 text-white border-slate-900'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {cat.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Продукты */}
+              <div className="rounded-3xl bg-white p-4 shadow-sm border border-slate-100">
+                <p className="text-xs font-medium text-slate-500 mb-3">
+                  2. Выберите модель
+                </p>
+                <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
+                  {filteredProducts.map((product) => (
+                    <button
+                      key={product.id}
+                      type="button"
+                      onClick={() => setSelectedProductId(product.id)}
+                      className={`w-full rounded-2xl border px-3 py-2 text-left text-xs transition ${
+                        selectedProduct?.id === product.id
+                          ? 'border-slate-900 bg-slate-900 text-white'
+                          : 'border-slate-200 bg-slate-50 text-slate-800 hover:bg-slate-100'
+                      }`}
+                    >
+                      <div className="font-semibold">
+                        {product.name}
+                      </div>
+                      <div className="text-[11px] opacity-80">
+                        {product.description}
+                      </div>
+                    </button>
+                  ))}
+                  {filteredProducts.length === 0 && (
+                    <p className="text-xs text-slate-500">
+                      Для этой категории пока нет
