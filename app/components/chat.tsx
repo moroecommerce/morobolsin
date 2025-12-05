@@ -26,6 +26,9 @@ const MANNEQUIN_FEMALE =
   "https://www.onlygfx.com/wp-content/uploads/2018/01/woman-silhouette-10.png";
 // при проблемах лучше скачать и положить в /public [web:309][web:265]
 
+// ТВОЁ ФОТО (вариант 1 – из public/12.png)
+const CHEF_PHOTO = "/12.png";
+
 const HATS: ItemVariant[] = [
   {
     id: 1,
@@ -348,9 +351,6 @@ const ChatPage: React.FC = () => {
     setLook((prev) => ({ ...prev, pants: PANTS[pantsIndex] ?? null }));
   }, [pantsIndex]);
 
-  const mannequinSrc =
-    gender === "male" ? MANNEQUIN_MALE : MANNEQUIN_FEMALE;
-
   return (
     <div
       style={{
@@ -555,7 +555,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Манекен + категории */}
+      {/* Фото шефа + категории */}
       <section
         ref={modelRef}
         style={{
@@ -567,7 +567,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВЫЙ БЛОК – силуэт */}
+        {/* ЛЕВЫЙ БЛОК – ТВОЁ ФОТО */}
         <div
           style={{
             borderRadius: 22,
@@ -592,13 +592,14 @@ const ChatPage: React.FC = () => {
             }}
           >
             <img
-              src={mannequinSrc}
-              alt={gender === "male" ? "Мужской силуэт" : "Женский силуэт"}
+              src={CHEF_PHOTO}
+              alt="Шеф Morobolsin"
               style={{
                 height: "100%",
                 maxHeight: 360,
                 width: "auto",
                 objectFit: "contain",
+                borderRadius: 18,
               }}
             />
           </div>
