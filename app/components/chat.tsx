@@ -10,9 +10,11 @@ type ItemVariant = {
   image: string;
 };
 
+// Фон и дефолтная 3D‑модель (файлы должны лежать в /public/images)
 const HERO_BG = "/images/chef-hero.jpg";
 const DEFAULT_TOP = "/images/chef-3d.png";
 
+// Пример путей к вариантам — замени на свои реальные файлы в /public/images
 const HATS: ItemVariant[] = [
   { id: 1, name: "Классическая шапка", image: "/images/hat-1.png" },
   { id: 2, name: "Высокая шапка", image: "/images/hat-2.png" },
@@ -36,6 +38,16 @@ const PANTS: ItemVariant[] = [
   { id: 2, name: "Джоггеры", image: "/images/pants-2.png" },
   { id: 3, name: "Узкие брюки", image: "/images/pants-3.png" },
 ];
+
+// Иконки категорий по прямым HTTPS‑ссылкам (пример, можно заменить)
+const ICON_TOP =
+  "https://cdn-icons-png.flaticon.com/512/892/892458.png"; // футболка [web:137]
+const ICON_BOTTOM =
+  "https://cdn-icons-png.flaticon.com/512/892/892490.png"; // штаны [web:142]
+const ICON_APRON =
+  "https://static.vecteezy.com/system/resources/thumbnails/022/651/809/small/apron-icon-symbol-illustration-free-png.png"; // фартук [web:143]
+const ICON_HAT =
+  "https://cdn-icons-png.flaticon.com/512/3801/3801780.png"; // поварская шапка [web:140]
 
 type ChefLook = {
   hat: ItemVariant | null;
@@ -68,6 +80,7 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
+  // анимация заголовка
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -108,6 +121,7 @@ const ChatPage: React.FC = () => {
     };
   }, [roleIndex, roles.length]);
 
+  // автоскролл чата
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -125,6 +139,7 @@ const ChatPage: React.FC = () => {
       "комплект формы: шапка, верх, фартук и брюки для шеф-повара";
     const typeLabelUz = typeLabelRu;
     const typeLabel = lang === "ru" ? typeLabelRu : typeLabelUz;
+
     return `Контекст: клиент выбирает ${typeLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
   };
 
@@ -137,7 +152,10 @@ const ChatPage: React.FC = () => {
 
     let historyToSend: Message[] = [
       ...chatHistory,
-      { text, sender: "user" },
+      {
+        text,
+        sender: "user",
+      },
     ];
 
     if (withContext && chatHistory.length === 0) {
@@ -202,6 +220,7 @@ const ChatPage: React.FC = () => {
     scrollTo(modelRef);
   };
 
+  // синхронизация look
   useEffect(() => {
     setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
@@ -246,7 +265,7 @@ const ChatPage: React.FC = () => {
             padding: "14px 16px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: "space между",
             gap: 16,
           }}
         >
@@ -384,7 +403,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3D + категории: одинаковая высота колонок */}
+      {/* 3D + категории */}
       <section
         ref={modelRef}
         style={{
@@ -393,20 +412,19 @@ const ChatPage: React.FC = () => {
           display: "grid",
           gridTemplateColumns: "minmax(0,1.1fr) minmax(0,0.9fr)",
           gap: 16,
-          alignItems: "stretch", // обе колонки тянутся по высоте
+          alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ 3D МОДЕЛЬ — ещё выше */}
+        {/* ЛЕВАЯ КОЛОНКА – 3D МОДЕЛЬ */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 18,
+            padding: 20,
             display: "flex",
             flexDirection: "column",
-            gap: 10,
-            minHeight: 340, // повысили высоту
+            minHeight: 380,
           }}
         >
           <div
@@ -425,8 +443,8 @@ const ChatPage: React.FC = () => {
               src={currentTopImage}
               alt="3D модель в форме"
               style={{
-                width: "96%", // максимально крупная модель
-                maxWidth: 460,
+                width: "98%",
+                maxWidth: 500,
                 height: "auto",
                 objectFit: "contain",
               }}
@@ -451,90 +469,95 @@ const ChatPage: React.FC = () => {
               {chefName || "Имя шефа"}
             </div>
           </div>
-
-          <div
-            style={{
-              fontSize: 12,
-              color: "#6b7280",
-              lineHeight: 1.6,
-            }}
-          >
-            Выберите верх и фартук — образ появится здесь.
-          </div>
+          {/* Текст под 3D убран по твоему запросу */}
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА — категории чуть левее, больше, с отступами */}
+        {/* ПРАВАЯ КОЛОНКА – выбор категорий, такой же высоты */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 18,
+            padding: 20,
             display: "flex",
             flexDirection: "column",
-            gap: 12, // больше отступ между категориями
+            justifyContent: "space-between",
+            minHeight: 380,
           }}
         >
-          <CompactSelect
-            items={HATS}
-            activeIndex={hatIndex}
-            onChange={setHatIndex}
-            bigger
-          />
-          <CompactSelect
-            items={TOPS}
-            activeIndex={topIndex}
-            onChange={setTopIndex}
-            bigger
-          />
-          <CompactSelect
-            items={APRONS}
-            activeIndex={apronIndex}
-            onChange={setApronIndex}
-            bigger
-          />
-          <CompactSelect
-            items={PANTS}
-            activeIndex={pantsIndex}
-            onChange={setPantsIndex}
-            bigger
-          />
-
-          <input
-            type="text"
-            value={chefName}
-            onChange={(e) => setChefName(e.target.value)}
-            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
+          <div
             style={{
-              width: "100%",
-              height: 36,
-              borderRadius: 999,
-              border: "1px solid #d1d5db",
-              padding: "0 14px",
-              fontSize: 12,
-              outline: "none",
-              marginTop: 4,
-              marginBottom: 10,
-            }}
-          />
-
-          <button
-            onClick={handleDone}
-            style={{
-              width: "100%",
-              height: 42,
-              borderRadius: 999,
-              border: "none",
-              background:
-                "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
-              color: "#fff",
-              fontSize: 14,
-              fontWeight: 600,
-              cursor: "pointer",
+              display: "flex",
+              flexDirection: "column",
+              gap: 14,
             }}
           >
-            {lang === "ru" ? "Готово" : "Tayyor"}
-          </button>
+            <IconSelectRow
+              icon={ICON_TOP}
+              alt="Верх"
+              items={TOPS}
+              activeIndex={topIndex}
+              onChange={setTopIndex}
+            />
+            <IconSelectRow
+              icon={ICON_APRON}
+              alt="Фартук"
+              items={APRONS}
+              activeIndex={apronIndex}
+              onChange={setApronIndex}
+            />
+            <IconSelectRow
+              icon={ICON_BOTTOM}
+              alt="Брюки"
+              items={PANTS}
+              activeIndex={pantsIndex}
+              onChange={setPantsIndex}
+            />
+            <IconSelectRow
+              icon={ICON_HAT}
+              alt="Шапка"
+              items={HATS}
+              activeIndex={hatIndex}
+              onChange={setHatIndex}
+            />
+          </div>
+
+          <div style={{ marginTop: 12 }}>
+            <input
+              type="text"
+              value={chefName}
+              onChange={(e) => setChefName(e.target.value)}
+              placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
+              style={{
+                width: "100%",
+                height: 38,
+                borderRadius: 999,
+                border: "1px solid #d1d5db",
+                padding: "0 14px",
+                fontSize: 12,
+                outline: "none",
+                marginBottom: 10,
+              }}
+            />
+
+            <button
+              onClick={handleDone}
+              style={{
+                width: "100%",
+                height: 42,
+                borderRadius: 999,
+                border: "none",
+                background:
+                  "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              {lang === "ru" ? "Готово" : "Tayyor"}
+            </button>
+          </div>
         </div>
       </section>
 
@@ -650,54 +673,79 @@ const ChatPage: React.FC = () => {
   );
 };
 
-type CompactSelectProps = {
+// Строка категории: маленькая тёмная иконка + крупный выпадающий список
+type IconSelectRowProps = {
+  icon: string;
+  alt: string;
   items: ItemVariant[];
   activeIndex: number;
   onChange: (index: number) => void;
-  bigger?: boolean;
 };
 
-const CompactSelect: React.FC<CompactSelectProps> = ({
+const IconSelectRow: React.FC<IconSelectRowProps> = ({
+  icon,
+  alt,
   items,
   activeIndex,
   onChange,
-  bigger,
-}) => {
-  return (
+}) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+    }}
+  >
     <div
       style={{
-        width: "100%",
+        width: 32,
+        height: 32,
+        borderRadius: 999,
+        background: "#e5e7eb",
         display: "flex",
-        justifyContent: "flex-start", // слегка сдвигаем левее
+        alignItems: "center",
+        justifyContent: "center",
+        overflow: "hidden",
+        flexShrink: 0,
       }}
     >
-      <select
-        value={items[activeIndex]?.id ?? ""}
-        onChange={(e) => {
-          const id = Number(e.target.value);
-          const index = items.findIndex((it) => it.id === id);
-          if (index >= 0) onChange(index);
-        }}
+      <img
+        src={icon}
+        alt={alt}
         style={{
-          width: "100%",
-          maxWidth: bigger ? "100%" : "100%",
-          height: bigger ? 36 : 32,
-          borderRadius: 999,
-          border: "1px solid #d1d5db",
-          padding: "0 12px",
-          fontSize: bigger ? 12 : 11,
-          outline: "none",
-          background: "#f9fafb",
+          width: "80%",
+          height: "80%",
+          objectFit: "contain",
+          filter: "grayscale(100%) brightness(0.3)",
         }}
-      >
-        {items.map((it) => (
-          <option key={it.id} value={it.id}>
-            {it.name}
-          </option>
-        ))}
-      </select>
+      />
     </div>
-  );
-};
+    <select
+      value={items[activeIndex]?.id ?? ""}
+      onChange={(e) => {
+        const id = Number(e.target.value);
+        const index = items.findIndex((it) => it.id === id);
+        if (index >= 0) onChange(index);
+      }}
+      style={{
+        flex: 1,
+        height: 38,
+        borderRadius: 999,
+        border: "1px solid #d1d5db",
+        padding: "0 14px",
+        fontSize: 12,
+        outline: "none",
+        background: "#f9fafb",
+        marginLeft: -4, // чуть левее внутри блока
+      }}
+    >
+      {items.map((it) => (
+        <option key={it.id} value={it.id}>
+          {it.name}
+        </option>
+      ))}
+    </select>
+  </div>
+);
 
 export default ChatPage;
