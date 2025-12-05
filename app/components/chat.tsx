@@ -10,11 +10,10 @@ type ItemVariant = {
   image: string;
 };
 
-// Фон и дефолтная 3D‑модель (файлы должны лежать в /public/images)
+// Файлы должны реально лежать в /public/images
 const HERO_BG = "/images/chef-hero.jpg";
 const DEFAULT_TOP = "/images/chef-3d.png";
 
-// Пример путей к вариантам — замени на свои реальные файлы в /public/images
 const HATS: ItemVariant[] = [
   { id: 1, name: "Классическая шапка", image: "/images/hat-1.png" },
   { id: 2, name: "Высокая шапка", image: "/images/hat-2.png" },
@@ -39,15 +38,15 @@ const PANTS: ItemVariant[] = [
   { id: 3, name: "Узкие брюки", image: "/images/pants-3.png" },
 ];
 
-// Иконки категорий по прямым HTTPS‑ссылкам (пример, можно заменить)
+// Небольшие тёмные иконки категорий по прямым ссылкам https
+const ICON_HAT =
+  "https://cdn-icons-png.flaticon.com/512/3801/3801780.png"; // шапка [web:151]
 const ICON_TOP =
-  "https://cdn-icons-png.flaticon.com/512/892/892458.png"; // футболка [web:137]
-const ICON_BOTTOM =
-  "https://cdn-icons-png.flaticon.com/512/892/892490.png"; // штаны [web:142]
+  "https://cdn-icons-png.flaticon.com/512/892/892458.png";   // верх/футболка [web:137]
 const ICON_APRON =
   "https://static.vecteezy.com/system/resources/thumbnails/022/651/809/small/apron-icon-symbol-illustration-free-png.png"; // фартук [web:143]
-const ICON_HAT =
-  "https://cdn-icons-png.flaticon.com/512/3801/3801780.png"; // поварская шапка [web:140]
+const ICON_PANTS =
+  "https://cdn-icons-png.flaticon.com/512/892/892490.png";   // брюки [web:142]
 
 type ChefLook = {
   hat: ItemVariant | null;
@@ -265,7 +264,7 @@ const ChatPage: React.FC = () => {
             padding: "14px 16px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space между",
+            justifyContent: "space-between",
             gap: 16,
           }}
         >
@@ -403,7 +402,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3D + категории */}
+      {/* 3D + категории, аккуратно выровнены */}
       <section
         ref={modelRef}
         style={{
@@ -415,7 +414,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – 3D МОДЕЛЬ */}
+        {/* ЛЕВАЯ КОЛОНКА – 3D модель, высокая */}
         <div
           style={{
             borderRadius: 22,
@@ -469,10 +468,10 @@ const ChatPage: React.FC = () => {
               {chefName || "Имя шефа"}
             </div>
           </div>
-          {/* Текст под 3D убран по твоему запросу */}
+          {/* Описание под 3D убрано по твоему пожеланию */}
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – выбор категорий, такой же высоты */}
+        {/* ПРАВАЯ КОЛОНКА – выбор категорий, такая же по высоте */}
         <div
           style={{
             borderRadius: 22,
@@ -489,9 +488,16 @@ const ChatPage: React.FC = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 14,
+              gap: 12,
             }}
           >
+            <IconSelectRow
+              icon={ICON_HAT}
+              alt="Шапка"
+              items={HATS}
+              activeIndex={hatIndex}
+              onChange={setHatIndex}
+            />
             <IconSelectRow
               icon={ICON_TOP}
               alt="Верх"
@@ -507,18 +513,11 @@ const ChatPage: React.FC = () => {
               onChange={setApronIndex}
             />
             <IconSelectRow
-              icon={ICON_BOTTOM}
+              icon={ICON_PANTS}
               alt="Брюки"
               items={PANTS}
               activeIndex={pantsIndex}
               onChange={setPantsIndex}
-            />
-            <IconSelectRow
-              icon={ICON_HAT}
-              alt="Шапка"
-              items={HATS}
-              activeIndex={hatIndex}
-              onChange={setHatIndex}
             />
           </div>
 
@@ -673,7 +672,7 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// Строка категории: маленькая тёмная иконка + крупный выпадающий список
+// Строка категории: маленькая тёмная иконка внутри блока + select
 type IconSelectRowProps = {
   icon: string;
   alt: string;
@@ -693,13 +692,13 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
     style={{
       display: "flex",
       alignItems: "center",
-      gap: 10,
+      gap: 8,
     }}
   >
     <div
       style={{
-        width: 32,
-        height: 32,
+        width: 28,
+        height: 28,
         borderRadius: 999,
         background: "#e5e7eb",
         display: "flex",
@@ -729,14 +728,13 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
       }}
       style={{
         flex: 1,
-        height: 38,
+        height: 36,
         borderRadius: 999,
         border: "1px solid #d1d5db",
         padding: "0 14px",
         fontSize: 12,
         outline: "none",
         background: "#f9fafb",
-        marginLeft: -4, // чуть левее внутри блока
       }}
     >
       {items.map((it) => (
