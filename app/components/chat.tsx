@@ -17,16 +17,14 @@ type ItemVariant = {
 
 type Gender = "male" | "female";
 
-// Фон
 const HERO_BG = "/images/chef-hero.jpg";
 
-// Силуэты во весь рост PNG без фона (подставишь свои ссылки)
+// PNG-силуэты без фона (подставь свои)
 const MANNEQUIN_MALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // прозрачный фон [web:231][web:234]
+  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // [web:231][web:234]
 const MANNEQUIN_FEMALE =
   "https://cdn-icons-png.flaticon.com/512/9498/9498380.png";
 
-// Примеры вариантов (заменишь на свои)
 const HATS: ItemVariant[] = [
   {
     id: 1,
@@ -111,7 +109,6 @@ const PANTS: ItemVariant[] = [
   },
 ];
 
-// Иконки категорий
 const ICON_HAT =
   "https://img.icons8.com/ios-filled/100/000000/chef-hat.png";
 const ICON_TOP =
@@ -121,7 +118,6 @@ const ICON_APRON =
 const ICON_PANTS =
   "https://img.icons8.com/ios-filled/100/000000/trousers.png";
 
-// Иконки для пола / роста / веса
 const ICON_GENDER_MALE =
   "https://img.icons8.com/ios-filled/100/000000/user-male.png";
 const ICON_GENDER_FEMALE =
@@ -131,7 +127,6 @@ const ICON_HEIGHT =
 const ICON_WEIGHT =
   "https://img.icons8.com/ios-filled/100/000000/scale.png";
 
-// Общий стиль для всех select справа
 const commonSelectStyle: CSSProperties = {
   flex: 1,
   height: 38,
@@ -519,13 +514,13 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – только манекен на прозрачном фоне */}
+        {/* ЛЕВО – только силуэт, без белого блока и сердечка */}
         <div
           style={{
             borderRadius: 22,
-            background: "#ffffff",
-            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 18,
+            padding: 0,
+            boxShadow: "none",
+            background: "transparent",
             display: "flex",
             flexDirection: "column",
             minHeight: 360,
@@ -556,7 +551,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории (без имени) */}
+        {/* ПРАВО – пол, рост, вес, категории */}
         <div
           style={{
             borderRadius: 22,
@@ -576,7 +571,6 @@ const ChatPage: React.FC = () => {
               gap: 10,
             }}
           >
-            {/* Пол */}
             <IconSelectRowSimple
               icon={
                 gender === "male" ? ICON_GENDER_MALE : ICON_GENDER_FEMALE
@@ -595,7 +589,6 @@ const ChatPage: React.FC = () => {
               </select>
             </IconSelectRowSimple>
 
-            {/* Рост */}
             <IconSelectRowSimple icon={ICON_HEIGHT} label="Рост">
               <select
                 value={height}
@@ -621,7 +614,6 @@ const ChatPage: React.FC = () => {
               </select>
             </IconSelectRowSimple>
 
-            {/* Вес */}
             <IconSelectRowSimple icon={ICON_WEIGHT} label="Вес">
               <select
                 value={weight}
@@ -647,7 +639,6 @@ const ChatPage: React.FC = () => {
               </select>
             </IconSelectRowSimple>
 
-            {/* Категории одежды – все одинакового размера */}
             <IconSelectRow
               icon={ICON_HAT}
               alt="Шапка"
@@ -857,7 +848,6 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// простая строка с иконкой слева (пол / рост / вес)
 type IconSelectRowSimpleProps = {
   icon: string;
   label: string;
@@ -885,7 +875,6 @@ const IconSelectRowSimple: React.FC<IconSelectRowSimpleProps> = ({
   </div>
 );
 
-// строка категории одежды: иконка + select
 type IconSelectRowProps = {
   icon: string;
   alt: string;
