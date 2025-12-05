@@ -6,6 +6,11 @@ import React, {
   useRef,
   CSSProperties,
 } from "react";
+import Image from "next/image";
+// вариант: public/12.png
+import chefPhoto from "/12.png";
+// или если лежит в public/images/12.png:
+// import chefPhoto from "/images/12.png";
 
 type Message = { text: string; sender: "user" | "bot" };
 
@@ -19,15 +24,6 @@ type Gender = "male" | "female";
 
 const HERO_BG =
   "https://images.pexels.com/photos/3298637/pexels-photo-3298637.jpeg";
-
-const MANNEQUIN_MALE =
-  "https://www.onlygfx.com/wp-content/uploads/2018/01/man-standing-silhouette-6.png";
-const MANNEQUIN_FEMALE =
-  "https://www.onlygfx.com/wp-content/uploads/2018/01/woman-silhouette-10.png";
-// при проблемах лучше скачать и положить в /public [web:309][web:265]
-
-// ТВОЁ ФОТО (вариант 1 – из public/12.png)
-const CHEF_PHOTO = "/12.png";
 
 const HATS: ItemVariant[] = [
   {
@@ -591,13 +587,13 @@ const ChatPage: React.FC = () => {
               overflow: "hidden",
             }}
           >
-            <img
-              src={CHEF_PHOTO}
+            <Image
+              src={chefPhoto}
               alt="Шеф Morobolsin"
               style={{
                 height: "100%",
-                maxHeight: 360,
                 width: "auto",
+                maxHeight: 360,
                 objectFit: "contain",
                 borderRadius: 18,
               }}
