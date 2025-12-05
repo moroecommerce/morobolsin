@@ -157,6 +157,9 @@ type ChefLook = {
   pants: ItemVariant | null;
 };
 
+const CURRENT_URL = "https://morobolsin.vercel.app";
+const SHARE_TEXT = "Подбор формы для команды Morobolsin"; // [web:266][web:267]
+
 const ChatPage: React.FC = () => {
   const [lang, setLang] = useState<"ru" | "uz">("ru");
 
@@ -195,6 +198,17 @@ const ChatPage: React.FC = () => {
 
   const TYPE_SPEED = 120;
   const WORD_DELAY = 5000;
+
+  const handleShareTelegram = () => {
+    const url = encodeURIComponent(CURRENT_URL);
+    const text = encodeURIComponent(SHARE_TEXT);
+    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; // [web:266][web:267]
+    window.open(shareUrl, "_blank", "noreferrer");
+  };
+
+  const handleOpenTelegramChannel = () => {
+    window.open("https://t.me/YOUR_TELEGRAM_CHANNEL", "_blank", "noreferrer");
+  };
 
   useEffect(() => {
     const currentWord = roles[roleIndex] ?? "";
@@ -399,31 +413,62 @@ const ChatPage: React.FC = () => {
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {/* 1. Поделиться */}
             <button
+              onClick={handleShareTelegram}
               style={{
                 width: 40,
                 height: 40,
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
                 background: "#ffffff",
-                fontSize: 22,
+                fontSize: 18,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
               }}
-              onClick={() => alert("Спасибо за лайк!")}
             >
-              ♥
+              ⇪
             </button>
+
+            {/* 2. Telegram */}
+            <button
+              onClick={handleOpenTelegramChannel}
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 999,
+                border: "1px solid #d1d5db",
+                background: "#229ED9",
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#fff",
+              }}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M16 3.038a2 2 0 0 1-1.39 1.89L4.927 8.548l-.78 3.117a.75.75 0 0 1-1.18.41L.63 10.642a.75.75 0 0 1 .078-1.238l14-7a.75.75 0 0 1 1.092.634z" />
+              </svg>
+            </button>
+
+            {/* 3–4. RU / UZ круглые */}
             <div style={{ display: "flex", gap: 4 }}>
               {["ru", "uz"].map((lng) => (
                 <button
                   key={lng}
                   onClick={() => setLang(lng as "ru" | "uz")}
                   style={{
-                    padding: "6px 12px",
+                    width: 40,
+                    height: 40,
                     borderRadius: 999,
                     border:
                       lang === lng
@@ -433,6 +478,9 @@ const ChatPage: React.FC = () => {
                     color: lang === lng ? "#f9fafb" : "#111827",
                     fontSize: 12,
                     cursor: "pointer",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
                   }}
                 >
                   {lng === "ru" ? "RU" : "UZ"}
@@ -515,7 +563,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВЫЙ БЛОК – силуэт человека без фона */}
+        {/* ЛЕВЫЙ БЛОК – силуэт без фона */}
         <div
           style={{
             borderRadius: 22,
