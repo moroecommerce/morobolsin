@@ -54,6 +54,7 @@ const WORD_DELAY = 5000;     // so‘z 5 sekundda bir almashadi
 
 useEffect(() => {
   const currentWord = roles[roleIndex];
+  console.log(currentWord)
   setTypedText("");
   setCharIndex(0);
 
@@ -67,7 +68,9 @@ useEffect(() => {
       return prev;
     });
   }, TYPE_SPEED);
-
+  console.log(typedText)
+  console.log(roleIndex)
+  console.log(charIndex)
   // so‘z yozilib bo‘lgandan keyin 5 sekunddan so‘ng keyingi so‘zga o‘tish
   const wordTimeout = setTimeout(() => {
     setRoleIndex((prev) => (prev + 1) % roles.length);
