@@ -49,38 +49,43 @@ const ChatPage: React.FC = () => {
 
   // typewriter‑эффект + смена слова
  // harfni sekinroq yozish (masalan, 180 ms)
-const TYPE_SPEED = 150;      // har bir harf 150 ms
-const WORD_DELAY = 5000;     // so‘z 5 sekundda bir almashadi
+const TYPE_SPEED = 120;    // harf tezligi (ms)
+const WORD_DELAY = 5000;   // so‘z almashtirish (ms)
 
 useEffect(() => {
   const currentWord = roles[roleIndex];
-  console.log(currentWord)
+
   setTypedText("");
   setCharIndex(0);
 
-  const typeInterval = setInterval(() => {
+  let typeInterval: number | undefined;
+
+  // faqat hozirgi so‘z uchun interval
+  typeInterval = window.setInterval(() => {
     setCharIndex((prev) => {
       if (prev < currentWord.length) {
         setTypedText(currentWord.slice(0, prev + 1));
         return prev + 1;
       }
-      clearInterval(typeInterval);
+      if (typeInterval !== undefined) {
+        clearInterval(typeInterval);
+      }
       return prev;
     });
   }, TYPE_SPEED);
-  console.log(typedText)
-  console.log(roleIndex)
-  console.log(charIndex)
-  // so‘z yozilib bo‘lgandan keyin 5 sekunddan so‘ng keyingi so‘zga o‘tish
-  const wordTimeout = setTimeout(() => {
+
+  // so‘z 5 sekundda bir marta almashtiriladi
+  const wordTimeout = window.setTimeout(() => {
     setRoleIndex((prev) => (prev + 1) % roles.length);
   }, WORD_DELAY);
 
   return () => {
-    clearInterval(typeInterval);
+    if (typeInterval !== undefined) clearInterval(typeInterval);
     clearTimeout(wordTimeout);
   };
-}, [roleIndex, roles]);
+}, [roleIndex, roles.length]); // roles o‘rniga roles.length qo‘y
+
+
 
 
 
