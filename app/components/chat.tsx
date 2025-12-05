@@ -202,7 +202,7 @@ const ChatPage: React.FC = () => {
   const handleShareTelegram = () => {
     const url = encodeURIComponent(CURRENT_URL);
     const text = encodeURIComponent(SHARE_TEXT);
-    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; // формат share [web:267]
+    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`;
     window.open(shareUrl, "_blank", "noreferrer");
   };
 
@@ -434,7 +434,7 @@ const ChatPage: React.FC = () => {
               ♥
             </button>
 
-            {/* 2. Telegram – аккуратный логотип */}
+            {/* 2. Telegram – меньше, тёмный, белый фон */}
             <button
               onClick={handleOpenTelegramChannel}
               style={{
@@ -442,24 +442,24 @@ const ChatPage: React.FC = () => {
                 height: 40,
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
-                background: "#229ED9",
+                background: "#ffffff",
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                color: "#fff",
+                color: "#111827",
               }}
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="20"
-                height="20"
+                width="16"
+                height="16"
                 viewBox="0 0 24 24"
-                role="img"
+                fill="none"
               >
                 <path
                   d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54l.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79l21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
-                  fill="white"
+                  fill="currentColor"
                 />
               </svg>
             </button>
@@ -739,8 +739,9 @@ const ChatPage: React.FC = () => {
         <p
           style={{
             fontSize: 13,
-            margin: "0 0 8px",
+            margin: "8px 0 10px",
             color: "#4b5563",
+            textAlign: "center",
           }}
         >
           Напишите имя повара, которое будет нанесено на форму.
