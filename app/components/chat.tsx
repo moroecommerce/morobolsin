@@ -20,9 +20,9 @@ type Gender = "male" | "female";
 // Фон
 const HERO_BG = "/images/chef-hero.jpg";
 
-// Силуэты во весь рост (подставишь свои)
+// Силуэты во весь рост PNG без фона (подставишь свои ссылки)
 const MANNEQUIN_MALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png";
+  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // прозрачный фон [web:231][web:234]
 const MANNEQUIN_FEMALE =
   "https://cdn-icons-png.flaticon.com/512/9498/9498380.png";
 
@@ -512,7 +512,7 @@ const ChatPage: React.FC = () => {
         ref={modelRef}
         style={{
           maxWidth: 960,
-          margin: "0 auto 24px",
+          margin: "0 auto 16px",
           display: "grid",
           gridTemplateColumns: "minmax(0,0.85fr) minmax(0,1.15fr)",
           gap: 16,
@@ -556,7 +556,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории + имя */}
+        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории (без имени) */}
         <div
           style={{
             borderRadius: 22,
@@ -677,45 +677,71 @@ const ChatPage: React.FC = () => {
               onChange={setPantsIndex}
             />
           </div>
+        </div>
+      </section>
 
-          {/* Имя шефа и кнопка ниже, с более явным отступом */}
-          <div style={{ marginTop: 20 }}>
-            <input
-              type="text"
-              value={chefName}
-              onChange={(e) => setChefName(e.target.value)}
-              placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
-              style={{
-                width: "100%",
-                height: 38,
-                borderRadius: 999,
-                border: "1px solid #d1d5db",
-                padding: "0 16px",
-                fontSize: 13,
-                outline: "none",
-                marginBottom: 10,
-                boxSizing: "border-box",
-              }}
-            />
+      {/* ОТДЕЛЬНЫЙ БЛОК ДЛЯ ИМЕНИ И КНОПКИ */}
+      <section
+        style={{
+          maxWidth: 960,
+          margin: "0 auto 24px",
+          borderRadius: 22,
+          background: "#ffffff",
+          boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
+          padding: 18,
+          boxSizing: "border-box",
+        }}
+      >
+        <p
+          style={{
+            fontSize: 13,
+            margin: "0 0 8px",
+            color: "#4b5563",
+          }}
+        >
+          Напишите имя повара, которое будет нанесено на форму.
+        </p>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}
+        >
+          <input
+            type="text"
+            value={chefName}
+            onChange={(e) => setChefName(e.target.value)}
+            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
+            style={{
+              width: "100%",
+              height: 38,
+              borderRadius: 999,
+              border: "1px solid #d1d5db",
+              padding: "0 16px",
+              fontSize: 13,
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
 
-            <button
-              onClick={handleDone}
-              style={{
-                width: "100%",
-                height: 42,
-                borderRadius: 999,
-                border: "none",
-                background:
-                  "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
-                color: "#fff",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              {lang === "ru" ? "Готово" : "Tayyor"}
-            </button>
-          </div>
+          <button
+            onClick={handleDone}
+            style={{
+              width: "100%",
+              height: 42,
+              borderRadius: 999,
+              border: "none",
+              background:
+                "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            {lang === "ru" ? "Готово" : "Tayyor"}
+          </button>
         </div>
       </section>
 
