@@ -4,31 +4,57 @@ import React, { useState, useEffect, useRef } from "react";
 
 type Message = { text: string; sender: "user" | "bot" };
 
-type UniformVariant = {
+type ItemVariant = {
   id: number;
   name: string;
   image: string;
 };
 
-const UNIFORMS: UniformVariant[] = [
-  { id: 1, name: "Классический китель", image: "/uniforms/chef-1.png" },
-  { id: 2, name: "Современный китель", image: "/uniforms/chef-2.png" },
-  { id: 3, name: "Минималистичный", image: "/uniforms/chef-3.png" },
-  { id: 4, name: "Узбекская кухня", image: "/uniforms/chef-4.png" },
-  { id: 5, name: "Street-food", image: "/uniforms/chef-5.png" },
+const HATS: ItemVariant[] = [
+  { id: 1, name: "Классическая шапка", image: "/uniforms/hat-1.png" },
+  { id: 2, name: "Современная шапка", image: "/uniforms/hat-2.png" },
 ];
+
+const TOPS: ItemVariant[] = [
+  { id: 1, name: "Классический китель", image: "/uniforms/top-1.png" },
+  { id: 2, name: "Современный китель", image: "/uniforms/top-2.png" },
+  { id: 3, name: "Минималистичный китель", image: "/uniforms/top-3.png" },
+  { id: 4, name: "Узбекская кухня", image: "/uniforms/top-4.png" },
+];
+
+const APRONS: ItemVariant[] = [
+  { id: 1, name: "Классический фартук", image: "/uniforms/apron-1.png" },
+  { id: 2, name: "Нагрудный фартук", image: "/uniforms/apron-2.png" },
+];
+
+const PANTS: ItemVariant[] = [
+  { id: 1, name: "Классические брюки", image: "/uniforms/pants-1.png" },
+  { id: 2, name: "Джоггеры", image: "/uniforms/pants-2.png" },
+];
+
+type ChefLook = {
+  hatId: number | null;
+  topId: number | null;
+  apronId: number | null;
+  pantsId: number | null;
+};
 
 const ChatPage: React.FC = () => {
   const [lang, setLang] = useState<"ru" | "uz">("ru");
 
-  const [selectedType, setSelectedType] = useState<
-    "chef" | "kitchen" | "waiter" | "bar"
-  >("chef");
-  const [selectedColor, setSelectedColor] = useState<
-    "white" | "black" | "sand" | "brand"
-  >("white");
+  // tanlovlar
+  const [hatIndex, setHatIndex] = useState(0);
+  const [topIndex, setTopIndex] = useState(0);
+  const [apronIndex, setApronIndex] = useState(0);
+  const [pantsIndex, setPantsIndex] = useState(0);
 
-  const [selectedUniformId, setSelectedUniformId] = useState<number>(1);
+  const [look, setLook] = useState<ChefLook>({
+    hatId: HATS[0]?.id ?? null,
+    topId: TOPS[0]?.id ?? null,
+    apronId: APRONS[0]?.id ?? null,
+    pantsId: PANTS[0]?.id ?? null,
+  });
+
   const [chefName, setChefName] = useState<string>("Шеф Алиджан");
 
   const [message, setMessage] = useState("");
@@ -38,7 +64,7 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // слова для анимации
+  // typewriter rollar
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -47,49 +73,40 @@ const ChatPage: React.FC = () => {
   const [typedText, setTypedText] = useState("");
   const [charIndex, setCharIndex] = useState(0);
 
-  // typewriter‑эффект + смена слова
- // harfni sekinroq yozish (masalan, 180 ms)
-const TYPE_SPEED = 120;    // harf tezligi (ms)
-const WORD_DELAY = 5000;   // so‘z almashtirish (ms)
+  const TYPE_SPEED = 120; // harf tezligi
+  const WORD_DELAY = 5000; // so‘z almashtirish
 
-useEffect(() => {
-  const currentWord = roles[roleIndex];
+  useEffect(() => {
+    const currentWord = roles[roleIndex] ?? "";
+    setTypedText("");
+    setCharIndex(0);
 
-  setTypedText("");
-  setCharIndex(0);
+    let typeInterval: number | undefined;
 
-  let typeInterval: number | undefined;
+    typeInterval = window.setInterval(() => {
+      setCharIndex((prev) => {
+        if (prev < currentWord.length) {
+          setTypedText(currentWord.slice(0, prev + 1));
+          return prev + 1;
+        }
+        if (typeInterval !== undefined) {
+          clearInterval(typeInterval);
+        }
+        return prev;
+      });
+    }, TYPE_SPEED);
 
-  // faqat hozirgi so‘z uchun interval
-  typeInterval = window.setInterval(() => {
-    setCharIndex((prev) => {
-      if (prev < currentWord.length) {
-        setTypedText(currentWord.slice(0, prev + 1));
-        return prev + 1;
-      }
-      if (typeInterval !== undefined) {
-        clearInterval(typeInterval);
-      }
-      return prev;
-    });
-  }, TYPE_SPEED);
+    const wordTimeout = window.setTimeout(() => {
+      setRoleIndex((prev) => (prev + 1) % roles.length);
+    }, WORD_DELAY);
 
-  // so‘z 5 sekundda bir marta almashtiriladi
-  const wordTimeout = window.setTimeout(() => {
-    setRoleIndex((prev) => (prev + 1) % roles.length);
-  }, WORD_DELAY);
+    return () => {
+      if (typeInterval !== undefined) clearInterval(typeInterval);
+      clearTimeout(wordTimeout);
+    };
+  }, [roleIndex, roles.length]);
 
-  return () => {
-    if (typeInterval !== undefined) clearInterval(typeInterval);
-    clearTimeout(wordTimeout);
-  };
-}, [roleIndex, roles.length]); // roles o‘rniga roles.length qo‘y
-
-
-
-
-
-  // автоскролл чата
+  // avtoscroll chat
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -103,31 +120,11 @@ useEffect(() => {
   };
 
   const buildContextIntro = () => {
-    const typeLabelRu =
-      selectedType === "chef"
-        ? "форма для шеф-повара"
-        : selectedType === "kitchen"
-        ? "форма для поваров кухни"
-        : selectedType === "waiter"
-        ? "форма для официантов"
-        : "форма для бариста / бара";
-
-    const colorLabelRu =
-      selectedColor === "white"
-        ? "в светлых тонах"
-        : selectedColor === "black"
-        ? "в тёмных тонах"
-        : selectedColor === "sand"
-        ? "в бежевых / тёплых тонах"
-        : "в фирменных цветах бренда";
-
+    const typeLabelRu = "комплект формы для шеф-повара";
     const typeLabelUz = typeLabelRu;
-    const colorLabelUz = colorLabelRu;
-
     const typeLabel = lang === "ru" ? typeLabelRu : typeLabelUz;
-    const colorLabel = lang === "ru" ? colorLabelRu : colorLabelUz;
 
-    return `Контекст: клиент выбирает ${typeLabel}, ${colorLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
+    return `Контекст: клиент выбирает ${typeLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
   };
 
   const sendMessageToGPT = async (
@@ -194,17 +191,63 @@ useEffect(() => {
   };
 
   const handleDone = () => {
-    const uniform = UNIFORMS.find((u) => u.id === selectedUniformId);
+    const hat = HATS[hatIndex];
+    const top = TOPS[topIndex];
+    const apron = APRONS[apronIndex];
+    const pants = PANTS[pantsIndex];
+
     const text =
       `Готовый комплект:\n` +
-      `Тип: ${selectedType}\n` +
-      `Цвет: ${selectedColor}\n` +
-      `Модель кителя: ${uniform?.name ?? "не выбрана"}\n` +
-      `Имя на кителе: ${chefName || "не указано"}`;
+      `Шапка: ${hat?.name ?? "не выбрана"}\n` +
+      `Верх: ${top?.name ?? "не выбран"}\n` +
+      `Фартук: ${apron?.name ?? "не выбран"}\n` +
+      `Брюки: ${pants?.name ?? "не выбраны"}\n` +
+      `Имя на форме: ${chefName || "не указано"}`;
+
     const withContext = chatHistory.length === 0;
     sendMessageToGPT(text, { withContext });
-    scrollTo(modelRef); // остаёмся рядом с редактором/чатом
+    scrollTo(modelRef);
   };
+
+  // helperlar: chap-o‘ng
+  const cycleIndex = (len: number, idx: number) =>
+    (idx + len) % len;
+
+  const nextHat = () =>
+    setHatIndex((prev) => cycleIndex(HATS.length, prev + 1));
+  const prevHat = () =>
+    setHatIndex((prev) => cycleIndex(HATS.length, prev - 1));
+
+  const nextTop = () =>
+    setTopIndex((prev) => cycleIndex(TOPS.length, prev + 1));
+  const prevTop = () =>
+    setTopIndex((prev) => cycleIndex(TOPS.length, prev - 1));
+
+  const nextApron = () =>
+    setApronIndex((prev) => cycleIndex(APRONS.length, prev + 1));
+  const prevApron = () =>
+    setApronIndex((prev) => cycleIndex(APRONS.length, prev - 1));
+
+  const nextPants = () =>
+    setPantsIndex((prev) => cycleIndex(PANTS.length, prev + 1));
+  const prevPants = () =>
+    setPantsIndex((prev) => cycleIndex(PANTS.length, prev - 1));
+
+  // tanlov o‘zgarganda look state yangilash
+  useEffect(() => {
+    setLook((prev) => ({ ...prev, hatId: HATS[hatIndex]?.id ?? null }));
+  }, [hatIndex]);
+  useEffect(() => {
+    setLook((prev) => ({ ...prev, topId: TOPS[topIndex]?.id ?? null }));
+  }, [topIndex]);
+  useEffect(() => {
+    setLook((prev) => ({ ...prev, apronId: APRONS[apronIndex]?.id ?? null }));
+  }, [apronIndex]);
+  useEffect(() => {
+    setLook((prev) => ({ ...prev, pantsId: PANTS[pantsIndex]?.id ?? null }));
+  }, [pantsIndex]);
+
+  const currentTopImage = TOPS[topIndex]?.image ?? "/uniforms/top-1.png";
 
   return (
     <div
@@ -369,8 +412,8 @@ useEffect(() => {
             }}
           >
             {lang === "ru"
-              ? "Подберите форму под кухню, зал и бар — ассистент поможет собрать комплекты под ваш бренд и задачи."
-              : "Oshxona, zal va bar uchun formani tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
+              ? "Подберите шапку, китель, фартук и брюки — ассистент поможет собрать комплекты под ваш бренд и задачи."
+              : "Shapka, kitel, fartuk va shimlarni tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
           </p>
         </div>
       </section>
@@ -423,7 +466,7 @@ useEffect(() => {
                   color: "#6b7280",
                 }}
               >
-                Выберите модель, цвет и имя — образ обновится.
+                Выберите шапку, верх, фартук и брюки — образ обновится.
               </div>
             </div>
           </div>
@@ -432,14 +475,7 @@ useEffect(() => {
             style={{
               flex: 1,
               borderRadius: 18,
-              background:
-                selectedColor === "white"
-                  ? "#f9fafb"
-                  : selectedColor === "black"
-                  ? "#030712"
-                  : selectedColor === "sand"
-                  ? "#f5e7d6"
-                  : "#111827",
+              background: "#f9fafb",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -448,10 +484,7 @@ useEffect(() => {
             }}
           >
             <img
-              src={
-                UNIFORMS.find((u) => u.id === selectedUniformId)?.image ??
-                "/uniforms/chef-1.png"
-              }
+              src={currentTopImage}
               alt="3D модель в форме"
               style={{
                 width: "70%",
@@ -468,14 +501,8 @@ useEffect(() => {
                 textAlign: "center",
                 fontSize: 12,
                 fontWeight: 700,
-                color:
-                  selectedColor === "white" || selectedColor === "sand"
-                    ? "#111827"
-                    : "#f9fafb",
-                textShadow:
-                  selectedColor === "white" || selectedColor === "sand"
-                    ? "0 1px 2px rgba(0,0,0,0.18)"
-                    : "0 1px 2px rgba(0,0,0,0.45)",
+                color: "#111827",
+                textShadow: "0 1px 2px rgba(0,0,0,0.18)",
                 padding: "0 6px",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
@@ -487,7 +514,7 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* СПИСОК ВАРИАНТОВ / ПРОДУКТОВ */}
+        {/* ВАРИАНТЫ: 4 КАТЕГОРИИ */}
         <div
           style={{
             borderRadius: 22,
@@ -496,7 +523,7 @@ useEffect(() => {
             padding: 16,
             display: "flex",
             flexDirection: "column",
-            gap: 10,
+            gap: 12,
           }}
         >
           <div
@@ -507,136 +534,42 @@ useEffect(() => {
               marginBottom: 4,
             }}
           >
-            {lang === "ru" ? "Варианты формы" : "Forma variantlari"}
+            {lang === "ru"
+              ? "Выберите элементы формы"
+              : "Forma elementlarini tanlang"}
           </div>
 
-          {/* выбор цвета (можно донастроить под себя) */}
-          <div
-            style={{
-              display: "flex",
-              gap: 8,
-              marginBottom: 8,
-            }}
-          >
-            {[
-              { id: "white", label: lang === "ru" ? "Светлая" : "Och" },
-              { id: "black", label: lang === "ru" ? "Тёмная" : "Tund" },
-              { id: "sand", label: lang === "ru" ? "Бежевая" : "Bej" },
-              { id: "brand", label: lang === "ru" ? "Фирменный" : "Brend" },
-            ].map((c) => (
-              <button
-                key={c.id}
-                onClick={() =>
-                  setSelectedColor(
-                    c.id as "white" | "black" | "sand" | "brand"
-                  )
-                }
-                style={{
-                  flex: 1,
-                  borderRadius: 999,
-                  border:
-                    selectedColor === c.id
-                      ? "2px solid #111827"
-                      : "1px solid #e5e7eb",
-                  background:
-                    c.id === "white"
-                      ? "#f9fafb"
-                      : c.id === "black"
-                      ? "#030712"
-                      : c.id === "sand"
-                      ? "#f5e7d6"
-                      : "#111827",
-                  color:
-                    c.id === "white" || c.id === "sand"
-                      ? "#111827"
-                      : "#f9fafb",
-                  fontSize: 11,
-                  padding: "6px 6px",
-                  cursor: "pointer",
-                }}
-              >
-                {c.label}
-              </button>
-            ))}
-          </div>
+          {/* ШАПКА */}
+          <CategoryRow
+            title={lang === "ru" ? "Шапка" : "Shapka"}
+            item={HATS[hatIndex]}
+            onPrev={prevHat}
+            onNext={nextHat}
+          />
 
-          {/* список моделей */}
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              gap: 8,
-              maxHeight: 220,
-              overflowY: "auto",
-            }}
-          >
-            {UNIFORMS.map((u) => (
-              <button
-                key={u.id}
-                onClick={() => setSelectedUniformId(u.id)}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 10,
-                  padding: 8,
-                  borderRadius: 14,
-                  border:
-                    selectedUniformId === u.id
-                      ? "2px solid #111827"
-                      : "1px solid #e5e7eb",
-                  background:
-                    selectedUniformId === u.id ? "#f3f4ff" : "#f9fafb",
-                  cursor: "pointer",
-                  textAlign: "left",
-                }}
-              >
-                <div
-                  style={{
-                    width: 46,
-                    height: 54,
-                    borderRadius: 12,
-                    background: "#e5e7eb",
-                    overflow: "hidden",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <img
-                    src={u.image}
-                    alt={u.name}
-                    style={{
-                      width: "90%",
-                      height: "auto",
-                      objectFit: "contain",
-                    }}
-                  />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div
-                    style={{
-                      fontSize: 13,
-                      fontWeight: 600,
-                      color: "#111827",
-                      marginBottom: 2,
-                    }}
-                  >
-                    {u.name}
-                  </div>
-                  <div
-                    style={{
-                      fontSize: 11,
-                      color: "#6b7280",
-                    }}
-                  >
-                    {lang === "ru"
-                      ? "Нажмите, чтобы примерить на 3D‑модели."
-                      : "3D modelda ko‘rish uchun bosing."}
-                  </div>
-                </div>
-              </button>
-            ))}
-          </div>
+          {/* ВЕРХ */}
+          <CategoryRow
+            title={lang === "ru" ? "Верхняя одежда" : "Yuqori kiyim"}
+            item={TOPS[topIndex]}
+            onPrev={prevTop}
+            onNext={nextTop}
+          />
+
+          {/* ФАРТУК */}
+          <CategoryRow
+            title={lang === "ru" ? "Фартук" : "Fartuk"}
+            item={APRONS[apronIndex]}
+            onPrev={prevApron}
+            onNext={nextApron}
+          />
+
+          {/* БРЮКИ */}
+          <CategoryRow
+            title={lang === "ru" ? "Брюки" : "Shimlar"}
+            item={PANTS[pantsIndex]}
+            onPrev={prevPants}
+            onNext={nextPants}
+          />
 
           {/* имя + Готово */}
           <div style={{ marginTop: 6 }}>
@@ -693,7 +626,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* ЧАТ ПОД РЕДАКТОРОМ */}
+      {/* ЧАТ */}
       <section
         style={{
           maxWidth: 960,
@@ -776,7 +709,7 @@ useEffect(() => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* ВВОД СООБЩЕНИЯ */}
+        {/* ВВОД */}
         <div
           style={{
             position: "absolute",
@@ -787,7 +720,7 @@ useEffect(() => {
             gap: 8,
           }}
         >
-                  <input
+          <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
@@ -835,5 +768,110 @@ useEffect(() => {
   );
 };
 
-export default ChatPage;
+type CategoryRowProps = {
+  title: string;
+  item: ItemVariant | undefined;
+  onPrev: () => void;
+  onNext: () => void;
+};
 
+const CategoryRow: React.FC<CategoryRowProps> = ({
+  title,
+  item,
+  onPrev,
+  onNext,
+}) => {
+  if (!item) return null;
+
+  return (
+    <div
+      style={{
+        borderRadius: 14,
+        border: "1px solid #e5e7eb",
+        padding: 8,
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          color: "#4b5563",
+          width: 90,
+        }}
+      >
+        {title}
+      </div>
+      <button
+        onClick={onPrev}
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 999,
+          border: "1px solid #d1d5db",
+          background: "#ffffff",
+          cursor: "pointer",
+        }}
+      >
+        ‹
+      </button>
+      <div
+        style={{
+          flex: 1,
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <div
+          style={{
+            width: 46,
+            height: 54,
+            borderRadius: 12,
+            background: "#e5e7eb",
+            overflow: "hidden",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <img
+            src={item.image}
+            alt={item.name}
+            style={{
+              width: "90%",
+              height: "auto",
+              objectFit: "contain",
+            }}
+          />
+        </div>
+        <div
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: "#111827",
+          }}
+        >
+          {item.name}
+        </div>
+      </div>
+      <button
+        onClick={onNext}
+        style={{
+          width: 28,
+          height: 28,
+          borderRadius: 999,
+          border: "1px solid #d1d5db",
+          background: "#ffffff",
+          cursor: "pointer",
+        }}
+      >
+        ›
+      </button>
+    </div>
+  );
+};
+
+export default ChatPage;
