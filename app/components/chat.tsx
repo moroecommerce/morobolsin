@@ -18,13 +18,13 @@ type ItemVariant = {
 type Gender = "male" | "female";
 
 const HERO_BG =
-  "https://images.pexels.com/photos/3298637/pexels-photo-3298637.jpeg"; // фон хиро, прямая ссылка [web:253]
+  "https://images.pexels.com/photos/3298637/pexels-photo-3298637.jpeg";
 
-// Прямые PNG-ссылки на силуэты без фона
+// Полноразмерные силуэты PNG с прозрачным фоном
 const MANNEQUIN_MALE =
-  "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/man-user-icon.png"; // мужской силуэт [web:245]
+  "https://www.onlygfx.com/wp-content/uploads/2018/01/man-standing-silhouette-6.png"; // [web:261]
 const MANNEQUIN_FEMALE =
-  "https://iconscout.com/wp-content/uploads/2019/02/female-user-avatar-illustration-400x400.png"; // женский силуэт [web:248]
+  "https://www.onlygfx.com/wp-content/uploads/2018/01/woman-silhouette-10.png"; // [web:265]
 
 const HATS: ItemVariant[] = [
   {
@@ -515,7 +515,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВЫЙ БЛОК – только силуэт на прозрачном фоне */}
+        {/* ЛЕВЫЙ БЛОК – силуэт человека без фона */}
         <div
           style={{
             borderRadius: 22,
@@ -543,9 +543,9 @@ const ChatPage: React.FC = () => {
               src={mannequinSrc}
               alt={gender === "male" ? "Мужской силуэт" : "Женский силуэт"}
               style={{
-                width: "70%",
-                maxWidth: 360,
-                height: "auto",
+                height: "100%",
+                maxHeight: 360,
+                width: "auto",
                 objectFit: "contain",
               }}
             />
