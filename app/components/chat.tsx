@@ -12,21 +12,21 @@ type Message = { text: string; sender: "user" | "bot" };
 type ItemVariant = {
   id: number;
   name: string;
-  image: string; // прямая ссылка
+  image: string;
 };
 
 type Gender = "male" | "female";
 
-// Фон (можно оставить свой из /public)
+// Фон
 const HERO_BG = "/images/chef-hero.jpg";
 
-// Силуэты во весь рост
-const FULL_BODY_MANNEQUIN_MALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // пример силуэта мужчины [web:202][web:205]
-const FULL_BODY_MANNEQUIN_FEMALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // позже можно заменить на женский
+// Силуэты во весь рост (подставишь свои)
+const MANNEQUIN_MALE =
+  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png";
+const MANNEQUIN_FEMALE =
+  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png";
 
-// Примеры данных с прямыми https‑ссылками (заменишь на свои 3D/фото)
+// Примеры вариантов (заменишь на свои)
 const HATS: ItemVariant[] = [
   {
     id: 1,
@@ -131,7 +131,7 @@ const ICON_HEIGHT =
 const ICON_WEIGHT =
   "https://img.icons8.com/ios-filled/100/000000/scale.png";
 
-// Общий стиль для всех select справа [web:197][web:198]
+// Общий стиль для всех select справа
 const commonSelectStyle: CSSProperties = {
   flex: 1,
   height: 38,
@@ -339,9 +339,7 @@ const ChatPage: React.FC = () => {
   }, [pantsIndex]);
 
   const mannequinSrc =
-    gender === "male"
-      ? FULL_BODY_MANNEQUIN_MALE
-      : FULL_BODY_MANNEQUIN_FEMALE;
+    gender === "male" ? MANNEQUIN_MALE : MANNEQUIN_FEMALE;
 
   return (
     <div
@@ -521,7 +519,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – только манекен */}
+        {/* ЛЕВАЯ КОЛОНКА – только манекен на прозрачном фоне */}
         <div
           style={{
             borderRadius: 22,
@@ -649,7 +647,7 @@ const ChatPage: React.FC = () => {
               </select>
             </IconSelectRowSimple>
 
-            {/* Категории одежды – все строки одинакового размера */}
+            {/* Категории одежды – все одинакового размера */}
             <IconSelectRow
               icon={ICON_HAT}
               alt="Шапка"
@@ -680,8 +678,8 @@ const ChatPage: React.FC = () => {
             />
           </div>
 
-          {/* Имя шефа и кнопка ниже, с отступом */}
-          <div style={{ marginTop: 16 }}>
+          {/* Имя шефа и кнопка ниже, с более явным отступом */}
+          <div style={{ marginTop: 20 }}>
             <input
               type="text"
               value={chefName}
