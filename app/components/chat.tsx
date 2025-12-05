@@ -7,15 +7,19 @@ type Message = { text: string; sender: "user" | "bot" };
 type ItemVariant = {
   id: number;
   name: string;
-  image: string;   // прямая ссылка на картинку этой вещи
+  image: string; // прямая ссылка
 };
 
-// фон и дефолт
+// Фон (можно оставить свой из /public)
 const HERO_BG = "/images/chef-hero.jpg";
-const DEFAULT_TOP =
-  "https://images.pexels.com/photos/803963/pexels-photo-803963.jpeg"; // временная форма [web:177]
 
-// пример данных с прямыми ссылками на фото (потом заменишь на свои)
+// Манекены (однотонные силуэты)
+const MALE_MANNEQUIN =
+  "https://img.icons8.com/ios-filled/300/000000/user-male-circle.png"; // [web:193]
+const FEMALE_MANNEQUIN =
+  "https://img.icons8.com/ios-filled/300/000000/user-female-circle.png"; // [web:196]
+
+// Примеры данных с прямыми https‑ссылками (потом подставишь свои 3D/фото)
 const HATS: ItemVariant[] = [
   {
     id: 1,
@@ -100,7 +104,7 @@ const PANTS: ItemVariant[] = [
   },
 ];
 
-// тематические иконки категорий
+// иконки категорий
 const ICON_HAT =
   "https://img.icons8.com/ios-filled/100/000000/chef-hat.png";
 const ICON_TOP =
@@ -110,6 +114,16 @@ const ICON_APRON =
 const ICON_PANTS =
   "https://img.icons8.com/ios-filled/100/000000/trousers.png";
 
+// иконки для пола / роста / веса
+const ICON_GENDER_MALE =
+  "https://img.icons8.com/ios-filled/100/000000/user-male.png";
+const ICON_GENDER_FEMALE =
+  "https://img.icons8.com/ios-filled/100/000000/user-female.png";
+const ICON_HEIGHT =
+  "https://img.icons8.com/ios-filled/100/000000/height.png";
+const ICON_WEIGHT =
+  "https://img.icons8.com/ios-filled/100/000000/scale.png";
+
 type ChefLook = {
   hat: ItemVariant | null;
   top: ItemVariant | null;
@@ -117,9 +131,17 @@ type ChefLook = {
   pants: ItemVariant | null;
 };
 
+type Gender = "male" | "female";
+
 const ChatPage: React.FC = () => {
   const [lang, setLang] = useState<"ru" | "uz">("ru");
 
+  // новые поля
+  const [gender, setGender] = useState<Gender>("male");
+  const [height, setHeight] = useState<string>("170");
+  const [weight, setWeight] = useState<string>("70");
+
+  // категории формы
   const [hatIndex, setHatIndex] = useState(0);
   const [topIndex, setTopIndex] = useState(0);
   const [apronIndex, setApronIndex] = useState(0);
@@ -141,6 +163,7 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
+  // анимация заголовка
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -264,6 +287,9 @@ const ChatPage: React.FC = () => {
   const handleDone = () => {
     const text =
       `Готовый комплект:\n` +
+      `Пол: ${gender === "male" ? "мужской" : "женский"}\n` +
+      `Рост: ${height} см\n` +
+      `Вес: ${weight} кг\n` +
       `Шапка: ${look.hat?.name ?? "не выбрана"}\n` +
       `Верх: ${look.top?.name ?? "не выбран"}\n` +
       `Фартук: ${look.apron?.name ?? "не выбран"}\n` +
@@ -275,7 +301,7 @@ const ChatPage: React.FC = () => {
     scrollTo(modelRef);
   };
 
-  // синхронизация look и одновременное обновление 3D‑превью
+  // синхронизация look
   useEffect(() => {
     setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
@@ -289,8 +315,10 @@ const ChatPage: React.FC = () => {
     setLook((prev) => ({ ...prev, pants: PANTS[pantsIndex] ?? null }));
   }, [pantsIndex]);
 
-  // наглядная картинка: пока используем верх как основную, потом можно склеить несколько
-  const currentTopImage = look.top?.image || DEFAULT_TOP;
+  // сейчас в превью используем картинку верха; позже можно собрать композицию
+  const mannequinSrc = gender === "male" ? MALE_MANNEQUIN : FEMALE_MANNEQUIN;
+  const topImage = look.top?.image;
+  const previewImage = topImage || mannequinSrc;
 
   return (
     <div
@@ -452,25 +480,25 @@ const ChatPage: React.FC = () => {
             }}
           >
             {lang === "ru"
-              ? "Подберите шапку, верх и фартук — ассистент поможет собрать комплект под ваш бренд."
-              : "Shapka, yuqori kiyim va fartukni tanlang — assistent brendingizga mos to‘plamni taklif qiladi."}
+              ? "Подберите размер, пол и комплект формы — ассистент поможет собрать образ под ваш бренд."
+              : "O‘lcham, jins va forma to‘plamini tanlang — assistent brendingizga mos ko‘rinish yaratadi."}
           </p>
         </div>
       </section>
 
-      {/* 3D + категории */}
+      {/* 3D / манекен + категории */}
       <section
         ref={modelRef}
         style={{
           maxWidth: 960,
           margin: "0 auto 24px",
           display: "grid",
-          gridTemplateColumns: "minmax(0,0.95fr) minmax(0,1.05fr)", // правая чуть шире, категории левее
+          gridTemplateColumns: "minmax(0,0.9fr) minmax(0,1.1fr)", // правая шире, категории левее
           gap: 16,
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – превью */}
+        {/* ЛЕВАЯ КОЛОНКА – манекен + одежда */}
         <div
           style={{
             borderRadius: 22,
@@ -494,14 +522,29 @@ const ChatPage: React.FC = () => {
               overflow: "hidden",
             }}
           >
+            {/* однотонный манекен */}
             <img
-              src={currentTopImage}
+              src={mannequinSrc}
+              alt={gender === "male" ? "Мужской манекен" : "Женский манекен"}
+              style={{
+                position: "absolute",
+                width: "70%",
+                maxWidth: 360,
+                height: "auto",
+                objectFit: "contain",
+                opacity: 0.25,
+              }}
+            />
+            {/* выбранная одежда (пока верх) */}
+            <img
+              src={previewImage}
               alt="Превью формы"
               style={{
                 width: "94%",
                 maxWidth: 460,
                 height: "auto",
                 objectFit: "cover",
+                position: "relative",
               }}
             />
             <div
@@ -526,7 +569,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – категории (чуть левее, внутри блока) */}
+        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории */}
         <div
           style={{
             borderRadius: 22,
@@ -543,9 +586,108 @@ const ChatPage: React.FC = () => {
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 10, // чуть меньше отступа под последней категорией
+              gap: 10,
             }}
           >
+            {/* Пол */}
+            <IconSelectRowSimple
+              icon={
+                gender === "male" ? ICON_GENDER_MALE : ICON_GENDER_FEMALE
+              }
+              label="Пол"
+            >
+              <select
+                value={gender}
+                onChange={(e) =>
+                  setGender(e.target.value as Gender)
+                }
+                style={{
+                  flex: 1,
+                  height: 36,
+                  borderRadius: 999,
+                  border: "1px solid #d1d5db",
+                  padding: "0 14px",
+                  fontSize: 12,
+                  outline: "none",
+                  background: "#f9fafb",
+                }}
+              >
+                <option value="male">Мужская одежда</option>
+                <option value="female">Женская одежда</option>
+              </select>
+            </IconSelectRowSimple>
+
+            {/* Рост */}
+            <IconSelectRowSimple icon={ICON_HEIGHT} label="Рост">
+              <select
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                style={{
+                  flex: 1,
+                  height: 36,
+                  borderRadius: 999,
+                  border: "1px solid #d1d5db",
+                  padding: "0 14px",
+                  fontSize: 12,
+                  outline: "none",
+                  background: "#f9fafb",
+                }}
+              >
+                {[
+                  "165",
+                  "170",
+                  "175",
+                  "180",
+                  "185",
+                  "190",
+                  "195",
+                  "200",
+                  "205",
+                  "210",
+                ].map((h) => (
+                  <option key={h} value={h}>
+                    {h} см
+                  </option>
+                ))}
+              </select>
+            </IconSelectRowSimple>
+
+            {/* Вес */}
+            <IconSelectRowSimple icon={ICON_WEIGHT} label="Вес">
+              <select
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                style={{
+                  flex: 1,
+                  height: 36,
+                  borderRadius: 999,
+                  border: "1px solid #d1d5db",
+                  padding: "0 14px",
+                  fontSize: 12,
+                  outline: "none",
+                  background: "#f9fafb",
+                }}
+              >
+                {[
+                  "50",
+                  "60",
+                  "70",
+                  "80",
+                  "90",
+                  "100",
+                  "110",
+                  "120",
+                  "130",
+                  "140",
+                ].map((w) => (
+                  <option key={w} value={w}>
+                    {w} кг
+                  </option>
+                ))}
+              </select>
+            </IconSelectRowSimple>
+
+            {/* Категории одежды – внутри блока, левее, не вылазят */}
             <IconSelectRow
               icon={ICON_HAT}
               alt="Шапка"
@@ -590,7 +732,7 @@ const ChatPage: React.FC = () => {
                 padding: "0 16px",
                 fontSize: 13,
                 outline: "none",
-                marginBottom: 10, // меньше зазор к последней категории
+                marginBottom: 10,
               }}
             />
 
@@ -727,6 +869,41 @@ const ChatPage: React.FC = () => {
   );
 };
 
+// простая строка с иконкой слева (для пола / роста / веса)
+type IconSelectRowSimpleProps = {
+  icon: string;
+  label: string;
+  children: React.ReactNode;
+};
+
+const IconSelectRowSimple: React.FC<IconSelectRowSimpleProps> = ({
+  icon,
+  label,
+  children,
+}) => (
+  <div
+    style={{
+      display: "flex",
+      alignItems: "center",
+      gap: 6,
+    }}
+  >
+    <img
+      src={icon}
+      alt={label}
+      style={{
+        width: 20,
+        height: 20,
+        objectFit: "contain",
+        filter: "grayscale(100%) brightness(0.3)",
+        flexShrink: 0,
+      }}
+    />
+    {children}
+  </div>
+);
+
+// строка категории одежды: иконка + select
 type IconSelectRowProps = {
   icon: string;
   alt: string;
@@ -735,7 +912,6 @@ type IconSelectRowProps = {
   onChange: (index: number) => void;
 };
 
-// иконка маленькая, внутри строки категории
 const IconSelectRow: React.FC<IconSelectRowProps> = ({
   icon,
   alt,
