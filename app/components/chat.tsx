@@ -20,11 +20,11 @@ type Gender = "male" | "female";
 // Фон (можно оставить свой из /public)
 const HERO_BG = "/images/chef-hero.jpg";
 
-// Силуэты во весь рост (подставь свои при необходимости)
+// Силуэты во весь рост
 const FULL_BODY_MANNEQUIN_MALE =
   "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // пример силуэта мужчины [web:202][web:205]
 const FULL_BODY_MANNEQUIN_FEMALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // пока тот же, позже заменишь на женский
+  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // позже можно заменить на женский
 
 // Примеры данных с прямыми https‑ссылками (заменишь на свои 3D/фото)
 const HATS: ItemVariant[] = [
@@ -142,9 +142,12 @@ const commonSelectStyle: CSSProperties = {
   outline: "none",
   background: "#f9fafb",
   boxSizing: "border-box",
+  whiteSpace: "nowrap",
+  overflow: "hidden",
+  textOverflow: "ellipsis",
 };
 
-const rowStyle: CSSProperties = {
+const commonRowStyle: CSSProperties = {
   display: "flex",
   alignItems: "center",
   gap: 6,
@@ -203,7 +206,6 @@ const ChatPage: React.FC = () => {
     setCharIndex(0);
 
     let typeInterval: number | undefined;
-
     typeInterval = window.setInterval(() => {
       setCharIndex((prev) => {
         if (prev < currentWord.length) {
@@ -519,7 +521,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – силуэт */}
+        {/* ЛЕВАЯ КОЛОНКА – только манекен */}
         <div
           style={{
             borderRadius: 22,
@@ -535,7 +537,7 @@ const ChatPage: React.FC = () => {
             style={{
               flex: 1,
               borderRadius: 18,
-              background: "#f9fafb",
+              background: "transparent",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
@@ -553,30 +555,10 @@ const ChatPage: React.FC = () => {
                 objectFit: "contain",
               }}
             />
-
-            <div
-              style={{
-                position: "absolute",
-                bottom: 14,
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#111827",
-                textShadow: "0 1px 2px rgba(0,0,0,0.18)",
-                padding: "0 6px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {chefName || "Имя шефа"}
-            </div>
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории */}
+        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории + имя */}
         <div
           style={{
             borderRadius: 22,
@@ -667,7 +649,7 @@ const ChatPage: React.FC = () => {
               </select>
             </IconSelectRowSimple>
 
-            {/* Категории одежды */}
+            {/* Категории одежды – все строки одинакового размера */}
             <IconSelectRow
               icon={ICON_HAT}
               alt="Шапка"
@@ -698,7 +680,8 @@ const ChatPage: React.FC = () => {
             />
           </div>
 
-          <div style={{ marginTop: 8 }}>
+          {/* Имя шефа и кнопка ниже, с отступом */}
+          <div style={{ marginTop: 16 }}>
             <input
               type="text"
               value={chefName}
@@ -862,7 +845,7 @@ const IconSelectRowSimple: React.FC<IconSelectRowSimpleProps> = ({
   label,
   children,
 }) => (
-  <div style={rowStyle}>
+  <div style={commonRowStyle}>
     <img
       src={icon}
       alt={label}
@@ -894,7 +877,7 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
   activeIndex,
   onChange,
 }) => (
-  <div style={rowStyle}>
+  <div style={commonRowStyle}>
     <img
       src={icon}
       alt={alt}
