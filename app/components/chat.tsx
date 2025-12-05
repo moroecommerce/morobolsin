@@ -20,12 +20,11 @@ type Gender = "male" | "female";
 const HERO_BG =
   "https://images.pexels.com/photos/3298637/pexels-photo-3298637.jpeg";
 
-// Полноразмерные силуэты PNG с прозрачным фоном
 const MANNEQUIN_MALE =
   "https://www.onlygfx.com/wp-content/uploads/2018/01/man-standing-silhouette-6.png";
 const MANNEQUIN_FEMALE =
   "https://www.onlygfx.com/wp-content/uploads/2018/01/woman-silhouette-10.png";
-// [web:261][web:265]
+// при проблемах лучше скачать и положить в /public [web:309][web:265]
 
 const HATS: ItemVariant[] = [
   {
@@ -203,7 +202,7 @@ const ChatPage: React.FC = () => {
   const handleShareTelegram = () => {
     const url = encodeURIComponent(CURRENT_URL);
     const text = encodeURIComponent(SHARE_TEXT);
-    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; // [web:267]
+    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; // формат share [web:267]
     window.open(shareUrl, "_blank", "noreferrer");
   };
 
@@ -415,7 +414,7 @@ const ChatPage: React.FC = () => {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {/* 1. Поделиться – минималистичное сердечко */}
+            {/* 1. Поделиться – сердечко */}
             <button
               onClick={handleShareTelegram}
               style={{
@@ -435,7 +434,7 @@ const ChatPage: React.FC = () => {
               ♥
             </button>
 
-            {/* 2. Telegram – минималистичный логотип */}
+            {/* 2. Telegram – аккуратный логотип */}
             <button
               onClick={handleOpenTelegramChannel}
               style={{
@@ -453,12 +452,15 @@ const ChatPage: React.FC = () => {
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="18"
-                height="18"
-                fill="currentColor"
-                viewBox="0 0 16 16"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                role="img"
               >
-                <path d="M16 3.038a2 2 0 0 1-1.39 1.89L4.927 8.548l-.78 3.117a.75.75 0 0 1-1.18.41L.63 10.642a.75.75 0 0 1 .078-1.238l14-7a.75.75 0 0 1 1.092.634z" />
+                <path
+                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54l.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79l21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
+                  fill="white"
+                />
               </svg>
             </button>
 
@@ -565,7 +567,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВЫЙ БЛОК – силуэт без фона */}
+        {/* ЛЕВЫЙ БЛОК – силуэт */}
         <div
           style={{
             borderRadius: 22,
@@ -602,7 +604,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВЫЙ БЛОК – пол, рост, вес, категории */}
+        {/* ПРАВЫЙ БЛОК */}
         <div
           style={{
             borderRadius: 22,
@@ -722,7 +724,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ОТДЕЛЬНЫЙ БЛОК ДЛЯ ИМЕНИ И КНОПКИ */}
+      {/* Имя + кнопка */}
       <section
         style={{
           maxWidth: 960,
