@@ -67,7 +67,7 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // typewriter заголовок
+  // typewriter‑заголовок
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -401,7 +401,7 @@ const ChatPage: React.FC = () => {
           gap: 16,
         }}
       >
-        {/* ЛЕВАЯ 3D МОДЕЛЬ (без заголовка) */}
+        {/* ЛЕВАЯ 3D МОДЕЛЬ (описание только снизу) */}
         <div
           style={{
             borderRadius: 22,
@@ -416,17 +416,6 @@ const ChatPage: React.FC = () => {
         >
           <div
             style={{
-              fontSize: 12,
-              color: "#6b7280",
-              lineHeight: 1.6,
-              marginBottom: 4,
-            }}
-          >
-            Выберите шапку, верх, фартук и брюки — образ появится здесь.
-          </div>
-
-          <div
-            style={{
               flex: 1,
               borderRadius: 18,
               background: "#f9fafb",
@@ -435,6 +424,7 @@ const ChatPage: React.FC = () => {
               justifyContent: "center",
               position: "relative",
               overflow: "hidden",
+              marginBottom: 8,
             }}
           >
             <img
@@ -466,9 +456,19 @@ const ChatPage: React.FC = () => {
               {chefName || "Имя шефа"}
             </div>
           </div>
+
+          <div
+            style={{
+              fontSize: 12,
+              color: "#6b7280",
+              lineHeight: 1.6,
+            }}
+          >
+            Выберите верх, фартук и брюки — образ появится здесь, чтобы вы сразу видели комплект.
+          </div>
         </div>
 
-        {/* ПРАВЫЙ БЛОК: МАЛЕНЬКИЕ ИКОНКИ ВНУТРИ КАТЕГОРИИ */}
+        {/* ПРАВЫЙ БЛОК: КОМПАКТНЫЕ ЗАКРУГЛЁННЫЕ SELECT */}
         <div
           style={{
             borderRadius: 22,
@@ -477,33 +477,25 @@ const ChatPage: React.FC = () => {
             padding: 12,
             display: "flex",
             flexDirection: "column",
-            gap: 8,
+            gap: 6,
           }}
         >
-          <IconSelectRow
-            iconSrc={look.hat?.image ?? HATS[0].image}
-            alt="Шапка"
+          <CompactSelect
             items={HATS}
             activeIndex={hatIndex}
             onChange={setHatIndex}
           />
-          <IconSelectRow
-            iconSrc={look.top?.image ?? TOPS[0].image}
-            alt="Верхняя одежда"
+          <CompactSelect
             items={TOPS}
             activeIndex={topIndex}
             onChange={setTopIndex}
           />
-          <IconSelectRow
-            iconSrc={look.apron?.image ?? APRONS[0].image}
-            alt="Фартук"
+          <CompactSelect
             items={APRONS}
             activeIndex={apronIndex}
             onChange={setApronIndex}
           />
-          <IconSelectRow
-            iconSrc={look.pants?.image ?? PANTS[0].image}
-            alt="Брюки"
+          <CompactSelect
             items={PANTS}
             activeIndex={pantsIndex}
             onChange={setPantsIndex}
@@ -520,11 +512,11 @@ const ChatPage: React.FC = () => {
             }
             style={{
               width: "100%",
-              height: 36,
+              height: 34,
               borderRadius: 999,
               border: "1px solid #d1d5db",
               padding: "0 12px",
-              fontSize: 13,
+              fontSize: 12,
               outline: "none",
               marginTop: 4,
               marginBottom: 8,
@@ -535,7 +527,7 @@ const ChatPage: React.FC = () => {
             onClick={handleDone}
             style={{
               width: "100%",
-              height: 40,
+              height: 38,
               borderRadius: 999,
               border: "none",
               background:
@@ -551,7 +543,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ЧАТ – только поле ввода, отступы сверху/снизу одинаковые */}
+      {/* ЧАТ */}
       <section
         style={{
           maxWidth: 960,
@@ -611,8 +603,8 @@ const ChatPage: React.FC = () => {
             bottom: 16,
             display: "flex",
             gap: 8,
-            paddingTop: 8,   // сверху
-            paddingBottom: 8 // снизу одинаковый отступ в контейнере
+            paddingTop: 8,
+            paddingBottom: 8,
           }}
         >
           <input
@@ -663,82 +655,43 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// компактный ряд: маленькая иконка + select, всё внутри одного белого блока
-type IconSelectRowProps = {
-  iconSrc: string;
-  alt: string;
+// Компактный красивый select с закруглёнными углами
+type CompactSelectProps = {
   items: ItemVariant[];
   activeIndex: number;
   onChange: (index: number) => void;
 };
 
-const IconSelectRow: React.FC<IconSelectRowProps> = ({
-  iconSrc,
-  alt,
+const CompactSelect: React.FC<CompactSelectProps> = ({
   items,
   activeIndex,
   onChange,
 }) => {
   return (
-    <div
+    <select
+      value={items[activeIndex]?.id ?? ""}
+      onChange={(e) => {
+        const id = Number(e.target.value);
+        const index = items.findIndex((it) => it.id === id);
+        if (index >= 0) onChange(index);
+      }}
       style={{
-        borderRadius: 12,
-        border: "1px solid #e5e7eb",
-        padding: 4,
-        display: "flex",
-        alignItems: "center",
-        gap: 6,
+        width: "100%",
+        height: 32,
+        borderRadius: 999,
+        border: "1px solid #d1d5db",
+        padding: "0 10px",
+        fontSize: 11,
+        outline: "none",
+        background: "#f9fafb",
       }}
     >
-      <div
-        style={{
-          width: 32,
-          height: 32,
-          borderRadius: 999,
-          background: "#e5e7eb",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          overflow: "hidden",
-          flexShrink: 0,
-        }}
-      >
-        <img
-          src={iconSrc}
-          alt={alt}
-          style={{
-            width: "80%",
-            height: "80%",
-            objectFit: "contain",
-            filter: "grayscale(100%) brightness(0.4)",
-          }}
-        />
-      </div>
-      <select
-        value={items[activeIndex]?.id ?? ""}
-        onChange={(e) => {
-          const id = Number(e.target.value);
-          const index = items.findIndex((it) => it.id === id);
-          if (index >= 0) onChange(index);
-        }}
-        style={{
-          flex: 1,
-          height: 32,
-          borderRadius: 999,
-          border: "1px solid #d1d5db",
-          padding: "0 10px",
-          fontSize: 12,
-          outline: "none",
-          background: "#f9fafb",
-        }}
-      >
-        {items.map((it) => (
-          <option key={it.id} value={it.id}>
-            {it.name}
-          </option>
-        ))}
-      </select>
-    </div>
+      {items.map((it) => (
+        <option key={it.id} value={it.id}>
+          {it.name}
+        </option>
+      ))}
+    </select>
   );
 };
 
