@@ -7,30 +7,33 @@ type Message = { text: string; sender: "user" | "bot" };
 type ItemVariant = {
   id: number;
   name: string;
+  image: string;
 };
 
+// ВАРИАНТЫ (поставь реальные пути картинок из своего проекта)
 const HATS: ItemVariant[] = [
-  { id: 1, name: "Классическая шапка" },
-  { id: 2, name: "Высокая шапка" },
-  { id: 3, name: "Бандана" },
+  { id: 1, name: "Классическая шапка", image: "/uniforms/hat-1.png" },
+  { id: 2, name: "Высокая шапка", image: "/uniforms/hat-2.png" },
+  { id: 3, name: "Бандана", image: "/uniforms/hat-3.png" },
 ];
 
 const TOPS: ItemVariant[] = [
-  { id: 1, name: "Классический китель" },
-  { id: 2, name: "Современный китель" },
-  { id: 3, name: "Минималистичный китель" },
+  { id: 1, name: "Классический китель", image: "/uniforms/chef-1.png" },
+  { id: 2, name: "Современный китель", image: "/uniforms/chef-2.png" },
+  { id: 3, name: "Минималистичный китель", image: "/uniforms/chef-3.png" },
+  { id: 4, name: "Узбекская кухня", image: "/uniforms/chef-4.png" },
 ];
 
 const APRONS: ItemVariant[] = [
-  { id: 1, name: "Классический фартук" },
-  { id: 2, name: "Нагрудный фартук" },
-  { id: 3, name: "Бариста фартук" },
+  { id: 1, name: "Классический фартук", image: "/uniforms/apron-1.png" },
+  { id: 2, name: "Нагрудный фартук", image: "/uniforms/apron-2.png" },
+  { id: 3, name: "Бариста фартук", image: "/uniforms/apron-3.png" },
 ];
 
 const PANTS: ItemVariant[] = [
-  { id: 1, name: "Классические брюки" },
-  { id: 2, name: "Джоггеры" },
-  { id: 3, name: "Узкие брюки" },
+  { id: 1, name: "Классические брюки", image: "/uniforms/pants-1.png" },
+  { id: 2, name: "Джоггеры", image: "/uniforms/pants-2.png" },
+  { id: 3, name: "Узкие брюки", image: "/uniforms/pants-3.png" },
 ];
 
 type ChefLook = {
@@ -43,6 +46,7 @@ type ChefLook = {
 const ChatPage: React.FC = () => {
   const [lang, setLang] = useState<"ru" | "uz">("ru");
 
+  // индексы выбора
   const [hatIndex, setHatIndex] = useState(0);
   const [topIndex, setTopIndex] = useState(0);
   const [apronIndex, setApronIndex] = useState(0);
@@ -62,8 +66,9 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // анимация заголовка
+  // typewriter-заголовок
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -110,6 +115,12 @@ const ChatPage: React.FC = () => {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatHistory]);
+
+  const scrollTo = (ref: React.RefObject<HTMLDivElement>) => {
+    if (ref.current) {
+      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
 
   const buildContextIntro = () => {
     const typeLabelRu =
@@ -194,9 +205,10 @@ const ChatPage: React.FC = () => {
 
     const withContext = chatHistory.length === 0;
     sendMessageToGPT(text, { withContext });
+    scrollTo(modelRef);
   };
 
-  // синхронизация look при смене индексов
+  // синхронизация look
   useEffect(() => {
     setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
@@ -209,6 +221,9 @@ const ChatPage: React.FC = () => {
   useEffect(() => {
     setLook((prev) => ({ ...prev, pants: PANTS[pantsIndex] ?? null }));
   }, [pantsIndex]);
+
+  const currentTopImage =
+    look.top?.image ?? "/uniforms/chef-1.png";
 
   return (
     <div
@@ -236,7 +251,7 @@ const ChatPage: React.FC = () => {
           style={{
             maxWidth: 960,
             margin: "0 auto",
-            padding: "10px 16px",
+            padding: "14px 16px", // чуть больше отступ
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
@@ -272,15 +287,15 @@ const ChatPage: React.FC = () => {
             </span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button
               style={{
-                width: 32,
-                height: 32,
+                width: 40,          // больше сердечко
+                height: 40,
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
                 background: "#ffffff",
-                fontSize: 16,
+                fontSize: 22,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
@@ -296,7 +311,7 @@ const ChatPage: React.FC = () => {
                   key={lng}
                   onClick={() => setLang(lng as "ru" | "uz")}
                   style={{
-                    padding: "6px 10px",
+                    padding: "6px 12px",
                     borderRadius: 999,
                     border:
                       lang === lng
@@ -316,7 +331,7 @@ const ChatPage: React.FC = () => {
         </div>
       </header>
 
-      {/* HERO */}
+      {/* HERO / БАННЕР */}
       <section
         style={{
           maxWidth: 960,
@@ -361,19 +376,119 @@ const ChatPage: React.FC = () => {
               {typedText}
             </span>
           </h1>
+          <p
+            style={{
+              fontSize: 14,
+              margin: "0 0 14px",
+              lineHeight: 1.6,
+              maxWidth: 480,
+              textAlign: "center",
+            }}
+          >
+            {lang === "ru"
+              ? "Подберите шапку, китель, фартук и брюки — ассистент поможет собрать комплекты под ваш бренд и задачи."
+              : "Shapka, kitel, fartuk va shimlarni tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
+          </p>
         </div>
       </section>
 
-      {/* БЛОК ВЫБОРА + КНОПКА */}
+      {/* РЕДАКТОР ОДЕЖДЫ + 3D */}
       <section
+        ref={modelRef}
         style={{
           maxWidth: 960,
           margin: "0 auto 24px",
           display: "grid",
-          gridTemplateColumns: "minmax(0,1fr)",
+          gridTemplateColumns: "minmax(0,1.2fr) minmax(0,1fr)",
           gap: 16,
         }}
       >
+        {/* ЛЕВАЯ 3D ЗАГЛУШКА */}
+        <div
+          style={{
+            borderRadius: 22,
+            background: "#ffffff",
+            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
+            padding: 16,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            minHeight: 260,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 6,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#111827",
+                }}
+              >
+                3D‑модель в форме
+              </div>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#6b7280",
+                }}
+              >
+                Выберите шапку, верх, фартук и брюки — образ обновится.
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              flex: 1,
+              borderRadius: 18,
+              background: "#f9fafb",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              src={currentTopImage}
+              alt="3D модель в форме"
+              style={{
+                width: "70%",
+                height: "auto",
+                objectFit: "contain",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                bottom: 14,
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                fontSize: 12,
+                fontWeight: 700,
+                color: "#111827",
+                textShadow: "0 1px 2px rgba(0,0,0,0.18)",
+                padding: "0 6px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {chefName || "Имя шефа"}
+            </div>
+          </div>
+        </div>
+
+        {/* ПРАВЫЙ БЛОК: ВЫБОР ШАПКИ / ВЕРХА / ФАРТУКА / БРЮК */}
         <div
           style={{
             borderRadius: 22,
@@ -447,7 +562,7 @@ const ChatPage: React.FC = () => {
               cursor: "pointer",
             }}
           >
-            {lang === "ru" ? "Готово" : "Tayyor"}
+            {lang === "ru" ? "Готово — отправить ассистенту" : "Tayyor — assistentga yuborish"}
           </button>
         </div>
       </section>
