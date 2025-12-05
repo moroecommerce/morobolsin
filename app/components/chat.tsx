@@ -7,46 +7,108 @@ type Message = { text: string; sender: "user" | "bot" };
 type ItemVariant = {
   id: number;
   name: string;
-  image: string;
+  image: string;   // прямая ссылка на картинку этой вещи
 };
 
-// Файлы должны лежать в /public/images
+// фон и дефолт
 const HERO_BG = "/images/chef-hero.jpg";
-const DEFAULT_TOP = "/images/chef-3d.png";
+const DEFAULT_TOP =
+  "https://images.pexels.com/photos/803963/pexels-photo-803963.jpeg"; // временная форма [web:177]
 
+// пример данных с прямыми ссылками на фото (потом заменишь на свои)
 const HATS: ItemVariant[] = [
-  { id: 1, name: "Классическая шапка", image: "/images/hat-1.png" },
-  { id: 2, name: "Высокая шапка", image: "/images/hat-2.png" },
-  { id: 3, name: "Бандана", image: "/images/hat-3.png" },
+  {
+    id: 1,
+    name: "Классическая шапка",
+    image:
+      "https://images.pexels.com/photos/3754678/pexels-photo-3754678.jpeg",
+  },
+  {
+    id: 2,
+    name: "Высокая шапка",
+    image:
+      "https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg",
+  },
+  {
+    id: 3,
+    name: "Бандана",
+    image:
+      "https://images.pexels.com/photos/6027504/pexels-photo-6027504.jpeg",
+  },
 ];
 
 const TOPS: ItemVariant[] = [
-  { id: 1, name: "Классический китель", image: "/images/top-1.png" },
-  { id: 2, name: "Современный китель", image: "/images/top-2.png" },
-  { id: 3, name: "Минималистичный китель", image: "/images/top-3.png" },
+  {
+    id: 1,
+    name: "Классический китель",
+    image:
+      "https://images.pexels.com/photos/3298637/pexels-photo-3298637.jpeg",
+  },
+  {
+    id: 2,
+    name: "Современный китель",
+    image:
+      "https://images.pexels.com/photos/4252139/pexels-photo-4252139.jpeg",
+  },
+  {
+    id: 3,
+    name: "Минималистичный китель",
+    image:
+      "https://images.pexels.com/photos/845812/pexels-photo-845812.jpeg",
+  },
 ];
 
 const APRONS: ItemVariant[] = [
-  { id: 1, name: "Классический фартук", image: "/images/apron-1.png" },
-  { id: 2, name: "Нагрудный фартук", image: "/images/apron-2.png" },
-  { id: 3, name: "Бариста фартук", image: "/images/apron-3.png" },
+  {
+    id: 1,
+    name: "Классический фартук",
+    image:
+      "https://images.pexels.com/photos/952478/pexels-photo-952478.jpeg",
+  },
+  {
+    id: 2,
+    name: "Нагрудный фартук",
+    image:
+      "https://images.pexels.com/photos/887827/pexels-photo-887827.jpeg",
+  },
+  {
+    id: 3,
+    name: "Бариста фартук",
+    image:
+      "https://images.pexels.com/photos/3962285/pexels-photo-3962285.jpeg",
+  },
 ];
 
 const PANTS: ItemVariant[] = [
-  { id: 1, name: "Классические брюки", image: "/images/pants-1.png" },
-  { id: 2, name: "Джоггеры", image: "/images/pants-2.png" },
-  { id: 3, name: "Узкие брюки", image: "/images/pants-3.png" },
+  {
+    id: 1,
+    name: "Классические брюки",
+    image:
+      "https://images.pexels.com/photos/3738082/pexels-photo-3738082.jpeg",
+  },
+  {
+    id: 2,
+    name: "Джоггеры",
+    image:
+      "https://images.pexels.com/photos/7691088/pexels-photo-7691088.jpeg",
+  },
+  {
+    id: 3,
+    name: "Узкие брюки",
+    image:
+      "https://images.pexels.com/photos/7691186/pexels-photo-7691186.jpeg",
+  },
 ];
 
-// Тематические иконки по прямым HTTPS‑ссылкам
+// тематические иконки категорий
 const ICON_HAT =
-  "https://img.icons8.com/ios-filled/100/000000/chef-hat.png";      // шапка [web:160]
+  "https://img.icons8.com/ios-filled/100/000000/chef-hat.png";
 const ICON_TOP =
-  "https://img.icons8.com/ios-filled/100/000000/t-shirt.png";        // верх/китель [web:163]
+  "https://img.icons8.com/ios-filled/100/000000/t-shirt.png";
 const ICON_APRON =
-  "https://img.icons8.com/ios-filled/100/000000/apron.png";          // фартук [web:165]
+  "https://img.icons8.com/ios-filled/100/000000/apron.png";
 const ICON_PANTS =
-  "https://img.icons8.com/ios-filled/100/000000/trousers.png";       // брюки [web:163]
+  "https://img.icons8.com/ios-filled/100/000000/trousers.png";
 
 type ChefLook = {
   hat: ItemVariant | null;
@@ -213,6 +275,7 @@ const ChatPage: React.FC = () => {
     scrollTo(modelRef);
   };
 
+  // синхронизация look и одновременное обновление 3D‑превью
   useEffect(() => {
     setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
@@ -226,6 +289,7 @@ const ChatPage: React.FC = () => {
     setLook((prev) => ({ ...prev, pants: PANTS[pantsIndex] ?? null }));
   }, [pantsIndex]);
 
+  // наглядная картинка: пока используем верх как основную, потом можно склеить несколько
   const currentTopImage = look.top?.image || DEFAULT_TOP;
 
   return (
@@ -349,7 +413,6 @@ const ChatPage: React.FC = () => {
           backgroundImage: `linear-gradient(135deg,rgba(17,24,39,0.9),rgba(75,85,99,0.9)), url(${HERO_BG})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
-          backgroundRepeat: "no-repeat",
         }}
       >
         <div
@@ -402,21 +465,21 @@ const ChatPage: React.FC = () => {
           maxWidth: 960,
           margin: "0 auto 24px",
           display: "grid",
-          gridTemplateColumns: "minmax(0,1.1fr) minmax(0,0.9fr)",
+          gridTemplateColumns: "minmax(0,0.95fr) minmax(0,1.05fr)", // правая чуть шире, категории левее
           gap: 16,
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – 3D модель */}
+        {/* ЛЕВАЯ КОЛОНКА – превью */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 20,
+            padding: 18,
             display: "flex",
             flexDirection: "column",
-            minHeight: 380,
+            minHeight: 360,
           }}
         >
           <div
@@ -433,12 +496,12 @@ const ChatPage: React.FC = () => {
           >
             <img
               src={currentTopImage}
-              alt="3D модель в форме"
+              alt="Превью формы"
               style={{
-                width: "98%",
-                maxWidth: 500,
+                width: "94%",
+                maxWidth: 460,
                 height: "auto",
-                objectFit: "contain",
+                objectFit: "cover",
               }}
             />
             <div
@@ -463,24 +526,24 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – выбор категорий */}
+        {/* ПРАВАЯ КОЛОНКА – категории (чуть левее, внутри блока) */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 20,
+            padding: 18,
             display: "flex",
             flexDirection: "column",
             justifyContent: "space-between",
-            minHeight: 380,
+            minHeight: 360,
           }}
         >
           <div
             style={{
               display: "flex",
               flexDirection: "column",
-              gap: 12,
+              gap: 10, // чуть меньше отступа под последней категорией
             }}
           >
             <IconSelectRow
@@ -513,7 +576,7 @@ const ChatPage: React.FC = () => {
             />
           </div>
 
-          <div style={{ marginTop: 12 }}>
+          <div style={{ marginTop: 8 }}>
             <input
               type="text"
               value={chefName}
@@ -521,13 +584,13 @@ const ChatPage: React.FC = () => {
               placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
               style={{
                 width: "100%",
-                height: 40,
+                height: 38,
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
                 padding: "0 16px",
                 fontSize: 13,
                 outline: "none",
-                marginBottom: 12,
+                marginBottom: 10, // меньше зазор к последней категории
               }}
             />
 
@@ -535,7 +598,7 @@ const ChatPage: React.FC = () => {
               onClick={handleDone}
               style={{
                 width: "100%",
-                height: 44,
+                height: 42,
                 borderRadius: 999,
                 border: "none",
                 background:
@@ -672,7 +735,7 @@ type IconSelectRowProps = {
   onChange: (index: number) => void;
 };
 
-// Иконка маленькая, без серого фона, стоит слева внутри строки категории
+// иконка маленькая, внутри строки категории
 const IconSelectRow: React.FC<IconSelectRowProps> = ({
   icon,
   alt,
