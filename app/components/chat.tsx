@@ -18,8 +18,9 @@ const UNIFORMS: UniformVariant[] = [
   { id: 5, name: "Street-food", image: "/uniforms/chef-5.png" },
 ];
 
-const Chat: React.FC = () => {
-  const [showWelcome, setShowWelcome] = useState(true);
+const ChatPage: React.FC = () => {
+  const [lang, setLang] = useState<"ru" | "uz">("ru");
+
   const [selectedType, setSelectedType] = useState<
     "chef" | "kitchen" | "waiter" | "bar"
   >("chef");
@@ -33,11 +34,22 @@ const Chat: React.FC = () => {
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const heroRef = useRef<HTMLDivElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
-  const chatSectionRef = useRef<HTMLDivElement | null>(null);
+
+  // анимируемый заголовок
+  const rolesRu = ["поваров", "официантов", "барменов"];
+  const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
+  const roles = lang === "ru" ? rolesRu : rolesUz;
+  const [roleIndex, setRoleIndex] = useState(0);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setRoleIndex((prev) => (prev + 1) % roles.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [roles.length]);
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -52,7 +64,7 @@ const Chat: React.FC = () => {
   };
 
   const buildContextIntro = () => {
-    const typeLabel =
+    const typeLabelRu =
       selectedType === "chef"
         ? "форма для шеф-повара"
         : selectedType === "kitchen"
@@ -61,7 +73,7 @@ const Chat: React.FC = () => {
         ? "форма для официантов"
         : "форма для бариста / бара";
 
-    const colorLabel =
+    const colorLabelRu =
       selectedColor === "white"
         ? "в светлых тонах"
         : selectedColor === "black"
@@ -70,10 +82,21 @@ const Chat: React.FC = () => {
         ? "в бежевых / тёплых тонах"
         : "в фирменных цветах бренда";
 
+    // uz вариант можешь адаптировать под себя
+    const typeLabelUz = typeLabelRu;
+    const colorLabelUz = colorLabelRu;
+
+    const typeLabel = lang === "ru" ? typeLabelRu : typeLabelUz;
+    const colorLabel = lang === "ru" ? colorLabelRu : colorLabelUz;
+
     return `Контекст: клиент выбирает ${typeLabel}, ${colorLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
   };
 
-  const sendMessageToGPT = async (text: string, withContext = false) => {
+  const sendMessageToGPT = async (
+    text: string,
+    options?: { withContext?: boolean }
+  ) => {
+    const withContext = options?.withContext ?? false;
     setLoading(true);
 
     let historyToSend: Message[] = [
@@ -124,547 +147,337 @@ const Chat: React.FC = () => {
       setLoading(false);
     }
   };
-
   const handleSend = () => {
     if (!message.trim() || loading) return;
     const withContext = chatHistory.length === 0;
-    sendMessageToGPT(message.trim(), withContext);
+    sendMessageToGPT(message.trim(), { withContext });
     setMessage("");
   };
 
-  // ЛЕНДИНГ + 3D + ФУТЕР
-  if (showWelcome) {
-    return (
-      <div
+  // отправка выбранных параметров по кнопке "Готово"
+  const handleDone = () => {
+    const uniform = UNIFORMS.find((u) => u.id === selectedUniformId);
+    const text =
+      `Готовый комплект:\n` +
+      `Тип: ${selectedType}\n` +
+      `Цвет: ${selectedColor}\n` +
+      `Модель кителя: ${uniform?.name ?? "не выбрана"}\n` +
+      `Имя на кителе: ${chefName || "не указано"}`;
+    const withContext = chatHistory.length === 0;
+    sendMessageToGPT(text, { withContext });
+  };
+
+  return (
+    <div
+      style={{
+        fontFamily: "Manrope, Arial, sans-serif",
+        background: "#f8fdff",
+        minHeight: "100vh",
+        padding: "0 16px 90px",
+        boxSizing: "border-box",
+      }}
+    >
+      {/* NAVBAR */}
+      <header
         style={{
-          fontFamily: "Manrope, Arial, sans-serif",
-          background: "#f8fdff",
-          minHeight: "100vh",
-          padding: "0 16px 40px",
-          boxSizing: "border-box",
+          position: "sticky",
+          top: 0,
+          zIndex: 20,
+          background: "rgba(248,253,255,0.96)",
+          backdropFilter: "blur(10px)",
+          borderBottom: "1px solid #e5e7eb",
+          margin: "0 -16px 16px",
         }}
       >
-        {/* NAVBAR */}
-        <header
+        <div
           style={{
-            position: "sticky",
-            top: 0,
-            zIndex: 20,
-            background: "rgba(248,253,255,0.96)",
-            backdropFilter: "blur(10px)",
-            borderBottom: "1px solid #e5e7eb",
-            margin: "0 -16px 16px",
+            maxWidth: 960,
+            margin: "0 auto",
+            padding: "10px 16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 16,
           }}
         >
-          <div
-            style={{
-              maxWidth: 960,
-              margin: "0 auto",
-              padding: "10px 16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 16,
-            }}
-          >
-            {/* ЛОГО */}
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <div
-                style={{
-                  width: 32,
-                  height: 32,
-                  borderRadius: 8,
-                  background: "#4b5563",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "#f9fafb",
-                  fontWeight: 800,
-                  fontSize: 18,
-                }}
-              >
-                M
-              </div>
-              <span
-                style={{
-                  fontWeight: 800,
-                  fontSize: 18,
-                  color: "#111827",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                MOROBOLSIN
-              </span>
-            </div>
-
-            {/* КАТЕГОРИИ */}
+          {/* ЛОГО */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div
               style={{
+                width: 32,
+                height: 32,
+                borderRadius: 8,
+                background: "#4b5563",
                 display: "flex",
-                gap: 8,
-                flex: 1,
+                alignItems: "center",
                 justifyContent: "center",
+                color: "#f9fafb",
+                fontWeight: 800,
+                fontSize: 18,
               }}
             >
-              {[
-                { id: "chef", label: "Шеф" },
-                { id: "kitchen", label: "Кухня" },
-                { id: "waiter", label: "Официанты" },
-                { id: "bar", label: "Бар / бариста" },
-              ].map((item) => (
+              M
+            </div>
+            <span
+              style={{
+                fontWeight: 800,
+                fontSize: 18,
+                color: "#111827",
+                letterSpacing: "0.08em",
+              }}
+            >
+              MOROBOLSIN
+            </span>
+          </div>
+
+          {/* СПРАВА: ПОДЕЛИТЬСЯ + ЯЗЫК */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <button
+              style={{
+                padding: "6px 10px",
+                borderRadius: 999,
+                border: "1px solid #d1d5db",
+                background: "#ffffff",
+                fontSize: 12,
+                cursor: "pointer",
+              }}
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: "Morobolsin — форма для HoReCa",
+                    text: "Подбор формы для поваров, официантов и барменов",
+                    url: window.location.href,
+                  });
+                } else {
+                  navigator.clipboard.writeText(window.location.href);
+                  alert("Ссылка скопирована");
+                }
+              }}
+            >
+              Поделиться
+            </button>
+            <div style={{ display: "flex", gap: 4 }}>
+              {["ru", "uz"].map((lng) => (
                 <button
-                  key={item.id}
-                  onClick={() =>
-                    setSelectedType(
-                      item.id as "chef" | "kitchen" | "waiter" | "bar"
-                    )
-                  }
+                  key={lng}
+                  onClick={() => setLang(lng as "ru" | "uz")}
                   style={{
                     padding: "6px 10px",
                     borderRadius: 999,
                     border:
-                      selectedType === item.id
+                      lang === lng
                         ? "1px solid #111827"
                         : "1px solid #e5e7eb",
-                    background:
-                      selectedType === item.id ? "#111827" : "transparent",
-                    color:
-                      selectedType === item.id ? "#f9fafb" : "#111827",
-                    fontSize: 13,
+                    background: lang === lng ? "#111827" : "#ffffff",
+                    color: lang === lng ? "#f9fafb" : "#111827",
+                    fontSize: 12,
                     cursor: "pointer",
-                    whiteSpace: "nowrap",
                   }}
                 >
-                  {item.label}
+                  {lng === "ru" ? "RU" : "UZ"}
                 </button>
               ))}
             </div>
-
-            {/* КНОПКИ СПРАВА */}
-            <div style={{ display: "flex", gap: 8 }}>
-              <button
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 999,
-                  border: "1px solid #d1d5db",
-                  background: "#ffffff",
-                  fontSize: 12,
-                  cursor: "pointer",
-                }}
-                onClick={() => scrollTo(modelRef)}
-              >
-                3D‑примерка
-              </button>
-              <button
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 999,
-                  border: "none",
-                  background:
-                    "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
-                  color: "#fff",
-                  fontSize: 12,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  setShowWelcome(false);
-                  setTimeout(() => scrollTo(chatSectionRef), 0);
-                }}
-              >
-                Чат ассистент
-              </button>
-            </div>
           </div>
-        </header>
+        </div>
+      </header>
 
-              {/* HERO / БАННЕР */}
-        <section
-          ref={heroRef}
-          style={{
-            maxWidth: 960,
-            margin: "0 auto 20px",
-            background:
-              "linear-gradient(135deg,#1f2937,#4b5563 45%,#e5e7eb 100%)",
-            borderRadius: 26,
-            padding: "24px 20px",
-            color: "#f9fafb",
-            display: "flex",
-            flexWrap: "wrap",
-            gap: 16,
-            alignItems: "center",
-          }}
-        >
-          <div style={{ flex: "1 1 260px" }}>
-            <h1
-              style={{
-                fontSize: 26,
-                fontWeight: 800,
-                margin: "0 0 10px",
-              }}
-            >
-              Форма для команды Morobolsin
-            </h1>
-            <p
-              style={{
-                fontSize: 14,
-                margin: "0 0 14px",
-                lineHeight: 1.6,
-                maxWidth: 420,
-              }}
-            >
-              Подберите форму для шефа, кухни, официантов и бара в едином стиле
-              бренда. Ассистент соберёт комплекты под ваш формат заведения.
-            </p>
-            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-              <button
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: 999,
-                  border: "none",
-                  background:
-                    "linear-gradient(135deg,#fbbf24 0%,#f97316 100%)",
-                  color: "#111827",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-                onClick={() => scrollTo(modelRef)}
-              >
-                Смотреть 3D‑примерку
-              </button>
-              <button
-                style={{
-                  padding: "10px 16px",
-                  borderRadius: 999,
-                  border: "1px solid rgba(249,250,251,0.7)",
-                  background: "transparent",
-                  color: "#f9fafb",
-                  fontSize: 14,
-                  cursor: "pointer",
-                }}
-                onClick={() => {
-                  setShowWelcome(false);
-                  setTimeout(() => scrollTo(chatSectionRef), 0);
-                }}
-              >
-                Перейти к ассистенту
-              </button>
-            </div>
-          </div>
-
-          <div
+      {/* HERO / БАННЕР */}
+      <section
+        style={{
+          maxWidth: 960,
+          margin: "0 auto 20px",
+          background:
+            "linear-gradient(135deg,#1f2937,#4b5563 45%,#e5e7eb 100%)",
+          borderRadius: 26,
+          padding: "24px 20px",
+          color: "#f9fafb",
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 16,
+          alignItems: "center",
+        }}
+      >
+        <div style={{ flex: "1 1 260px" }}>
+          <h1
             style={{
-              flex: "1 1 220px",
-              minWidth: 220,
-              background: "rgba(17,24,39,0.36)",
-              borderRadius: 22,
-              padding: 16,
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
+              fontSize: 26,
+              fontWeight: 800,
+              margin: "0 0 10px",
             }}
           >
-            <div
+            {lang === "ru" ? "Форма для " : "Forma uchun "}
+            <span
+              key={roles[roleIndex]}
               style={{
-                fontSize: 13,
-                fontWeight: 600,
-                marginBottom: 4,
+                display: "inline-block",
+                transition: "transform 0.3s ease, opacity 0.3s ease",
               }}
             >
-              Быстрая выгода
-            </div>
-            <ul
-              style={{
-                paddingLeft: 18,
-                margin: 0,
-                fontSize: 12,
-                lineHeight: 1.5,
-              }}
-            >
-              <li>Готовые комплекты по ролям и цвету.</li>
-              <li>Ссылки и артикула для заказа.</li>
-              <li>Учёт кухни, стиля и бюджета.</li>
-            </ul>
-          </div>
-        </section>
-
-        {/* БЛОК 3D-МОДЕЛИ И ТОВАРОВ */}
-        <section
-          ref={modelRef}
-          style={{
-            maxWidth: 960,
-            margin: "0 auto 24px",
-            display: "grid",
-            gridTemplateColumns: "minmax(0,1.2fr) minmax(0,1fr)",
-            gap: 16,
-          }}
-        >
-          {/* 3D ЗАГЛУШКА */}
-          <div
+              {roles[roleIndex]}
+            </span>
+            {lang === "ru" ? " и всей команды" : " va butun jamoa"}
+          </h1>
+          <p
             style={{
-              borderRadius: 22,
-              background: "#ffffff",
-              boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-              padding: 16,
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-              minHeight: 260,
+              fontSize: 14,
+              margin: "0 0 14px",
+              lineHeight: 1.6,
+              maxWidth: 420,
             }}
           >
-            <div
+            {lang === "ru"
+              ? "Подберите форму под кухню, зал и бар — ассистент поможет собрать комплекты под ваш бренд и задачи."
+              : "Oshxona, zal va bar uchun formani tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: 10,
+            }}
+          >
+            <button
               style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 6,
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    color: "#111827",
-                  }}
-                >
-                  3D‑модель в форме
-                </div>
-                <div
-                  style={{
-                    fontSize: 12,
-                    color: "#6b7280",
-                  }}
-                >
-                  При выборе модели кителя и цвета обновляйте образ.
-                </div>
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  padding: "4px 8px",
-                  borderRadius: 999,
-                  border: "1px solid #e5e7eb",
-                  color: "#4b5563",
-                }}
-              >
-                demo / placeholder
-              </div>
-            </div>
-
-            <div
-              style={{
-                flex: 1,
-                borderRadius: 18,
+                padding: "10px 18px",
+                borderRadius: 999,
+                border: "none",
                 background:
-                  selectedColor === "white"
-                    ? "#f9fafb"
-                    : selectedColor === "black"
-                    ? "#030712"
-                    : selectedColor === "sand"
-                    ? "#f5e7d6"
-                    : "#111827",
-                display: "flex",
-                alignItems: "center",
-                              justifyContent: "center",
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-              {/* Здесь потом можно встроить реальный 3D‑viewer */}
-              <img
-                src={
-                  UNIFORMS.find((u) => u.id === selectedUniformId)?.image ??
-                  "/uniforms/chef-1.png"
-                }
-                alt="3D модель в форме"
-                style={{
-                  width: "70%",
-                  height: "auto",
-                  objectFit: "contain",
-                }}
-              />
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: 14,
-                  left: 0,
-                  right: 0,
-                  textAlign: "center",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color:
-                    selectedColor === "white" || selectedColor === "sand"
-                      ? "#111827"
-                      : "#f9fafb",
-                  textShadow:
-                    selectedColor === "white" || selectedColor === "sand"
-                      ? "0 1px 2px rgba(0,0,0,0.18)"
-                      : "0 1px 2px rgba(0,0,0,0.45)",
-                  padding: "0 6px",
-                  whiteSpace: "nowrap",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                }}
-              >
-                {chefName || "Имя шефа"}
-              </div>
-            </div>
-          </div>
-
-          {/* СПИСОК ВАРИАНТОВ / ПРОДУКТОВ */}
-          <div
-            style={{
-              borderRadius: 22,
-              background: "#ffffff",
-              boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-              padding: 16,
-              display: "flex",
-              flexDirection: "column",
-              gap: 10,
-            }}
-          >
-            <div
-              style={{
+                  "linear-gradient(135deg,#fbbf24 0%,#f97316 100%)",
+                color: "#111827",
                 fontSize: 14,
                 fontWeight: 700,
-                color: "#111827",
-                marginBottom: 4,
+                cursor: "pointer",
               }}
+              onClick={() => scrollTo(modelRef)}
             >
-              Варианты формы ({selectedType === "chef"
-                ? "шеф"
-                : selectedType === "kitchen"
-                ? "кухня"
-                : selectedType === "waiter"
-                ? "зал"
-                : "бар"}
-              )
-            </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#6b7280",
-                marginBottom: 8,
-              }}
-            >
-              Нажмите на модель кителя, чтобы показать её на 3D‑фигуре.
-            </div>
+              {lang === "ru"
+                ? "Смотреть 3D‑примерку"
+                : "3D ko‘rishni boshlash"}
+            </button>
+          </div>
+        </div>
+      </section>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                gap: 8,
-                maxHeight: 260,
-                overflowY: "auto",
-              }}
-            >
-              {UNIFORMS.map((u) => (
-                <button
-                  key={u.id}
-                  onClick={() => setSelectedUniformId(u.id)}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 10,
-                    padding: 8,
-                    borderRadius: 14,
-                    border:
-                      selectedUniformId === u.id
-                        ? "2px solid #111827"
-                        : "1px solid #e5e7eb",
-                    background:
-                      selectedUniformId === u.id ? "#f3f4ff" : "#f9fafb",
-                    cursor: "pointer",
-                    textAlign: "left",
-                  }}
-                >
-                  <div
-                    style={{
-                      width: 46,
-                      height: 54,
-                      borderRadius: 12,
-                      background: "#e5e7eb",
-                      overflow: "hidden",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <img
-                      src={u.image}
-                      alt={u.name}
-                      style={{
-                        width: "90%",
-                        height: "auto",
-                        objectFit: "contain",
-                      }}
-                    />
-                  </div>
-                  <div style={{ flex: 1 }}>
-                    <div
-                      style={{
-                        fontSize: 13,
-                        fontWeight: 600,
-                        color: "#111827",
-                        marginBottom: 2,
-                      }}
-                    >
-                      {u.name}
-                    </div>
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: "#6b7280",
-                      }}
-                    >
-                      Нажмите, чтобы примерить на 3D‑модели.
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {/* ИМЯ ШЕФА ПОД 3D */}
-            <div style={{ marginTop: 6 }}>
+      {/* РЕДАКТОР ОДЕЖДЫ + 3D */}
+      <section
+        ref={modelRef}
+        style={{
+          maxWidth: 960,
+          margin: "0 auto 24px",
+          display: "grid",
+          gridTemplateColumns: "minmax(0,1.2fr) minmax(0,1fr)",
+          gap: 16,
+        }}
+      >
+        {/* 3D ЗАГЛУШКА */}
+        <div
+          style={{
+            borderRadius: 22,
+            background: "#ffffff",
+            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
+            padding: 16,
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+            minHeight: 260,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              marginBottom: 6,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  color: "#111827",
+                }}
+              >
+                3D‑модель в форме
+              </div>
               <div
                 style={{
                   fontSize: 12,
-                  fontWeight: 600,
-                  color: "#4b5563",
-                  marginBottom: 4,
+                  color: "#6b7280",
                 }}
               >
-                Имя шеф‑повара
+                Выберите модель, цвет и имя — образ обновится.
               </div>
-              <input
-                type="text"
-                value={chefName}
-                onChange={(e) => setChefName(e.target.value)}
-                placeholder="Например, Шеф Алиджан"
-                style={{
-                  width: "100%",
-                  height: 36,
-                  borderRadius: 999,
-                  border: "1px solid #d1d5db",
-                  padding: "0 12px",
-                  fontSize: 13,
-                  outline: "none",
-                }}
-              />
             </div>
           </div>
-        </section>
 
-        {/* ФУТЕР + CTA К ЧАТУ */}
-        <footer
+          <div
+            style={{
+              flex: 1,
+              borderRadius: 18,
+              background:
+                selectedColor === "white"
+                  ? "#f9fafb"
+                  : selectedColor === "black"
+                  ? "#030712"
+                  : selectedColor === "sand"
+                  ? "#f5e7d6"
+                  : "#111827",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <img
+              src={
+                UNIFORMS.find((u) => u.id === selectedUniformId)?.image ??
+                "/uniforms/chef-1.png"
+              }
+              alt="3D модель в форме"
+              style={{
+                width: "70%",
+                height: "auto",
+                objectFit: "contain",
+              }}
+            />
+            <div
+              style={{
+                position: "absolute",
+                bottom: 14,
+                left: 0,
+                right: 0,
+                textAlign: "center",
+                fontSize: 12,
+                fontWeight: 700,
+                color:
+                  selectedColor === "white" || selectedColor === "sand"
+                    ? "#111827"
+                    : "#f9fafb",
+                textShadow:
+                  selectedColor === "white" || selectedColor === "sand"
+                    ? "0 1px 2px rgba(0,0,0,0.18)"
+                    : "0 1px 2px rgba(0,0,0,0.45)",
+                padding: "0 6px",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+              }}
+            >
+              {chefName || "Имя шефа"}
+            </div>
+          </div>
+        </div>
+
+        {/* СПИСОК ВАРИАНТОВ / ПРОДУКТОВ */}
+        <div
           style={{
-            maxWidth: 960,
-            margin: "0 auto",
-            paddingTop: 16,
-            borderTop: "1px solid #e5e7eb",
+            borderRadius: 22,
+            background: "#ffffff",
+            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
+            padding: 16,
             display: "flex",
             flexDirection: "column",
             gap: 10,
@@ -672,102 +485,287 @@ const Chat: React.FC = () => {
         >
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              flexWrap: "wrap",
-              gap: 10,
-              fontSize: 12,
-              color: "#6b7280",
+              fontSize: 14,
+              fontWeight: 700,
+              color: "#111827",
+              marginBottom: 4,
             }}
           >
-            <div>
-              <div
-                style={{
-                  fontWeight: 700,
-                  color: "#111827",
-                  marginBottom: 4,
-                }}
-              >
-                Morobolsin
-              </div>
-              <div>Форма для шефов, кухни и зала.</div>
-            </div>
-            <div
-              style={{
-                display: "flex",
-                gap: 14,
-                alignItems: "center",
-              }}
-            >
-              <button
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 999,
-                  border: "1px solid #d1d5db",
-                  background: "#ffffff",
-                  cursor: "pointer",
-                  fontSize: 12,
-                }}
-                onClick={() =>
-                  window.open("https://t.me/morobolsin", "_blank")
-                }
-              >
-                Telegram
-              </button>
-              <button
-                style={{
-                  padding: "6px 10px",
-                  borderRadius: 999,
-                  border: "none",
-                  background:
-                    "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
-                  color: "#fff",
-                  cursor: "pointer",
-                  fontSize: 12,
-                  fontWeight: 600,
-                }}
-                onClick={() => {
-                  setShowWelcome(false);
-                  setTimeout(() => scrollTo(chatSectionRef), 0);
-                }}
-              >
-                Открыть чат‑ассистент
-              </button>
-            </div>
+            {lang === "ru" ? "Варианты формы" : "Forma variantlari"}
           </div>
+
+          {/* выбор цвета / типа можешь оставить из старого UI или добавить тут */}
 
           <div
             style={{
-              fontSize: 11,
-              color: "#9ca3af",
-              marginTop: 4,
+              display: "flex",
+              flexDirection: "column",
+              gap: 8,
+              maxHeight: 260,
+              overflowY: "auto",
             }}
           >
-            © {new Date().getFullYear()} Morobolsin. Все права защищены.
+            {UNIFORMS.map((u) => (
+              <button
+                key={u.id}
+                onClick={() => setSelectedUniformId(u.id)}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 10,
+                  padding: 8,
+                  borderRadius: 14,
+                  border:
+                    selectedUniformId === u.id
+                      ? "2px solid #111827"
+                      : "1px solid #e5e7eb",
+                  background:
+                    selectedUniformId === u.id ? "#f3f4ff" : "#f9fafb",
+                  cursor: "pointer",
+                  textAlign: "left",
+                }}
+              >
+                <div
+                  style={{
+                    width: 46,
+                    height: 54,
+                    borderRadius: 12,
+                    background: "#e5e7eb",
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <img
+                    src={u.image}
+                    alt={u.name}
+                    style={{
+                      width: "90%",
+                      height: "auto",
+                      objectFit: "contain",
+                    }}
+                  />
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: "#111827",
+                      marginBottom: 2,
+                    }}
+                  >
+                    {u.name}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: 11,
+                      color: "#6b7280",
+                    }}
+                  >
+                    {lang === "ru"
+                      ? "Нажмите, чтобы примерить на 3D‑модели."
+                      : "3D modelga ko‘rish uchun bosing."}
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
-        </footer>
-      </div>
-    );
-  }
 
-  // ЭКРАН С ЧАТОМ (оставь твой существующий код ниже)
-  return (
-    <div
-      ref={chatSectionRef}
-      style={{
-        fontFamily: "Manrope, Arial, sans-serif",
-        background: "#f8fdff",
-        minHeight: "100vh",
-        padding: "20px 0 90px",
-        boxSizing: "border-box",
-      }}
-    >
-      {/* дальше идёт твой исходный код чата */}
-      {/* ... */}
-      <div ref={messagesEndRef} />
-      {/* ... */}
+          <div style={{ marginTop: 6 }}>
+            <div
+              style={{
+                fontSize: 12,
+                fontWeight: 600,
+                color: "#4b5563",
+                marginBottom: 4,
+              }}
+            >
+              {lang === "ru" ? "Имя шеф‑повара" : "Oshpaz nomi"}
+            </div>
+            <input
+              type="text"
+              value={chefName}
+              onChange={(e) => setChefName(e.target.value)}
+              placeholder={
+                lang === "ru"
+                  ? "Например, Шеф Алидзан"
+                  : "Masalan, Shef Alidjan"
+              }
+              style={{
+                width: "100%",
+                height: 36,
+                borderRadius: 999,
+                border: "1px solid #d1d5db",
+                padding: "0 12px",
+                fontSize: 13,
+                outline: "none",
+                marginBottom: 8,
+              }}
+            />
+            <button
+              onClick={handleDone}
+              style={{
+                width: "100%",
+                height: 40,
+                borderRadius: 999,
+                border: "none",
+                background:
+                  "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
+                color: "#fff",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              {lang === "ru" ? "Готово — отправить ассистенту" : "Tayyor — assistentga yuborish"}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* ЧАТ СРАЗУ ПОД РЕДАКТОРОМ */}
+      <section
+        style={{
+          maxWidth: 960,
+          margin: "0 auto",
+          borderRadius: 22,
+          background: "#ffffff",
+          boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
+          padding: "16px 14px 70px",
+          position: "relative",
+        }}
+      >
+        <div
+          style={{
+            marginBottom: 10,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <div>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 700,
+                color: "#111827",
+              }}
+            >
+              Morobolsin Assistant
+            </div>
+            <div
+              style={{
+                fontSize: 12,
+                color: "#6b7280",
+              }}
+            >
+              {lang === "ru"
+                ? "Уточнит детали и поможет с заказом."
+                : "Buyurtma tafsilotlarini aniqlaydi va yordam beradi."}
+            </div>
+          </div>
+        </div>
+
+        <div
+          style={{
+            maxHeight: 260,
+            overflowY: "auto",
+            marginBottom: 10,
+          }}
+        >
+          {chatHistory.map((msg, idx) => (
+            <div
+              key={idx}
+              style={{
+                display: "flex",
+                justifyContent:
+                  msg.sender === "user" ? "flex-end" : "flex-start",
+                marginBottom: 8,
+              }}
+            >
+              <div
+                style={{
+                  maxWidth: "80%",
+                  padding: "8px 10px",
+                  borderRadius:
+                    msg.sender === "user"
+                      ? "16px 16px 4px 16px"
+                      : "16px 16px 16px 4px",
+                  background:
+                    msg.sender === "user" ? "#1f2937" : "#e5f0ff",
+                  color: msg.sender === "user" ? "#fff" : "#111827",
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {msg.text}
+              </div>
+            </div>
+          ))}
+          <div ref={messagesEndRef} />
+        </div>
+
+        {/* ВВОД СООБЩЕНИЯ */}
+        <div
+          style={{
+            position: "absolute",
+            left: 14,
+            right: 14,
+            bottom: 16,
+            display: "flex",
+            gap: 8,
+          }}
+        >
+          <input
+            type="text"
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleSend();
+            }}
+            placeholder={
+              lang === "ru"
+                ? "Опишите заведение и вопросы по форме..."
+                : "Zavod va forma bo‘yicha savolingizni yozing..."
+            }
+            style={{
+              flex: 1,
+              height: 42,
+              borderRadius: 999,
+              border: "1px solid #d1d5db",
+              padding: "0 14px",
+              fontSize: 14,
+              outline: "none",
+            }}
+            disabled={loading}
+          />
+          <button
+            onClick={handleSend}
+            disabled={loading || !message.trim()}
+            style={{
+              width: 46,
+              height: 42,
+              borderRadius: 999,
+              border: "none",
+              background:
+                "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
+              color: "#fff",
+              fontSize: 18,
+              cursor:
+                loading || !message.trim() ? "not-allowed" : "pointer",
+              opacity: loading || !message.trim() ? 0.6 : 1,
+            }}
+          >
+            →
+          </button>
+        </div>
+      </section>
     </div>
   );
 };
 
-export default Chat;
+export default ChatPage;
+
