@@ -19,11 +19,11 @@ type Gender = "male" | "female";
 
 const HERO_BG = "/images/chef-hero.jpg";
 
-// PNG-силуэты без фона (подставь свои)
+// Прямые PNG-ссылки на силуэты без фона (замени на свои при необходимости)
 const MANNEQUIN_MALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // [web:231][web:234]
+  "https://www.cleanpng.com/png-standing-man-silhouette-4059810/preview.html"; // пример мужского силуэта [web:241]
 const MANNEQUIN_FEMALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png";
+  "https://www.cleanpng.com/png-standing-woman-silhouette-4060121/preview.html"; // пример женского силуэта [web:242]
 
 const HATS: ItemVariant[] = [
   {
@@ -404,7 +404,7 @@ const ChatPage: React.FC = () => {
                 width: 40,
                 height: 40,
                 borderRadius: 999,
-                border: "1px solid #d1d5db",
+                border: "1px solid "#d1d5db",
                 background: "#ffffff",
                 fontSize: 22,
                 cursor: "pointer",
@@ -514,7 +514,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВО – только силуэт, без белого блока и сердечка */}
+        {/* ЛЕВЫЙ БЛОК – только силуэт на прозрачном фоне */}
         <div
           style={{
             borderRadius: 22,
@@ -551,7 +551,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВО – пол, рост, вес, категории */}
+        {/* ПРАВЫЙ БЛОК – пол, рост, вес, категории */}
         <div
           style={{
             borderRadius: 22,
