@@ -7,31 +7,30 @@ type Message = { text: string; sender: "user" | "bot" };
 type ItemVariant = {
   id: number;
   name: string;
-  icon: string;
 };
 
 const HATS: ItemVariant[] = [
-  { id: 1, name: "Классическая шапка", icon: "/icons/hat-1.svg" },
-  { id: 2, name: "Высокая шапка", icon: "/icons/hat-2.svg" },
-  { id: 3, name: "Бандана", icon: "/icons/hat-3.svg" },
+  { id: 1, name: "Классическая шапка" },
+  { id: 2, name: "Высокая шапка" },
+  { id: 3, name: "Бандана" },
 ];
 
 const TOPS: ItemVariant[] = [
-  { id: 1, name: "Классический китель", icon: "/icons/top-1.svg" },
-  { id: 2, name: "Современный китель", icon: "/icons/top-2.svg" },
-  { id: 3, name: "Минималистичный", icon: "/icons/top-3.svg" },
+  { id: 1, name: "Классический китель" },
+  { id: 2, name: "Современный китель" },
+  { id: 3, name: "Минималистичный китель" },
 ];
 
 const APRONS: ItemVariant[] = [
-  { id: 1, name: "Классический фартук", icon: "/icons/apron-1.svg" },
-  { id: 2, name: "Нагрудный фартук", icon: "/icons/apron-2.svg" },
-  { id: 3, name: "Бариста", icon: "/icons/apron-3.svg" },
+  { id: 1, name: "Классический фартук" },
+  { id: 2, name: "Нагрудный фартук" },
+  { id: 3, name: "Бариста фартук" },
 ];
 
 const PANTS: ItemVariant[] = [
-  { id: 1, name: "Классические брюки", icon: "/icons/pants-1.svg" },
-  { id: 2, name: "Джоггеры", icon: "/icons/pants-2.svg" },
-  { id: 3, name: "Узкие брюки", icon: "/icons/pants-3.svg" },
+  { id: 1, name: "Классические брюки" },
+  { id: 2, name: "Джоггеры" },
+  { id: 3, name: "Узкие брюки" },
 ];
 
 type ChefLook = {
@@ -63,9 +62,8 @@ const ChatPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
-  const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // animated header roles
+  // анимация заголовка
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -106,18 +104,12 @@ const ChatPage: React.FC = () => {
     };
   }, [roleIndex, roles.length]);
 
-  // chat autoscroll
+  // автоскролл чата
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatHistory]);
-
-  const scrollTo = (ref: React.RefObject<HTMLDivElement>) => {
-    if (ref.current) {
-      ref.current.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
 
   const buildContextIntro = () => {
     const typeLabelRu =
@@ -202,10 +194,9 @@ const ChatPage: React.FC = () => {
 
     const withContext = chatHistory.length === 0;
     sendMessageToGPT(text, { withContext });
-    scrollTo(modelRef);
   };
 
-  // indexlar o`zgarganda lookni yangilash
+  // синхронизация look при смене индексов
   useEffect(() => {
     setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
@@ -370,34 +361,19 @@ const ChatPage: React.FC = () => {
               {typedText}
             </span>
           </h1>
-          <p
-            style={{
-              fontSize: 14,
-              margin: "0 0 14px",
-              lineHeight: 1.6,
-              maxWidth: 480,
-              textAlign: "center",
-            }}
-          >
-            {lang === "ru"
-              ? "Свайпайте шапку, верх, фартук и брюки — ассистент соберёт комплект под ваш бренд."
-              : "Shapka, ustki, fartuk va shimlarni swipe qilib tanlang — assistent mos to‘plam tuzadi."}
-          </p>
         </div>
       </section>
 
-      {/* EDITOR + PREVIEW */}
+      {/* БЛОК ВЫБОРА + КНОПКА */}
       <section
-        ref={modelRef}
         style={{
           maxWidth: 960,
           margin: "0 auto 24px",
           display: "grid",
-          gridTemplateColumns: "minmax(0,1.2fr) minmax(0,1fr)",
+          gridTemplateColumns: "minmax(0,1fr)",
           gap: 16,
         }}
       >
-        {/* PREVIEW (chapdagi “3D”) */}
         <div
           style={{
             borderRadius: 22,
@@ -406,238 +382,77 @@ const ChatPage: React.FC = () => {
             padding: 16,
             display: "flex",
             flexDirection: "column",
-            gap: 10,
-            minHeight: 260,
+            gap: 8,
           }}
         >
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 6,
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: 14,
-                  fontWeight: 700,
-                  color: "#111827",
-                }}
-              >
-                3D‑модель в форме (иконки)
-              </div>
-              <div
-                style={{
-                  fontSize: 12,
-                  color: "#6b7280",
-                }}
-              >
-                Пока условно: шапка, верх, фартук и брюки как слои иконок.
-              </div>
-            </div>
-          </div>
-
-          <div
-            style={{
-              flex: 1,
-              borderRadius: 18,
-              background: "#f9fafb",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              position: "relative",
-              overflow: "hidden",
-            }}
-          >
-            {/* pants */}
-            {look.pants && (
-              <img
-                src={look.pants.icon}
-                alt={look.pants.name}
-                style={{
-                  position: "absolute",
-                  bottom: 12,
-                  width: "32%",
-                  opacity: 0.9,
-                }}
-              />
-            )}
-
-            {/* apron */}
-            {look.apron && (
-              <img
-                src={look.apron.icon}
-                alt={look.apron.name}
-                style={{
-                  position: "absolute",
-                  bottom: 40,
-                  width: "40%",
-                  opacity: 0.95,
-                }}
-              />
-            )}
-
-            {/* top */}
-            {look.top && (
-              <img
-                src={look.top.icon}
-                alt={look.top.name}
-                style={{
-                  position: "absolute",
-                  bottom: 80,
-                  width: "45%",
-                  opacity: 0.95,
-                }}
-              />
-            )}
-
-            {/* hat */}
-            {look.hat && (
-              <img
-                src={look.hat.icon}
-                alt={look.hat.name}
-                style={{
-                  position: "absolute",
-                  bottom: 150,
-                  width: "26%",
-                  opacity: 0.95,
-                }}
-              />
-            )}
-
-            {/* name */}
-            <div
-              style={{
-                position: "absolute",
-                bottom: 14,
-                left: 0,
-                right: 0,
-                textAlign: "center",
-                fontSize: 12,
-                fontWeight: 700,
-                color: "#111827",
-                textShadow: "0 1px 2px rgba(0,0,0,0.18)",
-                padding: "0 6px",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {chefName || "Имя шефа"}
-            </div>
-          </div>
-        </div>
-
-        {/* KATEGORIYALAR – SWIPE SCROLL */}
-        <div
-          style={{
-            borderRadius: 22,
-            background: "#ffffff",
-            boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 16,
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-          }}
-        >
-          <div
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              color: "#111827",
-              marginBottom: 4,
-            }}
-          >
-            {lang === "ru"
-              ? "Свайпните элементы формы"
-              : "Forma elementlarini swipe qiling"}
-          </div>
-
-          <SwipeRow
-            title={lang === "ru" ? "Шапка" : "Shapka"}
+          <SelectRow
+            label={lang === "ru" ? "Шапка" : "Shapka"}
             items={HATS}
             activeIndex={hatIndex}
-            onActiveChange={setHatIndex}
+            onChange={setHatIndex}
           />
-
-          <SwipeRow
-            title={lang === "ru" ? "Верхняя одежда" : "Yuqori kiyim"}
+          <SelectRow
+            label={lang === "ru" ? "Верхняя одежда" : "Yuqori kiyim"}
             items={TOPS}
             activeIndex={topIndex}
-            onActiveChange={setTopIndex}
+            onChange={setTopIndex}
           />
-
-          <SwipeRow
-            title={lang === "ru" ? "Фартук" : "Fartuk"}
+          <SelectRow
+            label={lang === "ru" ? "Фартук" : "Fartuk"}
             items={APRONS}
             activeIndex={apronIndex}
-            onActiveChange={setApronIndex}
+            onChange={setApronIndex}
           />
-
-          <SwipeRow
-            title={lang === "ru" ? "Брюки" : "Shimlar"}
+          <SelectRow
+            label={lang === "ru" ? "Брюки" : "Shimlar"}
             items={PANTS}
             activeIndex={pantsIndex}
-            onActiveChange={setPantsIndex}
+            onChange={setPantsIndex}
           />
 
-          <div style={{ marginTop: 6 }}>
-            <div
-              style={{
-                fontSize: 12,
-                fontWeight: 600,
-                color: "#4b5563",
-                marginBottom: 4,
-              }}
-            >
-              {lang === "ru" ? "Имя шеф‑повара" : "Oshpaz nomi"}
-            </div>
-            <input
-              type="text"
-              value={chefName}
-              onChange={(e) => setChefName(e.target.value)}
-              placeholder={
-                lang === "ru"
-                  ? "Например, Шеф Алиджан"
-                  : "Masalan, Shef Alijon"
-              }
-              style={{
-                width: "100%",
-                height: 36,
-                borderRadius: 999,
-                border: "1px solid #d1d5db",
-                padding: "0 12px",
-                fontSize: 13,
-                outline: "none",
-                marginBottom: 8,
-              }}
-            />
-            <button
-              onClick={handleDone}
-              style={{
-                width: "100%",
-                height: 40,
-                borderRadius: 999,
-                border: "none",
-                background:
-                  "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
-                color: "#fff",
-                fontSize: 14,
-                fontWeight: 600,
-                cursor: "pointer",
-              }}
-            >
-              {lang === "ru"
-                ? "Готово — отправить ассистенту"
-                : "Tayyor — assistentga yuborish"}
-            </button>
-          </div>
+          <input
+            type="text"
+            value={chefName}
+            onChange={(e) => setChefName(e.target.value)}
+            placeholder={
+              lang === "ru"
+                ? "Имя шефа"
+                : "Oshpaz nomi"
+            }
+            style={{
+              width: "100%",
+              height: 36,
+              borderRadius: 999,
+              border: "1px solid #d1d5db",
+              padding: "0 12px",
+              fontSize: 13,
+              outline: "none",
+              marginTop: 8,
+              marginBottom: 8,
+            }}
+          />
+
+          <button
+            onClick={handleDone}
+            style={{
+              width: "100%",
+              height: 40,
+              borderRadius: 999,
+              border: "none",
+              background:
+                "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: "pointer",
+            }}
+          >
+            {lang === "ru" ? "Готово" : "Tayyor"}
+          </button>
         </div>
       </section>
 
-      {/* CHAT */}
+      {/* ЧАТ */}
       <section
         style={{
           maxWidth: 960,
@@ -778,123 +593,65 @@ const ChatPage: React.FC = () => {
   );
 };
 
-type SwipeRowProps = {
-  title: string;
+type SelectRowProps = {
+  label: string;
   items: ItemVariant[];
   activeIndex: number;
-  onActiveChange: (index: number) => void;
+  onChange: (index: number) => void;
 };
 
-const SwipeRow: React.FC<SwipeRowProps> = ({
-  title,
+const SelectRow: React.FC<SelectRowProps> = ({
+  label,
   items,
   activeIndex,
-  onActiveChange,
+  onChange,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  // aktiv elementga taxminan o‘rtaga “scroll” qilish
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const child = el.children[activeIndex] as HTMLElement | undefined;
-    if (!child) return;
-    const offset =
-      child.offsetLeft - el.clientWidth / 2 + child.clientWidth / 2;
-    el.scrollTo({ left: offset, behavior: "smooth" });
-  }, [activeIndex]);
-
   return (
     <div
       style={{
         borderRadius: 14,
         border: "1px solid #e5e7eb",
-        padding: 8,
+        padding: 6,
         display: "flex",
-        flexDirection: "column",
-        gap: 6,
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 8,
       }}
     >
-      <div
+      <span
         style={{
           fontSize: 12,
           fontWeight: 600,
           color: "#4b5563",
+          minWidth: 90,
         }}
       >
-        {title}
-      </div>
-
-      <div
-        ref={containerRef}
+        {label}
+      </span>
+      <select
+        value={items[activeIndex]?.id ?? ""}
+        onChange={(e) => {
+          const id = Number(e.target.value);
+          const index = items.findIndex((it) => it.id === id);
+          if (index >= 0) onChange(index);
+        }}
         style={{
-          display: "flex",
-          gap: 8,
-          overflowX: "auto",
-          paddingBottom: 4,
-          WebkitOverflowScrolling: "touch",
+          flex: 1,
+          height: 32,
+          borderRadius: 999,
+          border: "1px solid #d1d5db",
+          padding: "0 10px",
+          fontSize: 12,
+          outline: "none",
+          background: "#f9fafb",
         }}
       >
-        {items.map((item, index) => {
-          const isActive = index === activeIndex;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => onActiveChange(index)}
-              style={{
-                minWidth: 84,
-                maxWidth: 84,
-                borderRadius: 14,
-                border: isActive
-                  ? "2px solid #111827"
-                  : "1px solid #e5e7eb",
-                background: isActive ? "#eef2ff" : "#f9fafb",
-                padding: 6,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 4,
-                cursor: "pointer",
-              }}
-            >
-              <div
-                style={{
-                  width: 52,
-                  height: 52,
-                  borderRadius: 999,
-                  background: "#e5e7eb",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  overflow: "hidden",
-                }}
-              >
-                <img
-                  src={item.icon}
-                  alt={item.name}
-                  style={{
-                    width: "70%",
-                    height: "70%",
-                    objectFit: "contain",
-                  }}
-                />
-              </div>
-              <div
-                style={{
-                  fontSize: 11,
-                  fontWeight: 500,
-                  color: "#111827",
-                  textAlign: "center",
-                  lineHeight: 1.3,
-                }}
-              >
-                {item.name}
-              </div>
-            </button>
-          );
-        })}
-      </div>
+        {items.map((it) => (
+          <option key={it.id} value={it.id}>
+            {it.name}
+          </option>
+        ))}
+      </select>
     </div>
   );
 };
