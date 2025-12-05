@@ -49,7 +49,7 @@ const ChatPage: React.FC = () => {
 
   // typewriter‑эффект + смена слова
  // harfni sekinroq yozish (masalan, 180 ms)
-const TYPE_SPEED = 180;
+const TYPE_SPEED = 3000;
 // so‘zni 5 sekundda bir almashtirish
 const WORD_DELAY = 5000;
 
