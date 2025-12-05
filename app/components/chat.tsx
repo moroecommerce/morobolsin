@@ -10,9 +10,9 @@ type ItemVariant = {
   image: string;
 };
 
-// Путь к картинкам: положи файлы в /public/images и укажи точные имена
-const HERO_BG = "/images/chef-hero.jpg"; // фон с поваром в шапке
-const DEFAULT_TOP = "/images/chef-3d.png"; // 3D модель по умолчанию
+// Картинки — проверь, что они лежат в /public/images
+const HERO_BG = "/images/chef-hero.jpg";
+const DEFAULT_TOP = "/images/chef-3d.png";
 
 const HATS: ItemVariant[] = [
   { id: 1, name: "Классическая шапка", image: "/images/hat-1.png" },
@@ -326,7 +326,7 @@ const ChatPage: React.FC = () => {
         </div>
       </header>
 
-      {/* HERO с фоном повара */}
+      {/* HERO: вернули более светлый градиент */}
       <section
         style={{
           maxWidth: 960,
@@ -338,7 +338,7 @@ const ChatPage: React.FC = () => {
           flexWrap: "wrap",
           gap: 16,
           alignItems: "center",
-          backgroundImage: `linear-gradient(135deg,rgba(15,23,42,0.92),rgba(30,64,175,0.92)), url(${HERO_BG})`,
+          backgroundImage: `linear-gradient(135deg,rgba(17,24,39,0.9),rgba(75,85,99,0.9)), url(${HERO_BG})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -381,25 +381,25 @@ const ChatPage: React.FC = () => {
             }}
           >
             {lang === "ru"
-              ? "Подберите шапку, верх, фартук и брюки — ассистент поможет собрать комплекты под ваш бренд и задачи."
-              : "Shapka, yuqori kiyim, fartuk va shimlarni tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
+              ? "Подберите шапку, верх и фартук — ассистент поможет собрать комплект под ваш бренд."
+              : "Shapka, yuqori kiyim va fartukni tanlang — assistent brendingizga mos to‘plamni taklif qiladi."}
           </p>
         </div>
       </section>
 
-      {/* РЕДАКТОР + 3D */}
+      {/* РЕДАКТОР + 3D — оба блока выше и крупнее */}
       <section
         ref={modelRef}
         style={{
           maxWidth: 960,
           margin: "0 auto 24px",
           display: "grid",
-          gridTemplateColumns: "minmax(0,1.2fr) minmax(0,1fr)",
+          gridTemplateColumns: "minmax(0,1.1fr) minmax(0,0.9fr)",
           gap: 16,
-          alignItems: "start", // всё чуть выше
+          alignItems: "start",
         }}
       >
-        {/* ЛЕВАЯ 3D МОДЕЛЬ: больше картинка, текст только снизу */}
+        {/* ЛЕВАЯ 3D МОДЕЛЬ — увеличили изображение */}
         <div
           style={{
             borderRadius: 22,
@@ -409,7 +409,7 @@ const ChatPage: React.FC = () => {
             display: "flex",
             flexDirection: "column",
             gap: 10,
-            minHeight: 260,
+            minHeight: 300,
           }}
         >
           <div
@@ -428,7 +428,8 @@ const ChatPage: React.FC = () => {
               src={currentTopImage}
               alt="3D модель в форме"
               style={{
-                width: "85%", // увеличили модель
+                width: "92%", // ещё больше
+                maxWidth: 420,
                 height: "auto",
                 objectFit: "contain",
               }}
@@ -465,7 +466,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА: селекты с отступами, всё внутри блока */}
+        {/* ПРАВАЯ КОЛОНКА — выбор, поднят повыше + отступы между select */}
         <div
           style={{
             borderRadius: 22,
@@ -474,7 +475,7 @@ const ChatPage: React.FC = () => {
             padding: 14,
             display: "flex",
             flexDirection: "column",
-            gap: 8, // отступ между категориями
+            gap: 10,
           }}
         >
           <CompactSelect
@@ -520,7 +521,7 @@ const ChatPage: React.FC = () => {
             onClick={handleDone}
             style={{
               width: "100%",
-              height: 38,
+              height: 40,
               borderRadius: 999,
               border: "none",
               background:
@@ -648,7 +649,7 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// Компактный select
+// Компактные закруглённые select'ы
 type CompactSelectProps = {
   items: ItemVariant[];
   activeIndex: number;
