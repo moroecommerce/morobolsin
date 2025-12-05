@@ -49,30 +49,31 @@ const ChatPage: React.FC = () => {
 
   // typewriter‑эффект + смена слова
   useEffect(() => {
-    const currentWord = roles[roleIndex];
-    setTypedText("");
-    setCharIndex(0);
+  const currentWord = roles[roleIndex];
+  setTypedText("");
+  setCharIndex(0);
 
-    const typeInterval = setInterval(() => {
-      setCharIndex((prev) => {
-        if (prev < currentWord.length) {
-          setTypedText(currentWord.slice(0, prev + 1));
-          return prev + 1;
-        }
-        clearInterval(typeInterval);
-        return prev;
-      });
-    }, 120);
-
-    const wordTimeout = setTimeout(() => {
-      setRoleIndex((prev) => (prev + 1) % roles.length);
-    }, 5000);
-
-    return () => {
+  const typeInterval = setInterval(() => {
+    setCharIndex((prev) => {
+      if (prev < currentWord.length) {
+        setTypedText(currentWord.slice(0, prev + 1));
+        return prev + 1;
+      }
       clearInterval(typeInterval);
-      clearTimeout(wordTimeout);
-    };
-  }, [roleIndex, roles]);
+      return prev;
+    });
+  }, 120);
+
+  const wordTimeout = setTimeout(() => {
+    setRoleIndex((prev) => (prev + 1) % roles.length);
+  }, 5000);
+
+  return () => {
+    clearInterval(typeInterval);
+    clearTimeout(wordTimeout);
+  };
+}, [roleIndex, roles]);
+
 
   // автоскролл чата
   useEffect(() => {
