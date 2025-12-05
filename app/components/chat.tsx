@@ -1,6 +1,11 @@
 "use client";
 
-import React, { useState, useEffect, useRef, CSSProperties } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  CSSProperties,
+} from "react";
 
 type Message = { text: string; sender: "user" | "bot" };
 
@@ -19,7 +24,7 @@ const HERO_BG = "/images/chef-hero.jpg";
 const FULL_BODY_MANNEQUIN_MALE =
   "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // пример силуэта мужчины [web:202][web:205]
 const FULL_BODY_MANNEQUIN_FEMALE =
-  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // здесь можно поставить женский силуэт
+  "https://cdn-icons-png.flaticon.com/512/9498/9498380.png"; // пока тот же, позже заменишь на женский
 
 // Примеры данных с прямыми https‑ссылками (заменишь на свои 3D/фото)
 const HATS: ItemVariant[] = [
@@ -126,7 +131,7 @@ const ICON_HEIGHT =
 const ICON_WEIGHT =
   "https://img.icons8.com/ios-filled/100/000000/scale.png";
 
-// Общий стиль для всех select справа (одинаковый размер) [web:197][web:198]
+// Общий стиль для всех select справа [web:197][web:198]
 const commonSelectStyle: CSSProperties = {
   flex: 1,
   height: 38,
@@ -427,7 +432,7 @@ const ChatPage: React.FC = () => {
                     border:
                       lang === lng
                         ? "1px solid #111827"
-                        : "1px solid "#e5e7eb",
+                        : "1px solid #e5e7eb",
                     background: lang === lng ? "#111827" : "#ffffff",
                     color: lang === lng ? "#f9fafb" : "#111827",
                     fontSize: 12,
@@ -509,12 +514,12 @@ const ChatPage: React.FC = () => {
           maxWidth: 960,
           margin: "0 auto 24px",
           display: "grid",
-          gridTemplateColumns: "minmax(0,0.85fr) minmax(0,1.15fr)", // правая шире, всё внутри [web:185]
+          gridTemplateColumns: "minmax(0,0.85fr) minmax(0,1.15fr)",
           gap: 16,
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – только силуэт человека */}
+        {/* ЛЕВАЯ КОЛОНКА – силуэт */}
         <div
           style={{
             borderRadius: 22,
@@ -571,7 +576,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории, все строки одинакового размера */}
+        {/* ПРАВАЯ КОЛОНКА – Пол / Рост / Вес + категории */}
         <div
           style={{
             borderRadius: 22,
