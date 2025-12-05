@@ -10,7 +10,6 @@ type ItemVariant = {
   image: string;
 };
 
-// Картинки — проверь, что они лежат в /public/images
 const HERO_BG = "/images/chef-hero.jpg";
 const DEFAULT_TOP = "/images/chef-3d.png";
 
@@ -69,7 +68,6 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // typewriter
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -204,7 +202,6 @@ const ChatPage: React.FC = () => {
     scrollTo(modelRef);
   };
 
-  // синхронизация look
   useEffect(() => {
     setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
@@ -326,7 +323,7 @@ const ChatPage: React.FC = () => {
         </div>
       </header>
 
-      {/* HERO: вернули более светлый градиент */}
+      {/* HERO */}
       <section
         style={{
           maxWidth: 960,
@@ -387,7 +384,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* РЕДАКТОР + 3D — оба блока выше и крупнее */}
+      {/* 3D + категории: одинаковая высота колонок */}
       <section
         ref={modelRef}
         style={{
@@ -396,20 +393,20 @@ const ChatPage: React.FC = () => {
           display: "grid",
           gridTemplateColumns: "minmax(0,1.1fr) minmax(0,0.9fr)",
           gap: 16,
-          alignItems: "start",
+          alignItems: "stretch", // обе колонки тянутся по высоте
         }}
       >
-        {/* ЛЕВАЯ 3D МОДЕЛЬ — увеличили изображение */}
+        {/* ЛЕВАЯ 3D МОДЕЛЬ — ещё выше */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 16,
+            padding: 18,
             display: "flex",
             flexDirection: "column",
             gap: 10,
-            minHeight: 300,
+            minHeight: 340, // повысили высоту
           }}
         >
           <div
@@ -428,8 +425,8 @@ const ChatPage: React.FC = () => {
               src={currentTopImage}
               alt="3D модель в форме"
               style={{
-                width: "92%", // ещё больше
-                maxWidth: 420,
+                width: "96%", // максимально крупная модель
+                maxWidth: 460,
                 height: "auto",
                 objectFit: "contain",
               }}
@@ -466,37 +463,41 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА — выбор, поднят повыше + отступы между select */}
+        {/* ПРАВАЯ КОЛОНКА — категории чуть левее, больше, с отступами */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 14,
+            padding: 18,
             display: "flex",
             flexDirection: "column",
-            gap: 10,
+            gap: 12, // больше отступ между категориями
           }}
         >
           <CompactSelect
             items={HATS}
             activeIndex={hatIndex}
             onChange={setHatIndex}
+            bigger
           />
           <CompactSelect
             items={TOPS}
             activeIndex={topIndex}
             onChange={setTopIndex}
+            bigger
           />
           <CompactSelect
             items={APRONS}
             activeIndex={apronIndex}
             onChange={setApronIndex}
+            bigger
           />
           <CompactSelect
             items={PANTS}
             activeIndex={pantsIndex}
             onChange={setPantsIndex}
+            bigger
           />
 
           <input
@@ -506,14 +507,14 @@ const ChatPage: React.FC = () => {
             placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
             style={{
               width: "100%",
-              height: 34,
+              height: 36,
               borderRadius: 999,
               border: "1px solid #d1d5db",
-              padding: "0 12px",
+              padding: "0 14px",
               fontSize: 12,
               outline: "none",
               marginTop: 4,
-              marginBottom: 8,
+              marginBottom: 10,
             }}
           />
 
@@ -521,7 +522,7 @@ const ChatPage: React.FC = () => {
             onClick={handleDone}
             style={{
               width: "100%",
-              height: 40,
+              height: 42,
               borderRadius: 999,
               border: "none",
               background:
@@ -649,43 +650,53 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// Компактные закруглённые select'ы
 type CompactSelectProps = {
   items: ItemVariant[];
   activeIndex: number;
   onChange: (index: number) => void;
+  bigger?: boolean;
 };
 
 const CompactSelect: React.FC<CompactSelectProps> = ({
   items,
   activeIndex,
   onChange,
+  bigger,
 }) => {
   return (
-    <select
-      value={items[activeIndex]?.id ?? ""}
-      onChange={(e) => {
-        const id = Number(e.target.value);
-        const index = items.findIndex((it) => it.id === id);
-        if (index >= 0) onChange(index);
-      }}
+    <div
       style={{
         width: "100%",
-        height: 32,
-        borderRadius: 999,
-        border: "1px solid #d1d5db",
-        padding: "0 10px",
-        fontSize: 11,
-        outline: "none",
-        background: "#f9fafb",
+        display: "flex",
+        justifyContent: "flex-start", // слегка сдвигаем левее
       }}
     >
-      {items.map((it) => (
-        <option key={it.id} value={it.id}>
-          {it.name}
-        </option>
-      ))}
-    </select>
+      <select
+        value={items[activeIndex]?.id ?? ""}
+        onChange={(e) => {
+          const id = Number(e.target.value);
+          const index = items.findIndex((it) => it.id === id);
+          if (index >= 0) onChange(index);
+        }}
+        style={{
+          width: "100%",
+          maxWidth: bigger ? "100%" : "100%",
+          height: bigger ? 36 : 32,
+          borderRadius: 999,
+          border: "1px solid #d1d5db",
+          padding: "0 12px",
+          fontSize: bigger ? 12 : 11,
+          outline: "none",
+          background: "#f9fafb",
+        }}
+      >
+        {items.map((it) => (
+          <option key={it.id} value={it.id}>
+            {it.name}
+          </option>
+        ))}
+      </select>
+    </div>
   );
 };
 
