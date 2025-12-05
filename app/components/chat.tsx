@@ -7,52 +7,53 @@ type Message = { text: string; sender: "user" | "bot" };
 type ItemVariant = {
   id: number;
   name: string;
-  image: string;
+  icon: string;
 };
 
 const HATS: ItemVariant[] = [
-  { id: 1, name: "Классическая шапка", image: "/uniforms/hat-1.png" },
-  { id: 2, name: "Современная шапка", image: "/uniforms/hat-2.png" },
+  { id: 1, name: "Классическая шапка", icon: "/icons/hat-1.svg" },
+  { id: 2, name: "Высокая шапка", icon: "/icons/hat-2.svg" },
+  { id: 3, name: "Бандана", icon: "/icons/hat-3.svg" },
 ];
 
 const TOPS: ItemVariant[] = [
-  { id: 1, name: "Классический китель", image: "/uniforms/top-1.png" },
-  { id: 2, name: "Современный китель", image: "/uniforms/top-2.png" },
-  { id: 3, name: "Минималистичный китель", image: "/uniforms/top-3.png" },
-  { id: 4, name: "Узбекская кухня", image: "/uniforms/top-4.png" },
+  { id: 1, name: "Классический китель", icon: "/icons/top-1.svg" },
+  { id: 2, name: "Современный китель", icon: "/icons/top-2.svg" },
+  { id: 3, name: "Минималистичный", icon: "/icons/top-3.svg" },
 ];
 
 const APRONS: ItemVariant[] = [
-  { id: 1, name: "Классический фартук", image: "/uniforms/apron-1.png" },
-  { id: 2, name: "Нагрудный фартук", image: "/uniforms/apron-2.png" },
+  { id: 1, name: "Классический фартук", icon: "/icons/apron-1.svg" },
+  { id: 2, name: "Нагрудный фартук", icon: "/icons/apron-2.svg" },
+  { id: 3, name: "Бариста", icon: "/icons/apron-3.svg" },
 ];
 
 const PANTS: ItemVariant[] = [
-  { id: 1, name: "Классические брюки", image: "/uniforms/pants-1.png" },
-  { id: 2, name: "Джоггеры", image: "/uniforms/pants-2.png" },
+  { id: 1, name: "Классические брюки", icon: "/icons/pants-1.svg" },
+  { id: 2, name: "Джоггеры", icon: "/icons/pants-2.svg" },
+  { id: 3, name: "Узкие брюки", icon: "/icons/pants-3.svg" },
 ];
 
 type ChefLook = {
-  hatId: number | null;
-  topId: number | null;
-  apronId: number | null;
-  pantsId: number | null;
+  hat: ItemVariant | null;
+  top: ItemVariant | null;
+  apron: ItemVariant | null;
+  pants: ItemVariant | null;
 };
 
 const ChatPage: React.FC = () => {
   const [lang, setLang] = useState<"ru" | "uz">("ru");
 
-  // tanlovlar
   const [hatIndex, setHatIndex] = useState(0);
   const [topIndex, setTopIndex] = useState(0);
   const [apronIndex, setApronIndex] = useState(0);
   const [pantsIndex, setPantsIndex] = useState(0);
 
   const [look, setLook] = useState<ChefLook>({
-    hatId: HATS[0]?.id ?? null,
-    topId: TOPS[0]?.id ?? null,
-    apronId: APRONS[0]?.id ?? null,
-    pantsId: PANTS[0]?.id ?? null,
+    hat: HATS[0],
+    top: TOPS[0],
+    apron: APRONS[0],
+    pants: PANTS[0],
   });
 
   const [chefName, setChefName] = useState<string>("Шеф Алиджан");
@@ -64,7 +65,7 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // typewriter rollar
+  // animated header roles
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -73,8 +74,8 @@ const ChatPage: React.FC = () => {
   const [typedText, setTypedText] = useState("");
   const [charIndex, setCharIndex] = useState(0);
 
-  const TYPE_SPEED = 120; // harf tezligi
-  const WORD_DELAY = 5000; // so‘z almashtirish
+  const TYPE_SPEED = 120;
+  const WORD_DELAY = 5000;
 
   useEffect(() => {
     const currentWord = roles[roleIndex] ?? "";
@@ -89,16 +90,15 @@ const ChatPage: React.FC = () => {
           setTypedText(currentWord.slice(0, prev + 1));
           return prev + 1;
         }
-        if (typeInterval !== undefined) {
-          clearInterval(typeInterval);
-        }
+        if (typeInterval !== undefined) clearInterval(typeInterval);
         return prev;
       });
     }, TYPE_SPEED);
 
-    const wordTimeout = window.setTimeout(() => {
-      setRoleIndex((prev) => (prev + 1) % roles.length);
-    }, WORD_DELAY);
+    const wordTimeout = window.setTimeout(
+      () => setRoleIndex((prev) => (prev + 1) % roles.length),
+      WORD_DELAY
+    );
 
     return () => {
       if (typeInterval !== undefined) clearInterval(typeInterval);
@@ -106,7 +106,7 @@ const ChatPage: React.FC = () => {
     };
   }, [roleIndex, roles.length]);
 
-  // avtoscroll chat
+  // chat autoscroll
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -120,7 +120,8 @@ const ChatPage: React.FC = () => {
   };
 
   const buildContextIntro = () => {
-    const typeLabelRu = "комплект формы для шеф-повара";
+    const typeLabelRu =
+      "комплект формы: шапка, верх, фартук и брюки для шеф-повара";
     const typeLabelUz = typeLabelRu;
     const typeLabel = lang === "ru" ? typeLabelRu : typeLabelUz;
 
@@ -191,17 +192,12 @@ const ChatPage: React.FC = () => {
   };
 
   const handleDone = () => {
-    const hat = HATS[hatIndex];
-    const top = TOPS[topIndex];
-    const apron = APRONS[apronIndex];
-    const pants = PANTS[pantsIndex];
-
     const text =
       `Готовый комплект:\n` +
-      `Шапка: ${hat?.name ?? "не выбрана"}\n` +
-      `Верх: ${top?.name ?? "не выбран"}\n` +
-      `Фартук: ${apron?.name ?? "не выбран"}\n` +
-      `Брюки: ${pants?.name ?? "не выбраны"}\n` +
+      `Шапка: ${look.hat?.name ?? "не выбрана"}\n` +
+      `Верх: ${look.top?.name ?? "не выбран"}\n` +
+      `Фартук: ${look.apron?.name ?? "не выбран"}\n` +
+      `Брюки: ${look.pants?.name ?? "не выбраны"}\n` +
       `Имя на форме: ${chefName || "не указано"}`;
 
     const withContext = chatHistory.length === 0;
@@ -209,45 +205,19 @@ const ChatPage: React.FC = () => {
     scrollTo(modelRef);
   };
 
-  // helperlar: chap-o‘ng
-  const cycleIndex = (len: number, idx: number) =>
-    (idx + len) % len;
-
-  const nextHat = () =>
-    setHatIndex((prev) => cycleIndex(HATS.length, prev + 1));
-  const prevHat = () =>
-    setHatIndex((prev) => cycleIndex(HATS.length, prev - 1));
-
-  const nextTop = () =>
-    setTopIndex((prev) => cycleIndex(TOPS.length, prev + 1));
-  const prevTop = () =>
-    setTopIndex((prev) => cycleIndex(TOPS.length, prev - 1));
-
-  const nextApron = () =>
-    setApronIndex((prev) => cycleIndex(APRONS.length, prev + 1));
-  const prevApron = () =>
-    setApronIndex((prev) => cycleIndex(APRONS.length, prev - 1));
-
-  const nextPants = () =>
-    setPantsIndex((prev) => cycleIndex(PANTS.length, prev + 1));
-  const prevPants = () =>
-    setPantsIndex((prev) => cycleIndex(PANTS.length, prev - 1));
-
-  // tanlov o‘zgarganda look state yangilash
+  // indexlar o`zgarganda lookni yangilash
   useEffect(() => {
-    setLook((prev) => ({ ...prev, hatId: HATS[hatIndex]?.id ?? null }));
+    setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
   useEffect(() => {
-    setLook((prev) => ({ ...prev, topId: TOPS[topIndex]?.id ?? null }));
+    setLook((prev) => ({ ...prev, top: TOPS[topIndex] ?? null }));
   }, [topIndex]);
   useEffect(() => {
-    setLook((prev) => ({ ...prev, apronId: APRONS[apronIndex]?.id ?? null }));
+    setLook((prev) => ({ ...prev, apron: APRONS[apronIndex] ?? null }));
   }, [apronIndex]);
   useEffect(() => {
-    setLook((prev) => ({ ...prev, pantsId: PANTS[pantsIndex]?.id ?? null }));
+    setLook((prev) => ({ ...prev, pants: PANTS[pantsIndex] ?? null }));
   }, [pantsIndex]);
-
-  const currentTopImage = TOPS[topIndex]?.image ?? "/uniforms/top-1.png";
 
   return (
     <div
@@ -282,7 +252,6 @@ const ChatPage: React.FC = () => {
             gap: 16,
           }}
         >
-          {/* ЛОГО */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div
               style={{
@@ -312,7 +281,6 @@ const ChatPage: React.FC = () => {
             </span>
           </div>
 
-          {/* СЕРДЕЧКО + ЯЗЫК */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button
               style={{
@@ -357,7 +325,7 @@ const ChatPage: React.FC = () => {
         </div>
       </header>
 
-      {/* HERO / БАННЕР */}
+      {/* HERO */}
       <section
         style={{
           maxWidth: 960,
@@ -412,13 +380,13 @@ const ChatPage: React.FC = () => {
             }}
           >
             {lang === "ru"
-              ? "Подберите шапку, китель, фартук и брюки — ассистент поможет собрать комплекты под ваш бренд и задачи."
-              : "Shapka, kitel, fartuk va shimlarni tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
+              ? "Свайпайте шапку, верх, фартук и брюки — ассистент соберёт комплект под ваш бренд."
+              : "Shapka, ustki, fartuk va shimlarni swipe qilib tanlang — assistent mos to‘plam tuzadi."}
           </p>
         </div>
       </section>
 
-      {/* РЕДАКТОР ОДЕЖДЫ + 3D */}
+      {/* EDITOR + PREVIEW */}
       <section
         ref={modelRef}
         style={{
@@ -429,7 +397,7 @@ const ChatPage: React.FC = () => {
           gap: 16,
         }}
       >
-        {/* 3D ЗАГЛУШКА */}
+        {/* PREVIEW (chapdagi “3D”) */}
         <div
           style={{
             borderRadius: 22,
@@ -458,7 +426,7 @@ const ChatPage: React.FC = () => {
                   color: "#111827",
                 }}
               >
-                3D‑модель в форме
+                3D‑модель в форме (иконки)
               </div>
               <div
                 style={{
@@ -466,7 +434,7 @@ const ChatPage: React.FC = () => {
                   color: "#6b7280",
                 }}
               >
-                Выберите шапку, верх, фартук и брюки — образ обновится.
+                Пока условно: шапка, верх, фартук и брюки как слои иконок.
               </div>
             </div>
           </div>
@@ -483,15 +451,63 @@ const ChatPage: React.FC = () => {
               overflow: "hidden",
             }}
           >
-            <img
-              src={currentTopImage}
-              alt="3D модель в форме"
-              style={{
-                width: "70%",
-                height: "auto",
-                objectFit: "contain",
-              }}
-            />
+            {/* pants */}
+            {look.pants && (
+              <img
+                src={look.pants.icon}
+                alt={look.pants.name}
+                style={{
+                  position: "absolute",
+                  bottom: 12,
+                  width: "32%",
+                  opacity: 0.9,
+                }}
+              />
+            )}
+
+            {/* apron */}
+            {look.apron && (
+              <img
+                src={look.apron.icon}
+                alt={look.apron.name}
+                style={{
+                  position: "absolute",
+                  bottom: 40,
+                  width: "40%",
+                  opacity: 0.95,
+                }}
+              />
+            )}
+
+            {/* top */}
+            {look.top && (
+              <img
+                src={look.top.icon}
+                alt={look.top.name}
+                style={{
+                  position: "absolute",
+                  bottom: 80,
+                  width: "45%",
+                  opacity: 0.95,
+                }}
+              />
+            )}
+
+            {/* hat */}
+            {look.hat && (
+              <img
+                src={look.hat.icon}
+                alt={look.hat.name}
+                style={{
+                  position: "absolute",
+                  bottom: 150,
+                  width: "26%",
+                  opacity: 0.95,
+                }}
+              />
+            )}
+
+            {/* name */}
             <div
               style={{
                 position: "absolute",
@@ -514,7 +530,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ВАРИАНТЫ: 4 КАТЕГОРИИ */}
+        {/* KATEGORIYALAR – SWIPE SCROLL */}
         <div
           style={{
             borderRadius: 22,
@@ -535,43 +551,38 @@ const ChatPage: React.FC = () => {
             }}
           >
             {lang === "ru"
-              ? "Выберите элементы формы"
-              : "Forma elementlarini tanlang"}
+              ? "Свайпните элементы формы"
+              : "Forma elementlarini swipe qiling"}
           </div>
 
-          {/* ШАПКА */}
-          <CategoryRow
+          <SwipeRow
             title={lang === "ru" ? "Шапка" : "Shapka"}
-            item={HATS[hatIndex]}
-            onPrev={prevHat}
-            onNext={nextHat}
+            items={HATS}
+            activeIndex={hatIndex}
+            onActiveChange={setHatIndex}
           />
 
-          {/* ВЕРХ */}
-          <CategoryRow
+          <SwipeRow
             title={lang === "ru" ? "Верхняя одежда" : "Yuqori kiyim"}
-            item={TOPS[topIndex]}
-            onPrev={prevTop}
-            onNext={nextTop}
+            items={TOPS}
+            activeIndex={topIndex}
+            onActiveChange={setTopIndex}
           />
 
-          {/* ФАРТУК */}
-          <CategoryRow
+          <SwipeRow
             title={lang === "ru" ? "Фартук" : "Fartuk"}
-            item={APRONS[apronIndex]}
-            onPrev={prevApron}
-            onNext={nextApron}
+            items={APRONS}
+            activeIndex={apronIndex}
+            onActiveChange={setApronIndex}
           />
 
-          {/* БРЮКИ */}
-          <CategoryRow
+          <SwipeRow
             title={lang === "ru" ? "Брюки" : "Shimlar"}
-            item={PANTS[pantsIndex]}
-            onPrev={prevPants}
-            onNext={nextPants}
+            items={PANTS}
+            activeIndex={pantsIndex}
+            onActiveChange={setPantsIndex}
           />
 
-          {/* имя + Готово */}
           <div style={{ marginTop: 6 }}>
             <div
               style={{
@@ -626,7 +637,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ЧАТ */}
+      {/* CHAT */}
       <section
         style={{
           maxWidth: 960,
@@ -709,7 +720,6 @@ const ChatPage: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* ВВОД */}
         <div
           style={{
             position: "absolute",
@@ -768,20 +778,31 @@ const ChatPage: React.FC = () => {
   );
 };
 
-type CategoryRowProps = {
+type SwipeRowProps = {
   title: string;
-  item: ItemVariant | undefined;
-  onPrev: () => void;
-  onNext: () => void;
+  items: ItemVariant[];
+  activeIndex: number;
+  onActiveChange: (index: number) => void;
 };
 
-const CategoryRow: React.FC<CategoryRowProps> = ({
+const SwipeRow: React.FC<SwipeRowProps> = ({
   title,
-  item,
-  onPrev,
-  onNext,
+  items,
+  activeIndex,
+  onActiveChange,
 }) => {
-  if (!item) return null;
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // aktiv elementga taxminan o‘rtaga “scroll” qilish
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const child = el.children[activeIndex] as HTMLElement | undefined;
+    if (!child) return;
+    const offset =
+      child.offsetLeft - el.clientWidth / 2 + child.clientWidth / 2;
+    el.scrollTo({ left: offset, behavior: "smooth" });
+  }, [activeIndex]);
 
   return (
     <div
@@ -790,8 +811,8 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
         border: "1px solid #e5e7eb",
         padding: 8,
         display: "flex",
-        alignItems: "center",
-        gap: 10,
+        flexDirection: "column",
+        gap: 6,
       }}
     >
       <div
@@ -799,77 +820,81 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
           fontSize: 12,
           fontWeight: 600,
           color: "#4b5563",
-          width: 90,
         }}
       >
         {title}
       </div>
-      <button
-        onClick={onPrev}
-        style={{
-          width: 28,
-          height: 28,
-          borderRadius: 999,
-          border: "1px solid #d1d5db",
-          background: "#ffffff",
-          cursor: "pointer",
-        }}
-      >
-        ‹
-      </button>
+
       <div
+        ref={containerRef}
         style={{
-          flex: 1,
           display: "flex",
-          alignItems: "center",
           gap: 8,
+          overflowX: "auto",
+          paddingBottom: 4,
+          WebkitOverflowScrolling: "touch",
         }}
       >
-        <div
-          style={{
-            width: 46,
-            height: 54,
-            borderRadius: 12,
-            background: "#e5e7eb",
-            overflow: "hidden",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <img
-            src={item.image}
-            alt={item.name}
-            style={{
-              width: "90%",
-              height: "auto",
-              objectFit: "contain",
-            }}
-          />
-        </div>
-        <div
-          style={{
-            fontSize: 13,
-            fontWeight: 600,
-            color: "#111827",
-          }}
-        >
-          {item.name}
-        </div>
+        {items.map((item, index) => {
+          const isActive = index === activeIndex;
+          return (
+            <button
+              key={item.id}
+              type="button"
+              onClick={() => onActiveChange(index)}
+              style={{
+                minWidth: 84,
+                maxWidth: 84,
+                borderRadius: 14,
+                border: isActive
+                  ? "2px solid #111827"
+                  : "1px solid #e5e7eb",
+                background: isActive ? "#eef2ff" : "#f9fafb",
+                padding: 6,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 4,
+                cursor: "pointer",
+              }}
+            >
+              <div
+                style={{
+                  width: 52,
+                  height: 52,
+                  borderRadius: 999,
+                  background: "#e5e7eb",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  overflow: "hidden",
+                }}
+              >
+                <img
+                  src={item.icon}
+                  alt={item.name}
+                  style={{
+                    width: "70%",
+                    height: "70%",
+                    objectFit: "contain",
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  fontSize: 11,
+                  fontWeight: 500,
+                  color: "#111827",
+                  textAlign: "center",
+                  lineHeight: 1.3,
+                }}
+              >
+                {item.name}
+              </div>
+            </button>
+          );
+        })}
       </div>
-      <button
-        onClick={onNext}
-        style={{
-          width: 28,
-          height: 28,
-          borderRadius: 999,
-          border: "1px solid #d1d5db",
-          background: "#ffffff",
-          cursor: "pointer",
-        }}
-      >
-        ›
-      </button>
     </div>
   );
 };
