@@ -22,9 +22,10 @@ const HERO_BG =
 
 // Полноразмерные силуэты PNG с прозрачным фоном
 const MANNEQUIN_MALE =
-  "https://www.onlygfx.com/wp-content/uploads/2018/01/man-standing-silhouette-6.png"; // [web:261]
+  "https://www.onlygfx.com/wp-content/uploads/2018/01/man-standing-silhouette-6.png";
 const MANNEQUIN_FEMALE =
-  "https://www.onlygfx.com/wp-content/uploads/2018/01/woman-silhouette-10.png"; // [web:265]
+  "https://www.onlygfx.com/wp-content/uploads/2018/01/woman-silhouette-10.png";
+// [web:261][web:265]
 
 const HATS: ItemVariant[] = [
   {
@@ -158,7 +159,7 @@ type ChefLook = {
 };
 
 const CURRENT_URL = "https://morobolsin.vercel.app";
-const SHARE_TEXT = "Подбор формы для команды Morobolsin"; // [web:266][web:267]
+const SHARE_TEXT = "Подбор формы для команды Morobolsin";
 
 const ChatPage: React.FC = () => {
   const [lang, setLang] = useState<"ru" | "uz">("ru");
@@ -202,7 +203,7 @@ const ChatPage: React.FC = () => {
   const handleShareTelegram = () => {
     const url = encodeURIComponent(CURRENT_URL);
     const text = encodeURIComponent(SHARE_TEXT);
-    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; // [web:266][web:267]
+    const shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; // [web:267]
     window.open(shareUrl, "_blank", "noreferrer");
   };
 
@@ -414,7 +415,7 @@ const ChatPage: React.FC = () => {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {/* 1. Поделиться */}
+            {/* 1. Поделиться – минималистичное сердечко */}
             <button
               onClick={handleShareTelegram}
               style={{
@@ -423,17 +424,18 @@ const ChatPage: React.FC = () => {
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
                 background: "#ffffff",
-                fontSize: 18,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                fontSize: 18,
+                color: "#111827",
               }}
             >
-              ⇪
+              ♥
             </button>
 
-            {/* 2. Telegram */}
+            {/* 2. Telegram – минималистичный логотип */}
             <button
               onClick={handleOpenTelegramChannel}
               style={{
@@ -460,7 +462,7 @@ const ChatPage: React.FC = () => {
               </svg>
             </button>
 
-            {/* 3–4. RU / UZ круглые */}
+            {/* 3–4. RU / UZ – круглые */}
             <div style={{ display: "flex", gap: 4 }}>
               {["ru", "uz"].map((lng) => (
                 <button
