@@ -109,7 +109,7 @@ export default function Chat() {
     <div className="min-h-screen bg-slate-50 text-slate-900">
       {showWelcome && (
         <div className="px-4 py-8 md:py-12">
-          {/* HEADER */}
+          
           <header className="mx-auto mb-6 flex max-w-5xl items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900">
@@ -151,7 +151,7 @@ export default function Chat() {
             </div>
           </header>
 
-          {/* BANNER */}
+          
           <section className="mx-auto mb-6 max-w-5xl">
             <div className="flex flex-col gap-4 rounded-3xl bg-slate-900 px-5 py-5 text-white md:flex-row md:items-center md:justify-between md:px-8 md:py-6">
               <div>
@@ -176,11 +176,11 @@ export default function Chat() {
             </div>
           </section>
 
-          {/* MAIN GRID */}
+          
           <section className="mx-auto grid max-w-5xl items-start gap-6 md:grid-cols-[1.1fr,0.9fr]">
-            {/* LEFT: CATEGORY + PRODUCT + NAME */}
+            
             <div className="space-y-5">
-              {/* Категории */}
+              
               <div className="rounded-3xl border border-slate-100 bg-white p-4 shadow-sm">
                 <p className="mb-3 text-xs font-medium text-slate-500">
                   1. Категория формы
