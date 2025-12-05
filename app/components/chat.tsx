@@ -17,14 +17,14 @@ type ItemVariant = {
 
 type Gender = "male" | "female";
 
-const HERO_BG = "/images/chef-hero.jpg";
+const HERO_BG =
+  "https://images.pexels.com/photos/3298637/pexels-photo-3298637.jpeg"; // фон хиро, прямая ссылка [web:253]
 
-// ЗАМЕНИ эти ссылки на реальные PNG-файлы (прямая ссылка на картинку, не на HTML-страницу!)
+// Прямые PNG-ссылки на силуэты без фона
 const MANNEQUIN_MALE =
-  "https://static-00.iconduck.com/assets.00/man-user-silhouette-icon-512x1024-9uyz7xgk.png";
+  "https://uxwing.com/wp-content/themes/uxwing/download/peoples-avatars/man-user-icon.png"; // мужской силуэт [web:245]
 const MANNEQUIN_FEMALE =
-  "https://static-00.iconduck.com/assets.00/woman-user-silhouette-icon-512x1024-8p7n2y9h.png";
-// [web:241][web:242]
+  "https://iconscout.com/wp-content/uploads/2019/02/female-user-avatar-illustration-400x400.png"; // женский силуэт [web:248]
 
 const HATS: ItemVariant[] = [
   {
@@ -515,7 +515,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВО – только силуэт на прозрачном фоне */}
+        {/* ЛЕВЫЙ БЛОК – только силуэт на прозрачном фоне */}
         <div
           style={{
             borderRadius: 22,
@@ -552,7 +552,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВО – пол, рост, вес, категории */}
+        {/* ПРАВЫЙ БЛОК – пол, рост, вес, категории */}
         <div
           style={{
             borderRadius: 22,
