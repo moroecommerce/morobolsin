@@ -7,10 +7,10 @@ type Message = { text: string; sender: "user" | "bot" };
 type ItemVariant = {
   id: number;
   name: string;
-  image: string;   // используется и как иконка, и как превью
+  image: string;
 };
 
-// ВАРИАНТЫ (замени пути на реальные из /public)
+// ЗАМЕНИ пути на реальные из /public
 const HATS: ItemVariant[] = [
   { id: 1, name: "Классическая шапка", image: "/uniforms/hat-1.png" },
   { id: 2, name: "Высокая шапка", image: "/uniforms/hat-2.png" },
@@ -67,7 +67,7 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // typewriter‑заголовок
+  // typewriter заголовок
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -378,7 +378,7 @@ const ChatPage: React.FC = () => {
             style={{
               fontSize: 14,
               margin: "0 0 14px",
-              lineHeight: 1.7, // чуть больше интерлиньяж
+              lineHeight: 1.7,
               maxWidth: 480,
               textAlign: "center",
             }}
@@ -401,7 +401,7 @@ const ChatPage: React.FC = () => {
           gap: 16,
         }}
       >
-        {/* ЛЕВАЯ 3D МОДЕЛЬ */}
+        {/* ЛЕВАЯ 3D МОДЕЛЬ (без заголовка) */}
         <div
           style={{
             borderRadius: 22,
@@ -416,30 +416,13 @@ const ChatPage: React.FC = () => {
         >
           <div
             style={{
-              marginBottom: 6,
+              fontSize: 12,
+              color: "#6b7280",
+              lineHeight: 1.6,
+              marginBottom: 4,
             }}
           >
-            <div
-              style={{
-                fontSize: 14,
-                fontWeight: 700,
-                color: "#111827",
-                marginBottom: 4,
-              }}
-            >
-              3D‑модель в форме
-            </div>
-            <div
-              style={{
-                fontSize: 12,
-                color: "#6b7280",
-                lineHeight: 1.6, // чуть больше отступа между строками
-              }}
-            >
-              Выберите шапку, верх, фартук и брюки —
-              образ сразу обновится здесь, чтобы вы
-              увидели общий комплект.
-            </div>
+            Выберите шапку, верх, фартук и брюки — образ появится здесь.
           </div>
 
           <div
@@ -485,16 +468,16 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВЫЙ БЛОК: ИКОНКИ КАТЕГОРИЙ + SELECT */}
+        {/* ПРАВЫЙ БЛОК: МАЛЕНЬКИЕ ИКОНКИ ВНУТРИ КАТЕГОРИИ */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 16,
+            padding: 12,
             display: "flex",
             flexDirection: "column",
-            gap: 10,
+            gap: 8,
           }}
         >
           <IconSelectRow
@@ -568,7 +551,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ЧАТ – только поле ввода */}
+      {/* ЧАТ – только поле ввода, отступы сверху/снизу одинаковые */}
       <section
         style={{
           maxWidth: 960,
@@ -628,6 +611,8 @@ const ChatPage: React.FC = () => {
             bottom: 16,
             display: "flex",
             gap: 8,
+            paddingTop: 8,   // сверху
+            paddingBottom: 8 // снизу одинаковый отступ в контейнере
           }}
         >
           <input
@@ -678,7 +663,7 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// Ряд: слева иконка категории, справа select
+// компактный ряд: маленькая иконка + select, всё внутри одного белого блока
 type IconSelectRowProps = {
   iconSrc: string;
   alt: string;
@@ -697,24 +682,25 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
   return (
     <div
       style={{
-        borderRadius: 14,
+        borderRadius: 12,
         border: "1px solid #e5e7eb",
-        padding: 6,
+        padding: 4,
         display: "flex",
         alignItems: "center",
-        gap: 8,
+        gap: 6,
       }}
     >
       <div
         style={{
-          width: 40,
-          height: 40,
+          width: 32,
+          height: 32,
           borderRadius: 999,
           background: "#e5e7eb",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           overflow: "hidden",
+          flexShrink: 0,
         }}
       >
         <img
@@ -724,7 +710,7 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
             width: "80%",
             height: "80%",
             objectFit: "contain",
-            filter: "grayscale(100%) brightness(0.4)", // тёмно-серый тон
+            filter: "grayscale(100%) brightness(0.4)",
           }}
         />
       </div>
@@ -744,7 +730,6 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
           fontSize: 12,
           outline: "none",
           background: "#f9fafb",
-          // немного левее (внутренний padding уже хватает, поэтому просто flex:1)
         }}
       >
         {items.map((it) => (
