@@ -10,7 +10,7 @@ type ItemVariant = {
   image: string;
 };
 
-// Файлы должны реально лежать в /public/images
+// Файлы должны лежать в /public/images
 const HERO_BG = "/images/chef-hero.jpg";
 const DEFAULT_TOP = "/images/chef-3d.png";
 
@@ -38,15 +38,15 @@ const PANTS: ItemVariant[] = [
   { id: 3, name: "Узкие брюки", image: "/images/pants-3.png" },
 ];
 
-// Небольшие тёмные иконки категорий по прямым ссылкам https
+// Тематические иконки по прямым HTTPS‑ссылкам
 const ICON_HAT =
-  "https://cdn-icons-png.flaticon.com/512/3801/3801780.png"; // шапка [web:151]
+  "https://img.icons8.com/ios-filled/100/000000/chef-hat.png";      // шапка [web:160]
 const ICON_TOP =
-  "https://cdn-icons-png.flaticon.com/512/892/892458.png";   // верх/футболка [web:137]
+  "https://img.icons8.com/ios-filled/100/000000/t-shirt.png";        // верх/китель [web:163]
 const ICON_APRON =
-  "https://static.vecteezy.com/system/resources/thumbnails/022/651/809/small/apron-icon-symbol-illustration-free-png.png"; // фартук [web:143]
+  "https://img.icons8.com/ios-filled/100/000000/apron.png";          // фартук [web:165]
 const ICON_PANTS =
-  "https://cdn-icons-png.flaticon.com/512/892/892490.png";   // брюки [web:142]
+  "https://img.icons8.com/ios-filled/100/000000/trousers.png";       // брюки [web:163]
 
 type ChefLook = {
   hat: ItemVariant | null;
@@ -79,7 +79,6 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // анимация заголовка
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -120,7 +119,6 @@ const ChatPage: React.FC = () => {
     };
   }, [roleIndex, roles.length]);
 
-  // автоскролл чата
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -138,7 +136,6 @@ const ChatPage: React.FC = () => {
       "комплект формы: шапка, верх, фартук и брюки для шеф-повара";
     const typeLabelUz = typeLabelRu;
     const typeLabel = lang === "ru" ? typeLabelRu : typeLabelUz;
-
     return `Контекст: клиент выбирает ${typeLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
   };
 
@@ -151,10 +148,7 @@ const ChatPage: React.FC = () => {
 
     let historyToSend: Message[] = [
       ...chatHistory,
-      {
-        text,
-        sender: "user",
-      },
+      { text, sender: "user" },
     ];
 
     if (withContext && chatHistory.length === 0) {
@@ -219,7 +213,6 @@ const ChatPage: React.FC = () => {
     scrollTo(modelRef);
   };
 
-  // синхронизация look
   useEffect(() => {
     setLook((prev) => ({ ...prev, hat: HATS[hatIndex] ?? null }));
   }, [hatIndex]);
@@ -402,7 +395,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 3D + категории, аккуратно выровнены */}
+      {/* 3D + категории */}
       <section
         ref={modelRef}
         style={{
@@ -414,7 +407,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВАЯ КОЛОНКА – 3D модель, высокая */}
+        {/* ЛЕВАЯ КОЛОНКА – 3D модель */}
         <div
           style={{
             borderRadius: 22,
@@ -468,10 +461,9 @@ const ChatPage: React.FC = () => {
               {chefName || "Имя шефа"}
             </div>
           </div>
-          {/* Описание под 3D убрано по твоему пожеланию */}
         </div>
 
-        {/* ПРАВАЯ КОЛОНКА – выбор категорий, такая же по высоте */}
+        {/* ПРАВАЯ КОЛОНКА – выбор категорий */}
         <div
           style={{
             borderRadius: 22,
@@ -529,13 +521,13 @@ const ChatPage: React.FC = () => {
               placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
               style={{
                 width: "100%",
-                height: 38,
+                height: 40,
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
-                padding: "0 14px",
-                fontSize: 12,
+                padding: "0 16px",
+                fontSize: 13,
                 outline: "none",
-                marginBottom: 10,
+                marginBottom: 12,
               }}
             />
 
@@ -543,7 +535,7 @@ const ChatPage: React.FC = () => {
               onClick={handleDone}
               style={{
                 width: "100%",
-                height: 42,
+                height: 44,
                 borderRadius: 999,
                 border: "none",
                 background:
@@ -672,7 +664,6 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// Строка категории: маленькая тёмная иконка внутри блока + select
 type IconSelectRowProps = {
   icon: string;
   alt: string;
@@ -681,6 +672,7 @@ type IconSelectRowProps = {
   onChange: (index: number) => void;
 };
 
+// Иконка маленькая, без серого фона, стоит слева внутри строки категории
 const IconSelectRow: React.FC<IconSelectRowProps> = ({
   icon,
   alt,
@@ -692,33 +684,20 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
     style={{
       display: "flex",
       alignItems: "center",
-      gap: 8,
+      gap: 6,
     }}
   >
-    <div
+    <img
+      src={icon}
+      alt={alt}
       style={{
-        width: 28,
-        height: 28,
-        borderRadius: 999,
-        background: "#e5e7eb",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
+        width: 20,
+        height: 20,
+        objectFit: "contain",
+        filter: "grayscale(100%) brightness(0.3)",
         flexShrink: 0,
       }}
-    >
-      <img
-        src={icon}
-        alt={alt}
-        style={{
-          width: "80%",
-          height: "80%",
-          objectFit: "contain",
-          filter: "grayscale(100%) brightness(0.3)",
-        }}
-      />
-    </div>
+    />
     <select
       value={items[activeIndex]?.id ?? ""}
       onChange={(e) => {
@@ -728,7 +707,7 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
       }}
       style={{
         flex: 1,
-        height: 36,
+        height: 38,
         borderRadius: 999,
         border: "1px solid #d1d5db",
         padding: "0 14px",
