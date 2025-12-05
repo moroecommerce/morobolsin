@@ -10,30 +10,32 @@ type ItemVariant = {
   image: string;
 };
 
-// ЗАМЕНИ пути на реальные из /public
+// Путь к картинкам: положи файлы в /public/images и укажи точные имена
+const HERO_BG = "/images/chef-hero.jpg"; // фон с поваром в шапке
+const DEFAULT_TOP = "/images/chef-3d.png"; // 3D модель по умолчанию
+
 const HATS: ItemVariant[] = [
-  { id: 1, name: "Классическая шапка", image: "/uniforms/hat-1.png" },
-  { id: 2, name: "Высокая шапка", image: "/uniforms/hat-2.png" },
-  { id: 3, name: "Бандана", image: "/uniforms/hat-3.png" },
+  { id: 1, name: "Классическая шапка", image: "/images/hat-1.png" },
+  { id: 2, name: "Высокая шапка", image: "/images/hat-2.png" },
+  { id: 3, name: "Бандана", image: "/images/hat-3.png" },
 ];
 
 const TOPS: ItemVariant[] = [
-  { id: 1, name: "Классический китель", image: "/uniforms/chef-1.png" },
-  { id: 2, name: "Современный китель", image: "/uniforms/chef-2.png" },
-  { id: 3, name: "Минималистичный китель", image: "/uniforms/chef-3.png" },
-  { id: 4, name: "Узбекская кухня", image: "/uniforms/chef-4.png" },
+  { id: 1, name: "Классический китель", image: "/images/top-1.png" },
+  { id: 2, name: "Современный китель", image: "/images/top-2.png" },
+  { id: 3, name: "Минималистичный китель", image: "/images/top-3.png" },
 ];
 
 const APRONS: ItemVariant[] = [
-  { id: 1, name: "Классический фартук", image: "/uniforms/apron-1.png" },
-  { id: 2, name: "Нагрудный фартук", image: "/uniforms/apron-2.png" },
-  { id: 3, name: "Бариста фартук", image: "/uniforms/apron-3.png" },
+  { id: 1, name: "Классический фартук", image: "/images/apron-1.png" },
+  { id: 2, name: "Нагрудный фартук", image: "/images/apron-2.png" },
+  { id: 3, name: "Бариста фартук", image: "/images/apron-3.png" },
 ];
 
 const PANTS: ItemVariant[] = [
-  { id: 1, name: "Классические брюки", image: "/uniforms/pants-1.png" },
-  { id: 2, name: "Джоггеры", image: "/uniforms/pants-2.png" },
-  { id: 3, name: "Узкие брюки", image: "/uniforms/pants-3.png" },
+  { id: 1, name: "Классические брюки", image: "/images/pants-1.png" },
+  { id: 2, name: "Джоггеры", image: "/images/pants-2.png" },
+  { id: 3, name: "Узкие брюки", image: "/images/pants-3.png" },
 ];
 
 type ChefLook = {
@@ -67,7 +69,7 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // typewriter‑заголовок
+  // typewriter
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
@@ -108,7 +110,6 @@ const ChatPage: React.FC = () => {
     };
   }, [roleIndex, roles.length]);
 
-  // автоскролл чата
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -126,7 +127,6 @@ const ChatPage: React.FC = () => {
       "комплект формы: шапка, верх, фартук и брюки для шеф-повара";
     const typeLabelUz = typeLabelRu;
     const typeLabel = lang === "ru" ? typeLabelRu : typeLabelUz;
-
     return `Контекст: клиент выбирает ${typeLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
   };
 
@@ -139,10 +139,7 @@ const ChatPage: React.FC = () => {
 
     let historyToSend: Message[] = [
       ...chatHistory,
-      {
-        text,
-        sender: "user",
-      },
+      { text, sender: "user" },
     ];
 
     if (withContext && chatHistory.length === 0) {
@@ -221,7 +218,7 @@ const ChatPage: React.FC = () => {
     setLook((prev) => ({ ...prev, pants: PANTS[pantsIndex] ?? null }));
   }, [pantsIndex]);
 
-  const currentTopImage = look.top?.image ?? "/uniforms/chef-1.png";
+  const currentTopImage = look.top?.image || DEFAULT_TOP;
 
   return (
     <div
@@ -329,13 +326,11 @@ const ChatPage: React.FC = () => {
         </div>
       </header>
 
-      {/* HERO / БАННЕР */}
+      {/* HERO с фоном повара */}
       <section
         style={{
           maxWidth: 960,
           margin: "0 auto 20px",
-          background:
-            "linear-gradient(135deg,#1f2937,#4b5563 45%,#e5e7eb 100%)",
           borderRadius: 26,
           padding: "24px 20px",
           color: "#f9fafb",
@@ -343,6 +338,10 @@ const ChatPage: React.FC = () => {
           flexWrap: "wrap",
           gap: 16,
           alignItems: "center",
+          backgroundImage: `linear-gradient(135deg,rgba(15,23,42,0.92),rgba(30,64,175,0.92)), url(${HERO_BG})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       >
         <div
@@ -359,7 +358,6 @@ const ChatPage: React.FC = () => {
               fontSize: 26,
               fontWeight: 800,
               margin: "0 0 10px",
-              textAlign: "center",
             }}
           >
             {lang === "ru" ? "Форма для " : "Forma uchun "}
@@ -380,17 +378,16 @@ const ChatPage: React.FC = () => {
               margin: "0 0 14px",
               lineHeight: 1.7,
               maxWidth: 480,
-              textAlign: "center",
             }}
           >
             {lang === "ru"
-              ? "Подберите шапку, китель, фартук и брюки — ассистент поможет собрать комплекты под ваш бренд и задачи."
-              : "Shapka, kitel, fartuk va shimlarni tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
+              ? "Подберите шапку, верх, фартук и брюки — ассистент поможет собрать комплекты под ваш бренд и задачи."
+              : "Shapka, yuqori kiyim, fartuk va shimlarni tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
           </p>
         </div>
       </section>
 
-      {/* РЕДАКТОР ОДЕЖДЫ + 3D */}
+      {/* РЕДАКТОР + 3D */}
       <section
         ref={modelRef}
         style={{
@@ -399,9 +396,10 @@ const ChatPage: React.FC = () => {
           display: "grid",
           gridTemplateColumns: "minmax(0,1.2fr) minmax(0,1fr)",
           gap: 16,
+          alignItems: "start", // всё чуть выше
         }}
       >
-        {/* ЛЕВАЯ 3D МОДЕЛЬ (описание только снизу) */}
+        {/* ЛЕВАЯ 3D МОДЕЛЬ: больше картинка, текст только снизу */}
         <div
           style={{
             borderRadius: 22,
@@ -424,14 +422,13 @@ const ChatPage: React.FC = () => {
               justifyContent: "center",
               position: "relative",
               overflow: "hidden",
-              marginBottom: 8,
             }}
           >
             <img
               src={currentTopImage}
               alt="3D модель в форме"
               style={{
-                width: "70%",
+                width: "85%", // увеличили модель
                 height: "auto",
                 objectFit: "contain",
               }}
@@ -464,20 +461,20 @@ const ChatPage: React.FC = () => {
               lineHeight: 1.6,
             }}
           >
-            Выберите верх, фартук и брюки — образ появится здесь, чтобы вы сразу видели комплект.
+            Выберите верх и фартук — образ появится здесь.
           </div>
         </div>
 
-        {/* ПРАВЫЙ БЛОК: КОМПАКТНЫЕ ЗАКРУГЛЁННЫЕ SELECT */}
+        {/* ПРАВАЯ КОЛОНКА: селекты с отступами, всё внутри блока */}
         <div
           style={{
             borderRadius: 22,
             background: "#ffffff",
             boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-            padding: 12,
+            padding: 14,
             display: "flex",
             flexDirection: "column",
-            gap: 6,
+            gap: 8, // отступ между категориями
           }}
         >
           <CompactSelect
@@ -505,11 +502,7 @@ const ChatPage: React.FC = () => {
             type="text"
             value={chefName}
             onChange={(e) => setChefName(e.target.value)}
-            placeholder={
-              lang === "ru"
-                ? "Имя шефа"
-                : "Oshpaz nomi"
-            }
+            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
             style={{
               width: "100%",
               height: 34,
@@ -655,7 +648,7 @@ const ChatPage: React.FC = () => {
   );
 };
 
-// Компактный красивый select с закруглёнными углами
+// Компактный select
 type CompactSelectProps = {
   items: ItemVariant[];
   activeIndex: number;
