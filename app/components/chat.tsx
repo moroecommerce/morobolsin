@@ -49,9 +49,8 @@ const ChatPage: React.FC = () => {
 
   // typewriter‑эффект + смена слова
  // harfni sekinroq yozish (masalan, 180 ms)
-const TYPE_SPEED = 3000;
-// so‘zni 5 sekundda bir almashtirish
-const WORD_DELAY = 5000;
+const TYPE_SPEED = 150;      // har bir harf 150 ms
+const WORD_DELAY = 5000;     // so‘z 5 sekundda bir almashadi
 
 useEffect(() => {
   const currentWord = roles[roleIndex];
@@ -69,6 +68,7 @@ useEffect(() => {
     });
   }, TYPE_SPEED);
 
+  // so‘z yozilib bo‘lgandan keyin 5 sekunddan so‘ng keyingi so‘zga o‘tish
   const wordTimeout = setTimeout(() => {
     setRoleIndex((prev) => (prev + 1) % roles.length);
   }, WORD_DELAY);
@@ -78,6 +78,7 @@ useEffect(() => {
     clearTimeout(wordTimeout);
   };
 }, [roleIndex, roles]);
+
 
 
   // автоскролл чата
