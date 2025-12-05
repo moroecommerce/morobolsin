@@ -48,7 +48,12 @@ const ChatPage: React.FC = () => {
   const [charIndex, setCharIndex] = useState(0);
 
   // typewriter‑эффект + смена слова
-  useEffect(() => {
+ // harfni sekinroq yozish (masalan, 180 ms)
+const TYPE_SPEED = 180;
+// so‘zni 5 sekundda bir almashtirish
+const WORD_DELAY = 5000;
+
+useEffect(() => {
   const currentWord = roles[roleIndex];
   setTypedText("");
   setCharIndex(0);
@@ -62,11 +67,11 @@ const ChatPage: React.FC = () => {
       clearInterval(typeInterval);
       return prev;
     });
-  }, 120);
+  }, TYPE_SPEED);
 
   const wordTimeout = setTimeout(() => {
     setRoleIndex((prev) => (prev + 1) % roles.length);
-  }, 5000);
+  }, WORD_DELAY);
 
   return () => {
     clearInterval(typeInterval);
