@@ -38,19 +38,43 @@ const ChatPage: React.FC = () => {
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
-  // анимируемый заголовок
+  // слова для анимации
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
   const roles = lang === "ru" ? rolesRu : rolesUz;
-  const [roleIndex, setRoleIndex] = useState(0);
 
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [typedText, setTypedText] = useState("");
+  const [charIndex, setCharIndex] = useState(0);
+
+  // typewriter‑эффект + смена слова
   useEffect(() => {
-    const id = setInterval(() => {
+    const currentWord = roles[roleIndex];
+    setTypedText("");
+    setCharIndex(0);
+
+    const typeInterval = setInterval(() => {
+      setCharIndex((prev) => {
+        if (prev < currentWord.length) {
+          setTypedText(currentWord.slice(0, prev + 1));
+          return prev + 1;
+        }
+        clearInterval(typeInterval);
+        return prev;
+      });
+    }, 120);
+
+    const wordTimeout = setTimeout(() => {
       setRoleIndex((prev) => (prev + 1) % roles.length);
     }, 5000);
-    return () => clearInterval(id);
-  }, [roles.length]);
 
+    return () => {
+      clearInterval(typeInterval);
+      clearTimeout(wordTimeout);
+    };
+  }, [roleIndex, roles]);
+
+  // автоскролл чата
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -82,7 +106,6 @@ const ChatPage: React.FC = () => {
         ? "в бежевых / тёплых тонах"
         : "в фирменных цветах бренда";
 
-    // uz вариант можешь адаптировать под себя
     const typeLabelUz = typeLabelRu;
     const colorLabelUz = colorLabelRu;
 
@@ -135,7 +158,7 @@ const ChatPage: React.FC = () => {
           : "Ассистент сейчас недоступен. Попробуйте ещё раз чуть позже.";
 
       setChatHistory((prev) => [...prev, { text: botReply, sender: "bot" }]);
-    } catch (e) {
+    } catch {
       setChatHistory((prev) => [
         ...prev,
         {
@@ -147,6 +170,7 @@ const ChatPage: React.FC = () => {
       setLoading(false);
     }
   };
+
   const handleSend = () => {
     if (!message.trim() || loading) return;
     const withContext = chatHistory.length === 0;
@@ -154,7 +178,6 @@ const ChatPage: React.FC = () => {
     setMessage("");
   };
 
-  // отправка выбранных параметров по кнопке "Готово"
   const handleDone = () => {
     const uniform = UNIFORMS.find((u) => u.id === selectedUniformId);
     const text =
@@ -165,6 +188,7 @@ const ChatPage: React.FC = () => {
       `Имя на кителе: ${chefName || "не указано"}`;
     const withContext = chatHistory.length === 0;
     sendMessageToGPT(text, { withContext });
+    scrollTo(modelRef); // остаёмся рядом с редактором/чатом
   };
 
   return (
@@ -230,31 +254,24 @@ const ChatPage: React.FC = () => {
             </span>
           </div>
 
-          {/* СПРАВА: ПОДЕЛИТЬСЯ + ЯЗЫК */}
+          {/* СЕРДЕЧКО + ЯЗЫК */}
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <button
               style={{
-                padding: "6px 10px",
+                width: 32,
+                height: 32,
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
                 background: "#ffffff",
-                fontSize: 12,
+                fontSize: 16,
                 cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-              onClick={() => {
-                if (navigator.share) {
-                  navigator.share({
-                    title: "Morobolsin — форма для HoReCa",
-                    text: "Подбор формы для поваров, официантов и барменов",
-                    url: window.location.href,
-                  });
-                } else {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert("Ссылка скопирована");
-                }
-              }}
+              onClick={() => alert("Спасибо за лайк!")}
             >
-              Поделиться
+              ♥
             </button>
             <div style={{ display: "flex", gap: 4 }}>
               {["ru", "uz"].map((lng) => (
@@ -298,64 +315,48 @@ const ChatPage: React.FC = () => {
           alignItems: "center",
         }}
       >
-        <div style={{ flex: "1 1 260px" }}>
+        <div
+          style={{
+            flex: "1 1 100%",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+          }}
+        >
           <h1
             style={{
               fontSize: 26,
               fontWeight: 800,
               margin: "0 0 10px",
+              textAlign: "center",
             }}
           >
             {lang === "ru" ? "Форма для " : "Forma uchun "}
             <span
-              key={roles[roleIndex]}
               style={{
                 display: "inline-block",
-                transition: "transform 0.3s ease, opacity 0.3s ease",
+                borderRight: "2px solid rgba(249,250,251,0.8)",
+                paddingRight: 4,
+                whiteSpace: "nowrap",
               }}
             >
-              {roles[roleIndex]}
+              {typedText}
             </span>
-            {lang === "ru" ? " и всей команды" : " va butun jamoa"}
           </h1>
           <p
             style={{
               fontSize: 14,
               margin: "0 0 14px",
               lineHeight: 1.6,
-              maxWidth: 420,
+              maxWidth: 480,
+              textAlign: "center",
             }}
           >
             {lang === "ru"
               ? "Подберите форму под кухню, зал и бар — ассистент поможет собрать комплекты под ваш бренд и задачи."
               : "Oshxona, zal va bar uchun formani tanlang — assistent brendingizga mos to‘plamlarni taklif qiladi."}
           </p>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: 10,
-            }}
-          >
-            <button
-              style={{
-                padding: "10px 18px",
-                borderRadius: 999,
-                border: "none",
-                background:
-                  "linear-gradient(135deg,#fbbf24 0%,#f97316 100%)",
-                color: "#111827",
-                fontSize: 14,
-                fontWeight: 700,
-                cursor: "pointer",
-              }}
-              onClick={() => scrollTo(modelRef)}
-            >
-              {lang === "ru"
-                ? "Смотреть 3D‑примерку"
-                : "3D ko‘rishni boshlash"}
-            </button>
-          </div>
         </div>
       </section>
 
@@ -494,14 +495,63 @@ const ChatPage: React.FC = () => {
             {lang === "ru" ? "Варианты формы" : "Forma variantlari"}
           </div>
 
-          {/* выбор цвета / типа можешь оставить из старого UI или добавить тут */}
+          {/* выбор цвета (можно донастроить под себя) */}
+          <div
+            style={{
+              display: "flex",
+              gap: 8,
+              marginBottom: 8,
+            }}
+          >
+            {[
+              { id: "white", label: lang === "ru" ? "Светлая" : "Och" },
+              { id: "black", label: lang === "ru" ? "Тёмная" : "Tund" },
+              { id: "sand", label: lang === "ru" ? "Бежевая" : "Bej" },
+              { id: "brand", label: lang === "ru" ? "Фирменный" : "Brend" },
+            ].map((c) => (
+              <button
+                key={c.id}
+                onClick={() =>
+                  setSelectedColor(
+                    c.id as "white" | "black" | "sand" | "brand"
+                  )
+                }
+                style={{
+                  flex: 1,
+                  borderRadius: 999,
+                  border:
+                    selectedColor === c.id
+                      ? "2px solid #111827"
+                      : "1px solid #e5e7eb",
+                  background:
+                    c.id === "white"
+                      ? "#f9fafb"
+                      : c.id === "black"
+                      ? "#030712"
+                      : c.id === "sand"
+                      ? "#f5e7d6"
+                      : "#111827",
+                  color:
+                    c.id === "white" || c.id === "sand"
+                      ? "#111827"
+                      : "#f9fafb",
+                  fontSize: 11,
+                  padding: "6px 6px",
+                  cursor: "pointer",
+                }}
+              >
+                {c.label}
+              </button>
+            ))}
+          </div>
 
+          {/* список моделей */}
           <div
             style={{
               display: "flex",
               flexDirection: "column",
               gap: 8,
-              maxHeight: 260,
+              maxHeight: 220,
               overflowY: "auto",
             }}
           >
@@ -566,13 +616,14 @@ const ChatPage: React.FC = () => {
                   >
                     {lang === "ru"
                       ? "Нажмите, чтобы примерить на 3D‑модели."
-                      : "3D modelga ko‘rish uchun bosing."}
+                      : "3D modelda ko‘rish uchun bosing."}
                   </div>
                 </div>
               </button>
             ))}
           </div>
 
+          {/* имя + Готово */}
           <div style={{ marginTop: 6 }}>
             <div
               style={{
@@ -590,8 +641,8 @@ const ChatPage: React.FC = () => {
               onChange={(e) => setChefName(e.target.value)}
               placeholder={
                 lang === "ru"
-                  ? "Например, Шеф Алидзан"
-                  : "Masalan, Shef Alidjan"
+                  ? "Например, Шеф Алиджан"
+                  : "Masalan, Shef Alijon"
               }
               style={{
                 width: "100%",
@@ -619,13 +670,15 @@ const ChatPage: React.FC = () => {
                 cursor: "pointer",
               }}
             >
-              {lang === "ru" ? "Готово — отправить ассистенту" : "Tayyor — assistentga yuborish"}
+              {lang === "ru"
+                ? "Готово — отправить ассистенту"
+                : "Tayyor — assistentga yuborish"}
             </button>
           </div>
         </div>
       </section>
 
-      {/* ЧАТ СРАЗУ ПОД РЕДАКТОРОМ */}
+      {/* ЧАТ ПОД РЕДАКТОРОМ */}
       <section
         style={{
           maxWidth: 960,
@@ -719,7 +772,7 @@ const ChatPage: React.FC = () => {
             gap: 8,
           }}
         >
-          <input
+                  <input
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
