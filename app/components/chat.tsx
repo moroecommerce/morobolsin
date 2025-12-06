@@ -7,10 +7,7 @@ import React, {
   CSSProperties,
 } from "react";
 import Image from "next/image";
-// вариант: public/12.png
 import chefPhoto from "/12.png";
-// или если лежит в public/images/12.png:
-// import chefPhoto from "/images/12.png";
 
 type Message = { text: string; sender: "user" | "bot" };
 
@@ -188,7 +185,11 @@ const ChatPage: React.FC = () => {
   const modelRef = useRef<HTMLDivElement | null>(null);
 
   const rolesRu = ["поваров", "официантов", "барменов"];
-  const rolesUz = ["oshpazlar", "ofitsiantlar", "barmenlar"];
+  const rolesUz = [
+    "oshpazlar uchun forma",
+    "ofitsiantlar uchun forma",
+    "barmenlar uchun forma",
+  ];
   const roles = lang === "ru" ? rolesRu : rolesUz;
 
   const [roleIndex, setRoleIndex] = useState(0);
@@ -252,7 +253,8 @@ const ChatPage: React.FC = () => {
   const buildContextIntro = () => {
     const typeLabelRu =
       "комплект формы: шапка, верх, фартук и брюки для шеф-повара";
-    const typeLabelUz = typeLabelRu;
+    const typeLabelUz =
+      "oshpaz uchun forma to‘plami: shapka, ustki kiyim, fartuk va shimlar";
     const typeLabel = lang === "ru" ? typeLabelRu : typeLabelUz;
     return `Контекст: клиент выбирает ${typeLabel}. Подбирай комплекты одежды для HoReCa с учётом этого.`;
   };
@@ -410,7 +412,6 @@ const ChatPage: React.FC = () => {
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            {/* 1. Поделиться – сердечко */}
             <button
               onClick={handleShareTelegram}
               style={{
@@ -430,7 +431,6 @@ const ChatPage: React.FC = () => {
               ♥
             </button>
 
-            {/* 2. Telegram – меньше, тёмный, белый фон */}
             <button
               onClick={handleOpenTelegramChannel}
               style={{
@@ -460,7 +460,6 @@ const ChatPage: React.FC = () => {
               </svg>
             </button>
 
-            {/* 3–4. RU / UZ – круглые */}
             <div style={{ display: "flex", gap: 4 }}>
               {["ru", "uz"].map((lng) => (
                 <button
@@ -524,7 +523,7 @@ const ChatPage: React.FC = () => {
               margin: "0 0 10px",
             }}
           >
-            {lang === "ru" ? "Форма для " : "Forma uchun "}
+            {lang === "ru" ? "Форма для " : ""}
             <span
               style={{
                 display: "inline-block",
@@ -546,12 +545,12 @@ const ChatPage: React.FC = () => {
           >
             {lang === "ru"
               ? "Подберите пол, параметры и комплект формы — ассистент поможет собрать образ под ваш бренд."
-              : "Jins, parametrlar va forma to‘plamini tanlang — assistent brendingizga mos ko‘rinish yaratadi."}
+              : "Jins, parametrlar va forma to‘plamini tanlang — yordamchi brendingizga mos ko‘rinish topishda yordam beradi."}
           </p>
         </div>
       </section>
 
-      {/* Фото шефа + категории */}
+      {/* Фото + категории */}
       <section
         ref={modelRef}
         style={{
@@ -563,7 +562,7 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВЫЙ БЛОК – ТВОЁ ФОТО */}
+        {/* ЛЕВЫЙ БЛОК – ФОТО */}
         <div
           style={{
             borderRadius: 22,
@@ -601,7 +600,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВЫЙ БЛОК */}
+        {/* ПРАВЫЙ БЛОК – параметры */}
         <div
           style={{
             borderRadius: 22,
@@ -741,7 +740,9 @@ const ChatPage: React.FC = () => {
             textAlign: "center",
           }}
         >
-          Напишите имя повара, которое будет нанесено на форму.
+          {lang === "ru"
+            ? "Напишите имя повара, которое будет нанесено на форму."
+            : "Oshpazning forma ustiga yoziladigan ismini kiriting."}
         </p>
         <div
           style={{
@@ -754,7 +755,7 @@ const ChatPage: React.FC = () => {
             type="text"
             value={chefName}
             onChange={(e) => setChefName(e.target.value)}
-            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz nomi"}
+            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz ismi"}
             style={{
               width: "100%",
               height: 38,
