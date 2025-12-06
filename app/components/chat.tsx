@@ -204,7 +204,6 @@ const FONT_OPTIONS = [
   },
 ];
 
-// те же цвета, что раньше (пример)
 const COLOR_OPTIONS = [
   { value: "#111827", label: "Темный" },
   { value: "#DC2626", label: "Красный" },
@@ -214,6 +213,8 @@ const COLOR_OPTIONS = [
   { value: "#F97316", label: "Ярко‑оранжевый" },
   { value: "#6B21A8", label: "Фиолетовый" },
   { value: "#000000", label: "Чёрный" },
+  { value: "#E11D48", label: "Малиновый" },
+  { value: "#0EA5E9", label: "Голубой" },
 ];
 
 const getItemName = (item: ItemVariant, lang: "ru" | "uz"): string => {
@@ -547,7 +548,7 @@ const ChatPage: React.FC = () => {
                 color: "#111827",
               }}
             >
-              {/* вернули иконку Telegram */} {/* [web:470] */}
+              {/* Telegram иконка [web:470] */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -840,7 +841,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Блок с именем, шрифтом, цветом и примером (4 строки) */}
+      {/* 4 строки: Имя, Шрифт, Цвет, Пример */}
       <section
         style={{
           maxWidth: 960,
@@ -852,19 +853,6 @@ const ChatPage: React.FC = () => {
           boxSizing: "border-box",
         }}
       >
-        <p
-          style={{
-            fontSize: 13,
-            margin: "0 0 10px",
-            color: "#4b5563",
-            textAlign: "center",
-          }}
-        >
-          {lang === "ru"
-            ? "Введите имя повара, выберите шрифт и цвет — ниже вы увидите, как надпись будет выглядеть на форме."
-            : "Oshpaz ismini yozing, shrift va rangni tanlang — pastda formadagi yozuvni ko‘rasiz."}
-        </p>
-
         {/* 1. Имя повара */}
         <div style={{ marginBottom: 10 }}>
           <label
@@ -937,7 +925,7 @@ const ChatPage: React.FC = () => {
           </select>
         </div>
 
-        {/* 3. Цвет (растянутый блок) */}
+        {/* 3. Цвет – без внешней рамки */}
         <div style={{ marginBottom: 10 }}>
           <label
             style={{
@@ -953,9 +941,9 @@ const ChatPage: React.FC = () => {
             style={{
               width: "100%",
               minHeight: 42,
+              border: "none",
               borderRadius: 999,
-              border: "1px solid #d1d5db",
-              padding: "6px 10px",
+              padding: "4px 2px",
               boxSizing: "border-box",
               display: "flex",
               flexWrap: "wrap",
@@ -1001,7 +989,7 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. Пример надписи (отдельной строкой, широкое поле, больше отступов) */}
+        {/* 4. Пример – в конце, крупнее */}
         <div style={{ marginBottom: 8 }}>
           <label
             style={{
@@ -1018,10 +1006,10 @@ const ChatPage: React.FC = () => {
           <div
             style={{
               width: "100%",
-              minHeight: 80,
+              minHeight: 90,
               borderRadius: 18,
               border: "1px solid #d1d5db",
-              padding: "10px 18px",
+              padding: "14px 20px",
               boxSizing: "border-box",
               background: "#f3f4f6",
               display: "flex",
@@ -1029,8 +1017,8 @@ const ChatPage: React.FC = () => {
               justifyContent: "center",
               fontFamily:
                 FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
-              fontSize: 20,
-              fontWeight: 500,
+              fontSize: 22,
+              fontWeight: 600,
               color: selectedColor,
               textAlign: "center",
               overflow: "hidden",
