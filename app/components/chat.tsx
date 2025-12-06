@@ -159,53 +159,58 @@ const SHARE_TEXT = "Подбор формы для команды Morobolsin";
 const FONT_OPTIONS = [
   {
     value: "system",
-    label: "System",
-    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    label: "System (Sans)",
+    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
   },
   {
-    value: "serif",
-    label: "Serif",
+    value: "arial",
+    label: "Arial",
+    css: "Arial, Helvetica, sans-serif",
+  },
+  {
+    value: "verdana",
+    label: "Verdana",
+    css: "Verdana, Geneva, sans-serif",
+  },
+  {
+    value: "tahoma",
+    label: "Tahoma",
+    css: "Tahoma, Geneva, sans-serif",
+  },
+  {
+    value: "trebuchet",
+    label: "Trebuchet MS",
+    css: "'Trebuchet MS', Tahoma, sans-serif",
+  },
+  {
+    value: "times",
+    label: "Times New Roman",
+    css: "'Times New Roman', Times, serif",
+  },
+  {
+    value: "georgia",
+    label: "Georgia",
     css: "Georgia, 'Times New Roman', serif",
   },
   {
-    value: "mono",
-    label: "Mono",
-    css: "'Fira Code', Menlo, Monaco, monospace",
+    value: "garamond",
+    label: "Garamond",
+    css: "Garamond, 'Times New Roman', serif",
   },
   {
-    value: "script",
-    label: "Script",
-    css: "'Brush Script MT', cursive",
-  },
-  {
-    value: "rounded",
-    label: "Rounded",
-    css: "'Trebuchet MS', system-ui, sans-serif",
-  },
-  {
-    value: "display",
-    label: "Display",
-    css: "'Impact', system-ui, sans-serif",
-  },
-  {
-    value: "light",
-    label: "Light",
-    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-  },
-  {
-    value: "bold",
-    label: "Bold",
-    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+    value: "courier",
+    label: "Courier New (Mono)",
+    css: "'Courier New', Courier, monospace",
   },
   {
     value: "handwritten",
-    label: "Handwritten",
-    css: "'Comic Sans MS', cursive, sans-serif",
+    label: "Handwritten (Script)",
+    css: "'Brush Script MT', 'Comic Sans MS', cursive",
   },
   {
-    value: "elegant",
-    label: "Elegant",
-    css: "'Garamond', 'Times New Roman', serif",
+    value: "bold-sans",
+    label: "Bold Sans",
+    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
   },
 ];
 
@@ -545,7 +550,7 @@ const ChatPage: React.FC = () => {
                 fill="none"
               >
                 <path
-                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54л.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
+                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9л-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54л.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
                   fill="currentColor"
                 />
               </svg>
@@ -829,7 +834,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Имя + выбор шрифта + предпросмотр */}
+      {/* Имя сверху + шрифт и пример ниже в одной линии */}
       <section
         style={{
           maxWidth: 960,
@@ -844,16 +849,55 @@ const ChatPage: React.FC = () => {
         <p
           style={{
             fontSize: 13,
-            margin: "0 0 12px",
+            margin: "0 0 10px",
             color: "#4b5563",
             textAlign: "center",
           }}
         >
           {lang === "ru"
-            ? "Выберите шрифт и введите имя повара — справа вы увидите, как оно будет выглядеть на форме."
-            : "Oshpazning ismi uchun shriftni tanlang va ismini yozing — o‘ng tomonda forma ustidagi ko‘rinishini ko‘rasiz."}
+            ? "Введите имя повара, выберите шрифт и посмотрите, как оно будет выглядеть на форме."
+            : "Oshpaz ismini yozing, shriftni tanlang va formadagi ko‘rinishini ko‘ring."}
         </p>
 
+        {/* Имя повара – отдельная строка сверху */}
+        <div
+          style={{
+            marginBottom: 12,
+          }}
+        >
+          <label
+            style={{
+              display: "block",
+              fontSize: 11,
+              color: "#6b7280",
+              marginBottom: 4,
+            }}
+          >
+            {lang === "ru" ? "Имя повара" : "Oshpaz ismi"}
+          </label>
+          <input
+            type="text"
+            value={chefName}
+            onChange={(e) => setChefName(e.target.value)}
+            placeholder={
+              lang === "ru"
+                ? "Например, Шеф Алиджан"
+                : "Masalan, Shef Alijon"
+            }
+            style={{
+              width: "100%",
+              height: 38,
+              borderRadius: 999,
+              border: "1px solid #d1d5db",
+              padding: "0 16px",
+              fontSize: 13,
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          />
+        </div>
+
+        {/* Нижняя линия: шрифт слева, дублирующее поле по центру, пример справа */}
         <div
           style={{
             display: "flex",
@@ -862,8 +906,8 @@ const ChatPage: React.FC = () => {
             flexWrap: "wrap",
           }}
         >
-          {/* 1. Выбор шрифта */}
-          <div style={{ flex: "0 0 180px", minWidth: 160 }}>
+          {/* 1. Выбор шрифта слева */}
+          <div style={{ flex: "0 0 200px", minWidth: 170 }}>
             <label
               style={{
                 display: "block",
@@ -900,8 +944,8 @@ const ChatPage: React.FC = () => {
             </select>
           </div>
 
-          {/* 2. Ввод имени */}
-          <div style={{ flex: "1 1 220px", minWidth: 180 }}>
+          {/* 2. Для наглядности: имя в выбранном шрифте по центру */}
+          <div style={{ flex: "1 1 200px", minWidth: 170 }}>
             <label
               style={{
                 display: "block",
@@ -910,35 +954,39 @@ const ChatPage: React.FC = () => {
                 marginBottom: 4,
               }}
             >
-              {lang === "ru" ? "Имя повара" : "Oshpaz ismi"}
+              {lang === "ru"
+                ? "Имя в выбранном шрифте"
+                : "Tanlangan shrift bilan ism"}
             </label>
-            <input
-              type="text"
-              value={chefName}
-              onChange={(e) => setChefName(e.target.value)}
-              placeholder={
-                lang === "ru"
-                  ? "Например, Шеф Алиджан"
-                  : "Masalan, Shef Alijon"
-              }
+            <div
               style={{
-                width: "100%",
                 height: 38,
                 borderRadius: 999,
                 border: "1px solid #d1d5db",
                 padding: "0 16px",
-                fontSize: 13,
-                outline: "none",
+                display: "flex",
+                alignItems: "center",
                 boxSizing: "border-box",
+                background: "#f9fafb",
+                fontFamily:
+                  FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
+                fontSize: 14,
+                color: "#111827",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
               }}
-            />
+            >
+              {chefName ||
+                (lang === "ru" ? "Имя повара" : "Oshpaz ismi")}
+            </div>
           </div>
 
-          {/* 3. Пример надписи на форме */}
+          {/* 3. Пример справа как на форме */}
           <div
             style={{
-              flex: "0 0 200px",
-              minWidth: 180,
+              flex: "0 0 220px",
+              minWidth: 170,
             }}
           >
             <label
@@ -950,8 +998,8 @@ const ChatPage: React.FC = () => {
               }}
             >
               {lang === "ru"
-                ? "Пример на форме"
-                : "Formadagi ko‘rinishi"}
+                ? "Пример надписи на форме"
+                : "Formadagi yozuv namunasi"}
             </label>
             <div
               style={{
@@ -963,12 +1011,15 @@ const ChatPage: React.FC = () => {
                 alignItems: "center",
                 justifyContent: "center",
                 boxSizing: "border-box",
-                background: "#f9fafb",
+                background: "#f3f4f6",
                 fontFamily:
                   FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
                 fontSize: 15,
                 color: "#111827",
                 textAlign: "center",
+                overflow: "hidden",
+                whiteSpace: "nowrap",
+                textOverflow: "ellipsis",
               }}
             >
               {chefName ||
