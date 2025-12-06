@@ -193,25 +193,26 @@ const FONT_OPTIONS = [
     css: "Georgia, 'Times New Roman', serif",
   },
   {
-    value: "garamond",
-    label: "Garamond",
-    css: "Garamond, 'Times New Roman', serif",
-  },
-  {
     value: "courier",
     label: "Courier New (Mono)",
     css: "'Courier New', Courier, monospace",
   },
   {
     value: "handwritten",
-    label: "Handwritten (Script)",
+    label: "Handwritten",
     css: "'Brush Script MT', 'Comic Sans MS', cursive",
   },
-  {
-    value: "bold-sans",
-    label: "Bold Sans",
-    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif",
-  },
+];
+
+const COLOR_OPTIONS = [
+  { value: "#111827", label: "Темный" },
+  { value: "#DC2626", label: "Красный" },
+  { value: "#2563EB", label: "Синий" },
+  { value: "#16A34A", label: "Зелёный" },
+  { value: "#F59E0B", label: "Оранжевый" },
+  { value: "#F97316", label: "Ярко-оранжевый" },
+  { value: "#6B21A8", label: "Фиолетовый" },
+  { value: "#000000", label: "Чёрный" },
 ];
 
 const getItemName = (item: ItemVariant, lang: "ru" | "uz"): string => {
@@ -268,6 +269,7 @@ const ChatPage: React.FC = () => {
 
   const [chefName, setChefName] = useState<string>("Шеф Алиджан");
   const [selectedFont, setSelectedFont] = useState<string>("system");
+  const [selectedColor, setSelectedColor] = useState<string>("#111827");
 
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
@@ -425,7 +427,9 @@ const ChatPage: React.FC = () => {
       `Верх: ${look.top?.name ?? "не выбран"}\n` +
       `Фартук: ${look.apron?.name ?? "не выбран"}\n` +
       `Брюки: ${look.pants?.name ?? "не выбраны"}\n` +
-      `Имя на форме: ${chefName || "не указано"}`;
+      `Имя на форме: ${chefName || "не указано"}\n` +
+      `Шрифт: ${selectedFont}\n` +
+      `Цвет: ${selectedColor}`;
 
     const withContext = chatHistory.length === 0;
     sendMessageToGPT(text, { withContext });
@@ -550,7 +554,7 @@ const ChatPage: React.FC = () => {
                 fill="none"
               >
                 <path
-                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9л-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54л.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
+                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9л-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54л.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73з"
                   fill="currentColor"
                 />
               </svg>
@@ -834,7 +838,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Имя сверху + шрифт и пример ниже в одной линии */}
+      {/* Имя сверху + снизу слева шрифт и цвета, справа пример */}
       <section
         style={{
           maxWidth: 960,
@@ -855,11 +859,11 @@ const ChatPage: React.FC = () => {
           }}
         >
           {lang === "ru"
-            ? "Введите имя повара, выберите шрифт и посмотрите, как оно будет выглядеть на форме."
-            : "Oshpaz ismini yozing, shriftni tanlang va formadagi ko‘rinishini ko‘ring."}
+            ? "Введите имя повара, выберите шрифт и цвет — справа вы увидите, как надпись будет выглядеть на форме."
+            : "Oshpaz ismini yozing, shrift va rangni tanlang — o‘ng tomonda formadagi yozuvni ko‘rasiz."}
         </p>
 
-        {/* Имя повара – отдельная строка сверху */}
+        {/* Имя повара сверху */}
         <div
           style={{
             marginBottom: 12,
@@ -897,96 +901,118 @@ const ChatPage: React.FC = () => {
           />
         </div>
 
-        {/* Нижняя линия: шрифт слева, дублирующее поле по центру, пример справа */}
+        {/* Снизу: слева шрифт + цвета, справа пример надписи */}
         <div
           style={{
             display: "flex",
             gap: 12,
-            alignItems: "center",
+            alignItems: "stretch",
             flexWrap: "wrap",
           }}
         >
-          {/* 1. Выбор шрифта слева */}
-          <div style={{ flex: "0 0 200px", minWidth: 170 }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: 11,
-                color: "#6b7280",
-                marginBottom: 4,
-              }}
-            >
-              {lang === "ru" ? "Шрифт" : "Shrift"}
-            </label>
-            <select
-              value={selectedFont}
-              onChange={(e) => setSelectedFont(e.target.value)}
-              style={{
-                width: "100%",
-                height: 38,
-                borderRadius: 999,
-                border: "1px solid #d1d5db",
-                padding: "0 12px",
-                fontSize: 13,
-                outline: "none",
-                boxSizing: "border-box",
-              }}
-            >
-              {FONT_OPTIONS.map((f) => (
-                <option
-                  key={f.value}
-                  value={f.value}
-                  style={{ fontFamily: f.css }}
-                >
-                  {f.label}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Лево: шрифт + цвета */}
+          <div style={{ flex: "1 1 260px", minWidth: 200 }}>
+            {/* Шрифт */}
+            <div style={{ marginBottom: 10 }}>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 11,
+                  color: "#6b7280",
+                  marginBottom: 4,
+                }}
+              >
+                {lang === "ru" ? "Шрифт" : "Shrift"}
+              </label>
+              <select
+                value={selectedFont}
+                onChange={(e) => setSelectedFont(e.target.value)}
+                style={{
+                  width: "100%",
+                  height: 38,
+                  borderRadius: 999,
+                  border: "1px solid #d1d5db",
+                  padding: "0 12px",
+                  fontSize: 13,
+                  outline: "none",
+                  boxSizing: "border-box",
+                }}
+              >
+                {FONT_OPTIONS.map((f) => (
+                  <option
+                    key={f.value}
+                    value={f.value}
+                    style={{ fontFamily: f.css }}
+                  >
+                    {f.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* 2. Для наглядности: имя в выбранном шрифте по центру */}
-          <div style={{ flex: "1 1 200px", minWidth: 170 }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: 11,
-                color: "#6b7280",
-                marginBottom: 4,
-              }}
-            >
-              {lang === "ru"
-                ? "Имя в выбранном шрифте"
-                : "Tanlangan shrift bilan ism"}
-            </label>
-            <div
-              style={{
-                height: 38,
-                borderRadius: 999,
-                border: "1px solid #d1d5db",
-                padding: "0 16px",
-                display: "flex",
-                alignItems: "center",
-                boxSizing: "border-box",
-                background: "#f9fafb",
-                fontFamily:
-                  FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
-                fontSize: 14,
-                color: "#111827",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {chefName ||
-                (lang === "ru" ? "Имя повара" : "Oshpaz ismi")}
+            {/* Цвета в кружках */}
+            <div>
+              <label
+                style={{
+                  display: "block",
+                  fontSize: 11,
+                  color: "#6b7280",
+                  marginBottom: 4,
+                }}
+              >
+                {lang === "ru" ? "Цвет надписи" : "Yozuv rangi"}
+              </label>
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  gap: 8,
+                }}
+              >
+                {COLOR_OPTIONS.map((c) => {
+                  const isActive = selectedColor === c.value;
+                  return (
+                    <button
+                      key={c.value}
+                      type="button"
+                      onClick={() => setSelectedColor(c.value)}
+                      title={c.label}
+                      style={{
+                        width: 26,
+                        height: 26,
+                        borderRadius: "999px",
+                        border: isActive
+                          ? "2px solid #111827"
+                          : "1px solid #d1d5db",
+                        padding: 0,
+                        background: "#ffffff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                      }}
+                    >
+                      <span
+                        style={{
+                          display: "block",
+                          width: 18,
+                          height: 18,
+                          borderRadius: "999px",
+                          backgroundColor: c.value,
+                        }}
+                      />
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* 3. Пример справа как на форме */}
+          {/* Право: пример надписи на форме */}
           <div
             style={{
-              flex: "0 0 220px",
-              minWidth: 170,
+              flex: "0 0 260px",
+              minWidth: 220,
             }}
           >
             <label
@@ -1003,8 +1029,8 @@ const ChatPage: React.FC = () => {
             </label>
             <div
               style={{
-                height: 38,
-                borderRadius: 999,
+                height: 72,
+                borderRadius: 18,
                 border: "1px dashed #9ca3af",
                 padding: "0 16px",
                 display: "flex",
@@ -1014,8 +1040,8 @@ const ChatPage: React.FC = () => {
                 background: "#f3f4f6",
                 fontFamily:
                   FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
-                fontSize: 15,
-                color: "#111827",
+                fontSize: 18,
+                color: selectedColor,
                 textAlign: "center",
                 overflow: "hidden",
                 whiteSpace: "nowrap",
@@ -1241,4 +1267,3 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
 );
 
 export default ChatPage;
- 
