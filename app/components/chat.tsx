@@ -206,13 +206,20 @@ const FONT_OPTIONS = [
 
 const COLOR_OPTIONS = [
   { value: "#111827", label: "Темный" },
-  { value: "#DC2626", label: "Красный" },
-  { value: "#2563EB", label: "Синий" },
-  { value: "#16A34A", label: "Зелёный" },
-  { value: "#F59E0B", label: "Оранжевый" },
-  { value: "#F97316", label: "Ярко-оранжевый" },
-  { value: "#6B21A8", label: "Фиолетовый" },
   { value: "#000000", label: "Чёрный" },
+  { value: "#4B5563", label: "Серо‑чёрный" },
+  { value: "#6B7280", label: "Серый" },
+  { value: "#DC2626", label: "Красный" },
+  { value: "#EF4444", label: "Ярко‑красный" },
+  { value: "#F97316", label: "Оранжевый" },
+  { value: "#F59E0B", label: "Жёлто‑оранжевый" },
+  { value: "#EAB308", label: "Жёлтый" },
+  { value: "#16A34A", label: "Зелёный" },
+  { value: "#22C55E", label: "Ярко‑зелёный" },
+  { value: "#2563EB", label: "Синий" },
+  { value: "#0EA5E9", label: "Голубой" },
+  { value: "#6B21A8", label: "Фиолетовый" },
+  { value: "#EC4899", label: "Розовый" },
 ];
 
 const getItemName = (item: ItemVariant, lang: "ru" | "uz"): string => {
@@ -838,7 +845,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Имя сверху + снизу слева шрифт и цвета, справа пример */}
+      {/* Имя повара + шрифт/цвет + пример */}
       <section
         style={{
           maxWidth: 960,
@@ -863,12 +870,8 @@ const ChatPage: React.FC = () => {
             : "Oshpaz ismini yozing, shrift va rangni tanlang — o‘ng tomonda formadagi yozuvni ko‘rasiz."}
         </p>
 
-        {/* Имя повара сверху */}
-        <div
-          style={{
-            marginBottom: 12,
-          }}
-        >
+        {/* Имя повара – отдельное поле сверху */}
+        <div style={{ marginBottom: 12 }}>
           <label
             style={{
               display: "block",
@@ -890,30 +893,30 @@ const ChatPage: React.FC = () => {
             }
             style={{
               width: "100%",
-              height: 38,
+              height: 42,
               borderRadius: 999,
               border: "1px solid #d1d5db",
               padding: "0 16px",
-              fontSize: 13,
+              fontSize: 14,
               outline: "none",
               boxSizing: "border-box",
             }}
           />
         </div>
 
-        {/* Снизу: слева шрифт + цвета, справа пример надписи */}
+        {/* Снизу: слева шрифт + цвета, справа пример */}
         <div
           style={{
-            display: "flex",
+            display: "grid",
+            gridTemplateColumns: "1fr 1fr",
             gap: 12,
             alignItems: "stretch",
-            flexWrap: "wrap",
           }}
         >
-          {/* Лево: шрифт + цвета */}
-          <div style={{ flex: "1 1 260px", minWidth: 200 }}>
+          {/* Левый столбец */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {/* Шрифт */}
-            <div style={{ marginBottom: 10 }}>
+            <div>
               <label
                 style={{
                   display: "block",
@@ -929,11 +932,11 @@ const ChatPage: React.FC = () => {
                 onChange={(e) => setSelectedFont(e.target.value)}
                 style={{
                   width: "100%",
-                  height: 38,
+                  height: 42,
                   borderRadius: 999,
                   border: "1px solid #d1d5db",
-                  padding: "0 12px",
-                  fontSize: 13,
+                  padding: "0 14px",
+                  fontSize: 14,
                   outline: "none",
                   boxSizing: "border-box",
                 }}
@@ -950,7 +953,7 @@ const ChatPage: React.FC = () => {
               </select>
             </div>
 
-            {/* Цвета в кружках */}
+            {/* Цвета – большой блок, отступы такие же, как у инпутов */}
             <div>
               <label
                 style={{
@@ -964,9 +967,16 @@ const ChatPage: React.FC = () => {
               </label>
               <div
                 style={{
+                  width: "100%",
+                  minHeight: 42,
+                  borderRadius: 999,
+                  border: "1px solid #d1d5db",
+                  padding: "6px 10px",
+                  boxSizing: "border-box",
                   display: "flex",
                   flexWrap: "wrap",
                   gap: 8,
+                  alignItems: "center",
                 }}
               >
                 {COLOR_OPTIONS.map((c) => {
@@ -1008,13 +1018,8 @@ const ChatPage: React.FC = () => {
             </div>
           </div>
 
-          {/* Право: пример надписи на форме */}
-          <div
-            style={{
-              flex: "0 0 260px",
-              minWidth: 220,
-            }}
-          >
+          {/* Правый столбец – пример надписи, во весь блок, с нормальными отступами */}
+          <div style={{ display: "flex", flexDirection: "column" }}>
             <label
               style={{
                 display: "block",
@@ -1029,18 +1034,20 @@ const ChatPage: React.FC = () => {
             </label>
             <div
               style={{
-                height: 72,
+                width: "100%",
+                minHeight: 80,
                 borderRadius: 18,
-                border: "1px dashed #9ca3af",
-                padding: "0 16px",
+                border: "1px solid #d1d5db",
+                padding: "10px 18px",
+                boxSizing: "border-box",
+                background: "#f3f4f6",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                boxSizing: "border-box",
-                background: "#f3f4f6",
                 fontFamily:
                   FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
-                fontSize: 18,
+                fontSize: 20,
+                fontWeight: 500,
                 color: selectedColor,
                 textAlign: "center",
                 overflow: "hidden",
@@ -1048,18 +1055,13 @@ const ChatPage: React.FC = () => {
                 textOverflow: "ellipsis",
               }}
             >
-              {chefName ||
-                (lang === "ru" ? "Имя повара" : "Oshpaz ismi")}
+              {chefName || (lang === "ru" ? "Имя повара" : "Oshpaz ismi")}
             </div>
           </div>
         </div>
 
         {/* Кнопка Готово */}
-        <div
-          style={{
-            marginTop: 14,
-          }}
-        >
+        <div style={{ marginTop: 14 }}>
           <button
             onClick={handleDone}
             style={{
