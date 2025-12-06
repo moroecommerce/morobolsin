@@ -186,9 +186,9 @@ const ChatPage: React.FC = () => {
 
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = [
-    "Oshpazlar uchun forma",
-    "Ofitsiantlar uchun forma",
-    "Barmenlar uchun forma",
+    "OSHPAZLAR UCHUN FORMA",
+    "OFITSIANTLAR UCHUN FORMA",
+    "BARMENLAR UCHUN FORMA",
   ];
   const roles = lang === "ru" ? rolesRu : rolesUz;
 
@@ -210,7 +210,7 @@ const ChatPage: React.FC = () => {
     window.open("https://t.me/YOUR_TELEGRAM_CHANNEL", "_blank", "noreferrer");
   };
 
-  // Всегда стартуем с верхушки страницы
+  // Стартуем с верхушки страницы
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []); [web:384]
@@ -550,7 +550,7 @@ const ChatPage: React.FC = () => {
           >
             {lang === "ru"
               ? "Подберите пол, параметры и комплект формы — ассистент поможет собрать образ под ваш бренд."
-              : "Jins, parametrlar va forma to‘plamini tanlang — yordamchi brendingizga mos ko‘rinish topishda yordam beradi."}
+              : "JINS, PARAMETRLAR VA FORMA TO‘PLAMINI TANLANG — YORDAMCHI BRENDINGIZGA MOS KO‘RINISH TOPISHDA YORDAM BERADI."}
           </p>
         </div>
       </section>
@@ -642,8 +642,8 @@ const ChatPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <option value="male">Erkaklar kiyimi</option>
-                    <option value="female">Ayollar kiyimi</option>
+                    <option value="male">ERKAKLAR KIYIMI</option>
+                    <option value="female">AYOLLAR KIYIMI</option>
                   </>
                 )}
               </select>
@@ -672,7 +672,7 @@ const ChatPage: React.FC = () => {
                   "210",
                 ].map((h) => (
                   <option key={h} value={h}>
-                    {h} {lang === "ru" ? "см" : "sm"}
+                    {h} {lang === "ru" ? "см" : "SM"}
                   </option>
                 ))}
               </select>
@@ -701,7 +701,7 @@ const ChatPage: React.FC = () => {
                   "140",
                 ].map((w) => (
                   <option key={w} value={w}>
-                    {w} {lang === "ru" ? "кг" : "kg"}
+                    {w} {lang === "ru" ? "кг" : "KG"}
                   </option>
                 ))}
               </select>
@@ -761,7 +761,7 @@ const ChatPage: React.FC = () => {
         >
           {lang === "ru"
             ? "Напишите имя повара, которое будет нанесено на форму."
-            : "Oshpazning forma ustiga yoziladigan ismini kiriting."}
+            : "OSHPAZNING FORMA USTIGA YOZILADIGAN ISMINI KIRITING."}
         </p>
         <div
           style={{
@@ -774,7 +774,7 @@ const ChatPage: React.FC = () => {
             type="text"
             value={chefName}
             onChange={(e) => setChefName(e.target.value)}
-            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz ismi"}
+            placeholder={lang === "ru" ? "Имя шефа" : "OSHPAZ ISMI"}
             style={{
               width: "100%",
               height: 38,
@@ -802,7 +802,7 @@ const ChatPage: React.FC = () => {
               cursor: "pointer",
             }}
           >
-            {lang === "ru" ? "Готово" : "Tayyor"}
+            {lang === "ru" ? "Готово" : "TAYYOR"}
           </button>
         </div>
       </section>
@@ -881,7 +881,7 @@ const ChatPage: React.FC = () => {
             placeholder={
               lang === "ru"
                 ? "Сообщение ассистенту..."
-                : "Assistentga xabar yozing..."
+                : "ASSISTENTGA XABAR YOZING..."
             }
             style={{
               flex: 1,
