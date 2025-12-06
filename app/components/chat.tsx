@@ -204,22 +204,16 @@ const FONT_OPTIONS = [
   },
 ];
 
+// те же цвета, что раньше (пример)
 const COLOR_OPTIONS = [
   { value: "#111827", label: "Темный" },
-  { value: "#000000", label: "Чёрный" },
-  { value: "#4B5563", label: "Серо‑чёрный" },
-  { value: "#6B7280", label: "Серый" },
   { value: "#DC2626", label: "Красный" },
-  { value: "#EF4444", label: "Ярко‑красный" },
-  { value: "#F97316", label: "Оранжевый" },
-  { value: "#F59E0B", label: "Жёлто‑оранжевый" },
-  { value: "#EAB308", label: "Жёлтый" },
-  { value: "#16A34A", label: "Зелёный" },
-  { value: "#22C55E", label: "Ярко‑зелёный" },
   { value: "#2563EB", label: "Синий" },
-  { value: "#0EA5E9", label: "Голубой" },
+  { value: "#16A34A", label: "Зелёный" },
+  { value: "#F59E0B", label: "Оранжевый" },
+  { value: "#F97316", label: "Ярко‑оранжевый" },
   { value: "#6B21A8", label: "Фиолетовый" },
-  { value: "#EC4899", label: "Розовый" },
+  { value: "#000000", label: "Чёрный" },
 ];
 
 const getItemName = (item: ItemVariant, lang: "ru" | "uz"): string => {
@@ -553,15 +547,16 @@ const ChatPage: React.FC = () => {
                 color: "#111827",
               }}
             >
+              {/* вернули иконку Telegram */} {/* [web:470] */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
               >
                 <path
-                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9л-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54л.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73з"
+                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54l.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79l21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
                   fill="currentColor"
                 />
               </svg>
@@ -845,7 +840,7 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Имя повара + шрифт/цвет + пример */}
+      {/* Блок с именем, шрифтом, цветом и примером (4 строки) */}
       <section
         style={{
           maxWidth: 960,
@@ -866,12 +861,12 @@ const ChatPage: React.FC = () => {
           }}
         >
           {lang === "ru"
-            ? "Введите имя повара, выберите шрифт и цвет — справа вы увидите, как надпись будет выглядеть на форме."
-            : "Oshpaz ismini yozing, shrift va rangni tanlang — o‘ng tomonda formadagi yozuvni ko‘rasiz."}
+            ? "Введите имя повара, выберите шрифт и цвет — ниже вы увидите, как надпись будет выглядеть на форме."
+            : "Oshpaz ismini yozing, shrift va rangni tanlang — pastda formadagi yozuvni ko‘rasiz."}
         </p>
 
-        {/* Имя повара – отдельное поле сверху */}
-        <div style={{ marginBottom: 12 }}>
+        {/* 1. Имя повара */}
+        <div style={{ marginBottom: 10 }}>
           <label
             style={{
               display: "block",
@@ -904,164 +899,151 @@ const ChatPage: React.FC = () => {
           />
         </div>
 
-        {/* Снизу: слева шрифт + цвета, справа пример */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 12,
-            alignItems: "stretch",
-          }}
-        >
-          {/* Левый столбец */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {/* Шрифт */}
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 11,
-                  color: "#6b7280",
-                  marginBottom: 4,
-                }}
+        {/* 2. Шрифт */}
+        <div style={{ marginBottom: 10 }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 11,
+              color: "#6b7280",
+              marginBottom: 4,
+            }}
+          >
+            {lang === "ru" ? "Шрифт" : "Shrift"}
+          </label>
+          <select
+            value={selectedFont}
+            onChange={(e) => setSelectedFont(e.target.value)}
+            style={{
+              width: "100%",
+              height: 42,
+              borderRadius: 999,
+              border: "1px solid #d1d5db",
+              padding: "0 14px",
+              fontSize: 14,
+              outline: "none",
+              boxSizing: "border-box",
+            }}
+          >
+            {FONT_OPTIONS.map((f) => (
+              <option
+                key={f.value}
+                value={f.value}
+                style={{ fontFamily: f.css }}
               >
-                {lang === "ru" ? "Шрифт" : "Shrift"}
-              </label>
-              <select
-                value={selectedFont}
-                onChange={(e) => setSelectedFont(e.target.value)}
-                style={{
-                  width: "100%",
-                  height: 42,
-                  borderRadius: 999,
-                  border: "1px solid #d1d5db",
-                  padding: "0 14px",
-                  fontSize: 14,
-                  outline: "none",
-                  boxSizing: "border-box",
-                }}
-              >
-                {FONT_OPTIONS.map((f) => (
-                  <option
-                    key={f.value}
-                    value={f.value}
-                    style={{ fontFamily: f.css }}
-                  >
-                    {f.label}
-                  </option>
-                ))}
-              </select>
-            </div>
+                {f.label}
+              </option>
+            ))}
+          </select>
+        </div>
 
-            {/* Цвета – большой блок, отступы такие же, как у инпутов */}
-            <div>
-              <label
-                style={{
-                  display: "block",
-                  fontSize: 11,
-                  color: "#6b7280",
-                  marginBottom: 4,
-                }}
-              >
-                {lang === "ru" ? "Цвет надписи" : "Yozuv rangi"}
-              </label>
-              <div
-                style={{
-                  width: "100%",
-                  minHeight: 42,
-                  borderRadius: 999,
-                  border: "1px solid #d1d5db",
-                  padding: "6px 10px",
-                  boxSizing: "border-box",
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 8,
-                  alignItems: "center",
-                }}
-              >
-                {COLOR_OPTIONS.map((c) => {
-                  const isActive = selectedColor === c.value;
-                  return (
-                    <button
-                      key={c.value}
-                      type="button"
-                      onClick={() => setSelectedColor(c.value)}
-                      title={c.label}
-                      style={{
-                        width: 26,
-                        height: 26,
-                        borderRadius: "999px",
-                        border: isActive
-                          ? "2px solid #111827"
-                          : "1px solid #d1d5db",
-                        padding: 0,
-                        background: "#ffffff",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                      }}
-                    >
-                      <span
-                        style={{
-                          display: "block",
-                          width: 18,
-                          height: 18,
-                          borderRadius: "999px",
-                          backgroundColor: c.value,
-                        }}
-                      />
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+        {/* 3. Цвет (растянутый блок) */}
+        <div style={{ marginBottom: 10 }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 11,
+              color: "#6b7280",
+              marginBottom: 4,
+            }}
+          >
+            {lang === "ru" ? "Цвет надписи" : "Yozuv rangi"}
+          </label>
+          <div
+            style={{
+              width: "100%",
+              minHeight: 42,
+              borderRadius: 999,
+              border: "1px solid #d1d5db",
+              padding: "6px 10px",
+              boxSizing: "border-box",
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 8,
+              alignItems: "center",
+            }}
+          >
+            {COLOR_OPTIONS.map((c) => {
+              const isActive = selectedColor === c.value;
+              return (
+                <button
+                  key={c.value}
+                  type="button"
+                  onClick={() => setSelectedColor(c.value)}
+                  title={c.label}
+                  style={{
+                    width: 26,
+                    height: 26,
+                    borderRadius: "999px",
+                    border: isActive
+                      ? "2px solid #111827"
+                      : "1px solid #d1d5db",
+                    padding: 0,
+                    background: "#ffffff",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: "pointer",
+                  }}
+                >
+                  <span
+                    style={{
+                      display: "block",
+                      width: 18,
+                      height: 18,
+                      borderRadius: "999px",
+                      backgroundColor: c.value,
+                    }}
+                  />
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          {/* Правый столбец – пример надписи, во весь блок, с нормальными отступами */}
-          <div style={{ display: "flex", flexDirection: "column" }}>
-            <label
-              style={{
-                display: "block",
-                fontSize: 11,
-                color: "#6b7280",
-                marginBottom: 4,
-              }}
-            >
-              {lang === "ru"
-                ? "Пример надписи на форме"
-                : "Formadagi yozuv namunasi"}
-            </label>
-            <div
-              style={{
-                width: "100%",
-                minHeight: 80,
-                borderRadius: 18,
-                border: "1px solid #d1d5db",
-                padding: "10px 18px",
-                boxSizing: "border-box",
-                background: "#f3f4f6",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily:
-                  FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
-                fontSize: 20,
-                fontWeight: 500,
-                color: selectedColor,
-                textAlign: "center",
-                overflow: "hidden",
-                whiteSpace: "nowrap",
-                textOverflow: "ellipsis",
-              }}
-            >
-              {chefName || (lang === "ru" ? "Имя повара" : "Oshpaz ismi")}
-            </div>
+        {/* 4. Пример надписи (отдельной строкой, широкое поле, больше отступов) */}
+        <div style={{ marginBottom: 8 }}>
+          <label
+            style={{
+              display: "block",
+              fontSize: 11,
+              color: "#6b7280",
+              marginBottom: 4,
+            }}
+          >
+            {lang === "ru"
+              ? "Пример надписи на форме"
+              : "Formadagi yozuv namunasi"}
+          </label>
+          <div
+            style={{
+              width: "100%",
+              minHeight: 80,
+              borderRadius: 18,
+              border: "1px solid #d1d5db",
+              padding: "10px 18px",
+              boxSizing: "border-box",
+              background: "#f3f4f6",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontFamily:
+                FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
+              fontSize: 20,
+              fontWeight: 500,
+              color: selectedColor,
+              textAlign: "center",
+              overflow: "hidden",
+              whiteSpace: "nowrap",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {chefName || (lang === "ru" ? "Имя повара" : "Oshpaz ismi")}
           </div>
         </div>
 
         {/* Кнопка Готово */}
-        <div style={{ marginTop: 14 }}>
+        <div style={{ marginTop: 6 }}>
           <button
             onClick={handleDone}
             style={{
