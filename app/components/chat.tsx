@@ -186,9 +186,9 @@ const ChatPage: React.FC = () => {
 
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = [
-    "oshpazlar uchun forma",
-    "ofitsiantlar uchun forma",
-    "barmenlar uchun forma",
+    "Oshpazlar uchun forma",
+    "Ofitsiantlar uchun forma",
+    "Barmenlar uchun forma",
   ];
   const roles = lang === "ru" ? rolesRu : rolesUz;
 
