@@ -161,29 +161,29 @@ const getItemName = (item: ItemVariant, lang: "ru" | "uz"): string => {
 
   switch (item.name) {
     case "Классическая шапка":
-      return "Klassik shlyapa";
+      return "Classic shapka";
     case "Высокая шапка":
-      return "Yuqori shlyapa";
+      return "Balandi shapka";
     case "Бандана":
       return "Bandana";
     case "Классический китель":
-      return "Klassik kuptak";
+      return "Classic kitel";
     case "Современный китель":
-      return "Zamonaviy kuptak";
+      return "Zamonaviy kitel";
     case "Минималистичный китель":
-      return "Minimalistik kuptak";
+      return "Minimalistik kitel";
     case "Классический фартук":
-      return "Klassik fartuk";
+      return "Classic fartuk";
     case "Нагрудный фартук":
       return "Ko‘krak fartugi";
     case "Бариста фартук":
-      return "Barista fartugi";
+      return "Barista fartuk";
     case "Классические брюки":
-      return "Klassik shimlar";
+      return "Classic shimlar";
     case "Джоггеры":
       return "Jogger shimlar";
     case "Узкие брюки":
-      return "Yupqa (tor) shimlar";
+      return "Yupqa shimlar";
     default:
       return item.name;
   }
@@ -491,7 +491,7 @@ const ChatPage: React.FC = () => {
                 fill="none"
               >
                 <path
-                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54l.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
+                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54л.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
                   fill="currentColor"
                 />
               </svg>
@@ -592,7 +592,7 @@ const ChatPage: React.FC = () => {
         ref={modelRef}
         style={{
           maxWidth: 960,
-          margin: "0 авто 16px",
+          margin: "0 auto 16px",
           display: "grid",
           gridTemplateColumns: "minmax(0,0.85fr) minmax(0,1.15fr)",
           gap: 16,
