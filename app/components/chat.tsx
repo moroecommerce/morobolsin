@@ -210,6 +210,11 @@ const ChatPage: React.FC = () => {
     window.open("https://t.me/YOUR_TELEGRAM_CHANNEL", "_blank", "noreferrer");
   };
 
+  // Всегда стартуем с верхушки страницы
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, []); [web:384]
+
   useEffect(() => {
     const currentWord = roles[roleIndex] ?? "";
     setTypedText("");
@@ -620,25 +625,35 @@ const ChatPage: React.FC = () => {
               gap: 10,
             }}
           >
+            {/* Пол / Jins */}
             <IconSelectRowSimple
-              icon={
-                gender === "male" ? ICON_GENDER_MALE : ICON_GENDER_FEMALE
-              }
-              label="Пол"
+              icon={gender === "male" ? ICON_GENDER_MALE : ICON_GENDER_FEMALE}
+              label={lang === "ru" ? "Пол" : "Jins"}
             >
               <select
                 value={gender}
-                onChange={(e) =>
-                  setGender(e.target.value as Gender)
-                }
+                onChange={(e) => setGender(e.target.value as Gender)}
                 style={commonSelectStyle}
               >
-                <option value="male">Мужская одежда</option>
-                <option value="female">Женская одежда</option>
+                {lang === "ru" ? (
+                  <>
+                    <option value="male">Мужская одежда</option>
+                    <option value="female">Женская одежда</option>
+                  </>
+                ) : (
+                  <>
+                    <option value="male">Erkaklar kiyimi</option>
+                    <option value="female">Ayollar kiyimi</option>
+                  </>
+                )}
               </select>
             </IconSelectRowSimple>
 
-            <IconSelectRowSimple icon={ICON_HEIGHT} label="Рост">
+            {/* Рост / Bo‘y */}
+            <IconSelectRowSimple
+              icon={ICON_HEIGHT}
+              label={lang === "ru" ? "Рост" : "Bo‘y (balandlik)"}
+            >
               <select
                 value={height}
                 onChange={(e) => setHeight(e.target.value)}
@@ -657,13 +672,17 @@ const ChatPage: React.FC = () => {
                   "210",
                 ].map((h) => (
                   <option key={h} value={h}>
-                    {h} см
+                    {h} {lang === "ru" ? "см" : "sm"}
                   </option>
                 ))}
               </select>
             </IconSelectRowSimple>
 
-            <IconSelectRowSimple icon={ICON_WEIGHT} label="Вес">
+            {/* Вес / Vazn */}
+            <IconSelectRowSimple
+              icon={ICON_WEIGHT}
+              label={lang === "ru" ? "Вес" : "Vazn"}
+            >
               <select
                 value={weight}
                 onChange={(e) => setWeight(e.target.value)}
@@ -682,7 +701,7 @@ const ChatPage: React.FC = () => {
                   "140",
                 ].map((w) => (
                   <option key={w} value={w}>
-                    {w} кг
+                    {w} {lang === "ru" ? "кг" : "kg"}
                   </option>
                 ))}
               </select>
