@@ -210,10 +210,10 @@ const ChatPage: React.FC = () => {
     window.open("https://t.me/YOUR_TELEGRAM_CHANNEL", "_blank", "noreferrer");
   };
 
-  // Стартуем с верхушки страницы
+  // Всегда стартуем с верхушки страницы
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-  }, []); [web:384]
+  }, []);
 
   useEffect(() => {
     const currentWord = roles[roleIndex] ?? "";
