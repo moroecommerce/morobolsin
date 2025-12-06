@@ -156,6 +156,59 @@ type ChefLook = {
 const CURRENT_URL = "https://morobolsin.vercel.app";
 const SHARE_TEXT = "Подбор формы для команды Morobolsin";
 
+const FONT_OPTIONS = [
+  {
+    value: "system",
+    label: "System",
+    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+  {
+    value: "serif",
+    label: "Serif",
+    css: "Georgia, 'Times New Roman', serif",
+  },
+  {
+    value: "mono",
+    label: "Mono",
+    css: "'Fira Code', Menlo, Monaco, monospace",
+  },
+  {
+    value: "script",
+    label: "Script",
+    css: "'Brush Script MT', cursive",
+  },
+  {
+    value: "rounded",
+    label: "Rounded",
+    css: "'Trebuchet MS', system-ui, sans-serif",
+  },
+  {
+    value: "display",
+    label: "Display",
+    css: "'Impact', system-ui, sans-serif",
+  },
+  {
+    value: "light",
+    label: "Light",
+    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+  {
+    value: "bold",
+    label: "Bold",
+    css: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+  },
+  {
+    value: "handwritten",
+    label: "Handwritten",
+    css: "'Comic Sans MS', cursive, sans-serif",
+  },
+  {
+    value: "elegant",
+    label: "Elegant",
+    css: "'Garamond', 'Times New Roman', serif",
+  },
+];
+
 const getItemName = (item: ItemVariant, lang: "ru" | "uz"): string => {
   if (lang === "ru") return item.name;
 
@@ -209,6 +262,7 @@ const ChatPage: React.FC = () => {
   });
 
   const [chefName, setChefName] = useState<string>("Шеф Алиджан");
+  const [selectedFont, setSelectedFont] = useState<string>("system");
 
   const [message, setMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
@@ -775,11 +829,11 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Имя + кнопка */}
+      {/* Имя + выбор шрифта + предпросмотр */}
       <section
         style={{
           maxWidth: 960,
-          margin: "0 auto 24px",
+          margin: "24px auto 24px",
           borderRadius: 22,
           background: "#ffffff",
           boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
@@ -790,39 +844,145 @@ const ChatPage: React.FC = () => {
         <p
           style={{
             fontSize: 13,
-            margin: "8px 0 10px",
+            margin: "0 0 12px",
             color: "#4b5563",
             textAlign: "center",
           }}
         >
           {lang === "ru"
-            ? "Напишите имя повара, которое будет нанесено на форму."
-            : "Oshpazning forma ustiga yoziladigan ismini kiriting."}
+            ? "Выберите шрифт и введите имя повара — справа вы увидите, как оно будет выглядеть на форме."
+            : "Oshpazning ismi uchun shriftni tanlang va ismini yozing — o‘ng tomonda forma ustidagi ko‘rinishini ko‘rasiz."}
         </p>
+
         <div
           style={{
             display: "flex",
-            flexDirection: "column",
-            gap: 10,
+            gap: 12,
+            alignItems: "center",
+            flexWrap: "wrap",
           }}
         >
-          <input
-            type="text"
-            value={chefName}
-            onChange={(e) => setChefName(e.target.value)}
-            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz ismi"}
-            style={{
-              width: "100%",
-              height: 38,
-              borderRadius: 999,
-              border: "1px solid #d1d5db",
-              padding: "0 16px",
-              fontSize: 13,
-              outline: "none",
-              boxSizing: "border-box",
-            }}
-          />
+          {/* 1. Выбор шрифта */}
+          <div style={{ flex: "0 0 180px", minWidth: 160 }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: 11,
+                color: "#6b7280",
+                marginBottom: 4,
+              }}
+            >
+              {lang === "ru" ? "Шрифт" : "Shrift"}
+            </label>
+            <select
+              value={selectedFont}
+              onChange={(e) => setSelectedFont(e.target.value)}
+              style={{
+                width: "100%",
+                height: 38,
+                borderRadius: 999,
+                border: "1px solid #d1d5db",
+                padding: "0 12px",
+                fontSize: 13,
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            >
+              {FONT_OPTIONS.map((f) => (
+                <option
+                  key={f.value}
+                  value={f.value}
+                  style={{ fontFamily: f.css }}
+                >
+                  {f.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
+          {/* 2. Ввод имени */}
+          <div style={{ flex: "1 1 220px", minWidth: 180 }}>
+            <label
+              style={{
+                display: "block",
+                fontSize: 11,
+                color: "#6b7280",
+                marginBottom: 4,
+              }}
+            >
+              {lang === "ru" ? "Имя повара" : "Oshpaz ismi"}
+            </label>
+            <input
+              type="text"
+              value={chefName}
+              onChange={(e) => setChefName(e.target.value)}
+              placeholder={
+                lang === "ru"
+                  ? "Например, Шеф Алиджан"
+                  : "Masalan, Shef Alijon"
+              }
+              style={{
+                width: "100%",
+                height: 38,
+                borderRadius: 999,
+                border: "1px solid #d1d5db",
+                padding: "0 16px",
+                fontSize: 13,
+                outline: "none",
+                boxSizing: "border-box",
+              }}
+            />
+          </div>
+
+          {/* 3. Пример надписи на форме */}
+          <div
+            style={{
+              flex: "0 0 200px",
+              minWidth: 180,
+            }}
+          >
+            <label
+              style={{
+                display: "block",
+                fontSize: 11,
+                color: "#6b7280",
+                marginBottom: 4,
+              }}
+            >
+              {lang === "ru"
+                ? "Пример на форме"
+                : "Formadagi ko‘rinishi"}
+            </label>
+            <div
+              style={{
+                height: 38,
+                borderRadius: 999,
+                border: "1px dashed #9ca3af",
+                padding: "0 16px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                boxSizing: "border-box",
+                background: "#f9fafb",
+                fontFamily:
+                  FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
+                fontSize: 15,
+                color: "#111827",
+                textAlign: "center",
+              }}
+            >
+              {chefName ||
+                (lang === "ru" ? "Имя повара" : "Oshpaz ismi")}
+            </div>
+          </div>
+        </div>
+
+        {/* Кнопка Готово */}
+        <div
+          style={{
+            marginTop: 14,
+          }}
+        >
           <button
             onClick={handleDone}
             style={{
