@@ -156,6 +156,39 @@ type ChefLook = {
 const CURRENT_URL = "https://morobolsin.vercel.app";
 const SHARE_TEXT = "Подбор формы для команды Morobolsin";
 
+const getItemName = (item: ItemVariant, lang: "ru" | "uz"): string => {
+  if (lang === "ru") return item.name;
+
+  switch (item.name) {
+    case "Классическая шапка":
+      return "Klassik shlyapa";
+    case "Высокая шапка":
+      return "Yuqori shlyapa";
+    case "Бандана":
+      return "Bandana";
+    case "Классический китель":
+      return "Klassik kuptak";
+    case "Современный китель":
+      return "Zamonaviy kuptak";
+    case "Минималистичный китель":
+      return "Minimalistik kuptak";
+    case "Классический фартук":
+      return "Klassik fartuk";
+    case "Нагрудный фартук":
+      return "Ko‘krak fartugi";
+    case "Бариста фартук":
+      return "Barista fartugi";
+    case "Классические брюки":
+      return "Klassik shimlar";
+    case "Джоггеры":
+      return "Jogger shimlar";
+    case "Узкие брюки":
+      return "Yupqa (tor) shimlar";
+    default:
+      return item.name;
+  }
+};
+
 const ChatPage: React.FC = () => {
   const [lang, setLang] = useState<"ru" | "uz">("ru");
 
@@ -186,9 +219,9 @@ const ChatPage: React.FC = () => {
 
   const rolesRu = ["поваров", "официантов", "барменов"];
   const rolesUz = [
-    "OSHPAZLAR UCHUN FORMA",
-    "OFITSIANTLAR UCHUN FORMA",
-    "BARMENLAR UCHUN FORMA",
+    "Oshpazlar uchun forma",
+    "Ofitsiantlar uchun forma",
+    "Barmenlar uchun forma",
   ];
   const roles = lang === "ru" ? rolesRu : rolesUz;
 
@@ -210,7 +243,6 @@ const ChatPage: React.FC = () => {
     window.open("https://t.me/YOUR_TELEGRAM_CHANNEL", "_blank", "noreferrer");
   };
 
-  // Всегда стартуем с верхушки страницы
   useEffect(() => {
     window.scrollTo({ top: 0, left: 0, behavior: "auto" });
   }, []);
@@ -459,7 +491,7 @@ const ChatPage: React.FC = () => {
                 fill="none"
               >
                 <path
-                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54l.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79l21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
+                  d="M23.91 3.79L20.3 20.84c-.26 1.16-.95 1.44-1.93.9l-5.34-3.94-2.58 2.49c-.29.29-.54.54-1.11.54l.4-5.7 10.38-9.39c.45-.4-.1-.63-.7-.23L7.2 13.26 1.7 11.54C.5 11.18.48 10.38 1.93 9.79л21.26-8.2c.97-.43 1.9.24 1.53 1.73z"
                   fill="currentColor"
                 />
               </svg>
@@ -550,7 +582,7 @@ const ChatPage: React.FC = () => {
           >
             {lang === "ru"
               ? "Подберите пол, параметры и комплект формы — ассистент поможет собрать образ под ваш бренд."
-              : "JINS, PARAMETRLAR VA FORMA TO‘PLAMINI TANLANG — YORDAMCHI BRENDINGIZGA MOS KO‘RINISH TOPISHDA YORDAM BERADI."}
+              : "Jins, parametrlar va forma to‘plamini tanlang — yordamchi brendingizga mos ko‘rinish topishda yordam beradi."}
           </p>
         </div>
       </section>
@@ -560,7 +592,7 @@ const ChatPage: React.FC = () => {
         ref={modelRef}
         style={{
           maxWidth: 960,
-          margin: "0 auto 16px",
+          margin: "0 авто 16px",
           display: "grid",
           gridTemplateColumns: "minmax(0,0.85fr) minmax(0,1.15fr)",
           gap: 16,
@@ -642,8 +674,8 @@ const ChatPage: React.FC = () => {
                   </>
                 ) : (
                   <>
-                    <option value="male">ERKAKLAR KIYIMI</option>
-                    <option value="female">AYOLLAR KIYIMI</option>
+                    <option value="male">Erkaklar kiyimi</option>
+                    <option value="female">Ayollar kiyimi</option>
                   </>
                 )}
               </select>
@@ -672,7 +704,7 @@ const ChatPage: React.FC = () => {
                   "210",
                 ].map((h) => (
                   <option key={h} value={h}>
-                    {h} {lang === "ru" ? "см" : "SM"}
+                    {h} {lang === "ru" ? "см" : "sm"}
                   </option>
                 ))}
               </select>
@@ -701,7 +733,7 @@ const ChatPage: React.FC = () => {
                   "140",
                 ].map((w) => (
                   <option key={w} value={w}>
-                    {w} {lang === "ru" ? "кг" : "KG"}
+                    {w} {lang === "ru" ? "кг" : "kg"}
                   </option>
                 ))}
               </select>
@@ -713,6 +745,7 @@ const ChatPage: React.FC = () => {
               items={HATS}
               activeIndex={hatIndex}
               onChange={setHatIndex}
+              lang={lang}
             />
             <IconSelectRow
               icon={ICON_TOP}
@@ -720,6 +753,7 @@ const ChatPage: React.FC = () => {
               items={TOPS}
               activeIndex={topIndex}
               onChange={setTopIndex}
+              lang={lang}
             />
             <IconSelectRow
               icon={ICON_APRON}
@@ -727,6 +761,7 @@ const ChatPage: React.FC = () => {
               items={APRONS}
               activeIndex={apronIndex}
               onChange={setApronIndex}
+              lang={lang}
             />
             <IconSelectRow
               icon={ICON_PANTS}
@@ -734,6 +769,7 @@ const ChatPage: React.FC = () => {
               items={PANTS}
               activeIndex={pantsIndex}
               onChange={setPantsIndex}
+              lang={lang}
             />
           </div>
         </div>
@@ -761,7 +797,7 @@ const ChatPage: React.FC = () => {
         >
           {lang === "ru"
             ? "Напишите имя повара, которое будет нанесено на форму."
-            : "OSHPAZNING FORMA USTIGA YOZILADIGAN ISMINI KIRITING."}
+            : "Oshpazning forma ustiga yoziladigan ismini kiriting."}
         </p>
         <div
           style={{
@@ -774,7 +810,7 @@ const ChatPage: React.FC = () => {
             type="text"
             value={chefName}
             onChange={(e) => setChefName(e.target.value)}
-            placeholder={lang === "ru" ? "Имя шефа" : "OSHPAZ ISMI"}
+            placeholder={lang === "ru" ? "Имя шефа" : "Oshpaz ismi"}
             style={{
               width: "100%",
               height: 38,
@@ -802,7 +838,7 @@ const ChatPage: React.FC = () => {
               cursor: "pointer",
             }}
           >
-            {lang === "ru" ? "Готово" : "TAYYOR"}
+            {lang === "ru" ? "Готово" : "Tayyor"}
           </button>
         </div>
       </section>
@@ -881,7 +917,7 @@ const ChatPage: React.FC = () => {
             placeholder={
               lang === "ru"
                 ? "Сообщение ассистенту..."
-                : "ASSISTENTGA XABAR YOZING..."
+                : "Assistentga xabar yozing..."
             }
             style={{
               flex: 1,
@@ -952,6 +988,7 @@ type IconSelectRowProps = {
   items: ItemVariant[];
   activeIndex: number;
   onChange: (index: number) => void;
+  lang: "ru" | "uz";
 };
 
 const IconSelectRow: React.FC<IconSelectRowProps> = ({
@@ -960,6 +997,7 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
   items,
   activeIndex,
   onChange,
+  lang,
 }) => (
   <div style={commonRowStyle}>
     <img
@@ -984,7 +1022,7 @@ const IconSelectRow: React.FC<IconSelectRowProps> = ({
     >
       {items.map((it) => (
         <option key={it.id} value={it.id}>
-          {it.name}
+          {getItemName(it, lang)}
         </option>
       ))}
     </select>
