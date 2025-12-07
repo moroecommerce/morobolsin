@@ -277,6 +277,8 @@ const ChatPage: React.FC = () => {
   const [chatHistory, setChatHistory] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
 
+  const [typingText, setTypingText] = useState<string>("");
+
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const modelRef = useRef<HTMLDivElement | null>(null);
 
@@ -342,7 +344,7 @@ const ChatPage: React.FC = () => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [chatHistory]);
+  }, [chatHistory, typingText]);
 
   const scrollTo = (ref: React.RefObject<HTMLDivElement>) => {
     if (ref.current) {
@@ -365,6 +367,7 @@ const ChatPage: React.FC = () => {
   ) => {
     const withContext = options?.withContext ?? false;
     setLoading(true);
+    setTypingText("");
 
     let historyToSend: Message[] = [
       ...chatHistory,
@@ -398,7 +401,23 @@ const ChatPage: React.FC = () => {
           ? data.reply
           : "Ассистент сейчас недоступен. Попробуйте ещё раз чуть позже.";
 
+      // добавляем полное сообщение в историю
       setChatHistory((prev) => [...prev, { text: botReply, sender: "bot" }]);
+
+      // запускаем эффект «печати» для последнего ответа
+      setTypingText("");
+      let index = 0;
+      const speed = 15; // мс на символ
+
+      const intervalId = window.setInterval(() => {
+        index += 1;
+        setTypingText(botReply.slice(0, index));
+
+        if (index >= botReply.length) {
+          window.clearInterval(intervalId);
+          setTypingText("");
+        }
+      }, speed);
     } catch {
       setChatHistory((prev) => [
         ...prev,
@@ -691,7 +710,7 @@ const ChatPage: React.FC = () => {
           >
             <Image
               src={chefPhoto}
-              alt="Шеф Morobolsin"
+              alt="Шеф Morobolsин"
               style={{
                 height: "100%",
                 width: "auto",
@@ -1052,76 +1071,85 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ЧАТ */}
+      {/* ЧАТ – как в GPT */}
       <section
         style={{
           maxWidth: 960,
-          margin: "0 auto",
-          borderRadius: 22,
+          margin: "0 auto 40px",
+          borderRadius: 0,
           background: "transparent",
-          padding: "16px 0 70px",
+          padding: "0 0 90px",
           position: "relative",
         }}
       >
         <div
           style={{
-            maxHeight: 260,
-            overflowY: "auto",
-            marginBottom: 10,
+            maxHeight: "none",
+            overflowY: "visible",
+            marginBottom: 16,
           }}
         >
-          {chatHistory.map((msg, idx) => (
-            <div
-              key={idx}
-              style={{
-                display: "flex",
-                justifyContent:
-                  msg.sender === "user" ? "flex-end" : "flex-start",
-                marginBottom: 12,
-              }}
-            >
+          {chatHistory.map((msg, idx) => {
+            const isLastBot =
+              msg.sender === "bot" &&
+              idx === chatHistory.length - 1 &&
+              typingText;
+
+            return (
               <div
+                key={idx}
                 style={{
-                  maxWidth: "82%",
-                  padding: "12px 16px",
-                  borderRadius:
-                    msg.sender === "user"
-                      ? "18px 18px 6px 18px"
-                      : "18px 18px 18px 6px",
-                  background:
-                    msg.sender === "user"
-                      ? "linear-gradient(135deg,#111827,#374151)"
-                      : "rgba(255,255,255,0.96)",
-                  color: msg.sender === "user" ? "#f9fafb" : "#111827",
-                  fontSize: 15,
-                  lineHeight: 1.6,
-                  whiteSpace: "pre-wrap",
-                  boxShadow:
-                    msg.sender === "user"
-                      ? "0 4px 10px rgba(15,23,42,0.35)"
-                      : "0 3px 8px rgba(148,163,184,0.35)",
-                  backdropFilter:
-                    msg.sender === "user" ? undefined : "blur(8px)",
+                  display: "flex",
+                  justifyContent:
+                    msg.sender === "user" ? "flex-end" : "flex-start",
+                  marginBottom: 16,
                 }}
               >
-                {msg.text}
+                <div
+                  style={{
+                    maxWidth: "90%",
+                    padding: "16px 20px",
+                    borderRadius:
+                      msg.sender === "user"
+                        ? "22px 22px 10px 22px"
+                        : "22px 22px 22px 10px",
+                    background:
+                      msg.sender === "user"
+                        ? "linear-gradient(135deg,#111827,#374151)"
+                        : "rgba(255,255,255,0.96)",
+                    color: msg.sender === "user" ? "#f9fafb" : "#111827",
+                    fontSize: 16,
+                    lineHeight: 1.7,
+                    whiteSpace: "pre-wrap",
+                    boxShadow:
+                      msg.sender === "user"
+                        ? "0 4px 10px rgba(15,23,42,0.35)"
+                        : "0 3px 8px rgba(148,163,184,0.35)",
+                    backdropFilter:
+                      msg.sender === "user" ? undefined : "blur(8px)",
+                  }}
+                >
+                  {isLastBot ? typingText : msg.text}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Инпут как в GPT – фиксирован внизу */}
         <div
           style={{
-            position: "absolute",
+            position: "fixed",
             left: 0,
             right: 0,
-            bottom: 16,
+            bottom: 0,
             display: "flex",
             gap: 8,
-            paddingInline: 14,
-            paddingTop: 8,
-            paddingBottom: 8,
+            padding: "10px 16px",
+            background: "rgba(248,253,255,0.96)",
+            borderTop: "1px solid #e5e7eb",
+            boxSizing: "border-box",
           }}
         >
           <input
@@ -1138,11 +1166,11 @@ const ChatPage: React.FC = () => {
             }
             style={{
               flex: 1,
-              height: 46,
+              height: 48,
               borderRadius: 999,
               border: "1px solid #d1d5db",
-              padding: "0 16px",
-              fontSize: 15,
+              padding: "0 18px",
+              fontSize: 16,
               outline: "none",
               background: "#ffffff",
             }}
@@ -1152,14 +1180,14 @@ const ChatPage: React.FC = () => {
             onClick={handleSend}
             disabled={loading || !message.trim()}
             style={{
-              width: 52,
-              height: 46,
+              width: 56,
+              height: 48,
               borderRadius: 999,
               border: "none",
               background:
                 "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
               color: "#fff",
-              fontSize: 20,
+              fontSize: 22,
               cursor:
                 loading || !message.trim() ? "not-allowed" : "pointer",
               opacity: loading || !message.trim() ? 0.6 : 1,
