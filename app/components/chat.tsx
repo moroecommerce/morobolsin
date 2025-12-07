@@ -548,7 +548,7 @@ const ChatPage: React.FC = () => {
                 color: "#111827",
               }}
             >
-              {/* Telegram иконка [web:470] */}
+              {/* Telegram иконка */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -1058,9 +1058,8 @@ const ChatPage: React.FC = () => {
           maxWidth: 960,
           margin: "0 auto",
           borderRadius: 22,
-          background: "#ffffff",
-          boxShadow: "0 4px 16px rgba(148,163,184,0.16)",
-          padding: "16px 14px 70px",
+          background: "transparent",
+          padding: "16px 0 70px",
           position: "relative",
         }}
       >
@@ -1078,23 +1077,31 @@ const ChatPage: React.FC = () => {
                 display: "flex",
                 justifyContent:
                   msg.sender === "user" ? "flex-end" : "flex-start",
-                marginBottom: 8,
+                marginBottom: 12,
               }}
             >
               <div
                 style={{
-                  maxWidth: "80%",
-                  padding: "8px 10px",
+                  maxWidth: "82%",
+                  padding: "12px 16px",
                   borderRadius:
                     msg.sender === "user"
-                      ? "16px 16px 4px 16px"
-                      : "16px 16px 16px 4px",
+                      ? "18px 18px 6px 18px"
+                      : "18px 18px 18px 6px",
                   background:
-                    msg.sender === "user" ? "#1f2937" : "#e5f0ff",
-                  color: msg.sender === "user" ? "#fff" : "#111827",
-                  fontSize: 13,
-                  lineHeight: 1.5,
+                    msg.sender === "user"
+                      ? "linear-gradient(135deg,#111827,#374151)"
+                      : "rgba(255,255,255,0.96)",
+                  color: msg.sender === "user" ? "#f9fafb" : "#111827",
+                  fontSize: 15,
+                  lineHeight: 1.6,
                   whiteSpace: "pre-wrap",
+                  boxShadow:
+                    msg.sender === "user"
+                      ? "0 4px 10px rgba(15,23,42,0.35)"
+                      : "0 3px 8px rgba(148,163,184,0.35)",
+                  backdropFilter:
+                    msg.sender === "user" ? undefined : "blur(8px)",
                 }}
               >
                 {msg.text}
@@ -1107,11 +1114,12 @@ const ChatPage: React.FC = () => {
         <div
           style={{
             position: "absolute",
-            left: 14,
-            right: 14,
+            left: 0,
+            right: 0,
             bottom: 16,
             display: "flex",
             gap: 8,
+            paddingInline: 14,
             paddingTop: 8,
             paddingBottom: 8,
           }}
@@ -1130,12 +1138,13 @@ const ChatPage: React.FC = () => {
             }
             style={{
               flex: 1,
-              height: 42,
+              height: 46,
               borderRadius: 999,
               border: "1px solid #d1d5db",
-              padding: "0 14px",
-              fontSize: 14,
+              padding: "0 16px",
+              fontSize: 15,
               outline: "none",
+              background: "#ffffff",
             }}
             disabled={loading}
           />
@@ -1143,14 +1152,14 @@ const ChatPage: React.FC = () => {
             onClick={handleSend}
             disabled={loading || !message.trim()}
             style={{
-              width: 46,
-              height: 42,
+              width: 52,
+              height: 46,
               borderRadius: 999,
               border: "none",
               background:
                 "linear-gradient(135deg,#1f242b 0%,#3a4250 100%)",
               color: "#fff",
-              fontSize: 18,
+              fontSize: 20,
               cursor:
                 loading || !message.trim() ? "not-allowed" : "pointer",
               opacity: loading || !message.trim() ? 0.6 : 1,
