@@ -401,13 +401,11 @@ const ChatPage: React.FC = () => {
           ? data.reply
           : "Ассистент сейчас недоступен. Попробуйте ещё раз чуть позже.";
 
-      // добавляем полное сообщение в историю
       setChatHistory((prev) => [...prev, { text: botReply, sender: "bot" }]);
 
-      // запускаем эффект «печати» для последнего ответа
       setTypingText("");
       let index = 0;
-      const speed = 15; // мс на символ
+      const speed = 15;
 
       const intervalId = window.setInterval(() => {
         index += 1;
@@ -476,7 +474,7 @@ const ChatPage: React.FC = () => {
         fontFamily: "Manrope, Arial, sans-serif",
         background: "#f8fdff",
         minHeight: "100vh",
-        padding: "0 16px 90px",
+        padding: "0 16px 16px", // 90px o‘rniga 16px
         boxSizing: "border-box",
       }}
     >
@@ -567,7 +565,6 @@ const ChatPage: React.FC = () => {
                 color: "#111827",
               }}
             >
-              {/* Telegram иконка */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="18"
@@ -594,7 +591,7 @@ const ChatPage: React.FC = () => {
                     border:
                       lang === lng
                         ? "1px solid #111827"
-                        : "1px solid #e5e7eb",
+                        : "1px solid "#e5e7eb",
                     background: lang === lng ? "#111827" : "#ffffff",
                     color: lang === lng ? "#f9fafb" : "#111827",
                     fontSize: 12,
@@ -742,7 +739,6 @@ const ChatPage: React.FC = () => {
               gap: 10,
             }}
           >
-            {/* Пол / Jins */}
             <IconSelectRowSimple
               icon={gender === "male" ? ICON_GENDER_MALE : ICON_GENDER_FEMALE}
               label={lang === "ru" ? "Пол" : "Jins"}
@@ -766,7 +762,6 @@ const ChatPage: React.FC = () => {
               </select>
             </IconSelectRowSimple>
 
-            {/* Рост / Bo‘y */}
             <IconSelectRowSimple
               icon={ICON_HEIGHT}
               label={lang === "ru" ? "Рост" : "Bo‘y (balandlik)"}
@@ -795,7 +790,6 @@ const ChatPage: React.FC = () => {
               </select>
             </IconSelectRowSimple>
 
-            {/* Вес / Vazn */}
             <IconSelectRowSimple
               icon={ICON_WEIGHT}
               label={lang === "ru" ? "Вес" : "Vazn"}
@@ -872,7 +866,6 @@ const ChatPage: React.FC = () => {
           boxSizing: "border-box",
         }}
       >
-        {/* 1. Имя повара */}
         <div style={{ marginBottom: 10 }}>
           <label
             style={{
@@ -906,7 +899,6 @@ const ChatPage: React.FC = () => {
           />
         </div>
 
-        {/* 2. Шрифт */}
         <div style={{ marginBottom: 10 }}>
           <label
             style={{
@@ -944,7 +936,6 @@ const ChatPage: React.FC = () => {
           </select>
         </div>
 
-        {/* 3. Цвет – без внешней рамки */}
         <div style={{ marginBottom: 10 }}>
           <label
             style={{
@@ -1008,7 +999,6 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* 4. Пример – в конце, крупнее */}
         <div style={{ marginBottom: 8 }}>
           <label
             style={{
@@ -1025,10 +1015,10 @@ const ChatPage: React.FC = () => {
           <div
             style={{
               width: "100%",
-              minHeight: 90,
+              minHeight: 72, // 90 o‘rniga 72
               borderRadius: 18,
               border: "1px solid #d1d5db",
-              padding: "14px 20px",
+              padding: "10px 16px", // 14x20 o‘rniga ixchamroq
               boxSizing: "border-box",
               background: "#f3f4f6",
               display: "flex",
@@ -1036,7 +1026,7 @@ const ChatPage: React.FC = () => {
               justifyContent: "center",
               fontFamily:
                 FONT_OPTIONS.find((f) => f.value === selectedFont)?.css,
-              fontSize: 22,
+              fontSize: 20,
               fontWeight: 600,
               color: selectedColor,
               textAlign: "center",
@@ -1049,7 +1039,6 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Кнопка Готово */}
         <div style={{ marginTop: 6 }}>
           <button
             onClick={handleDone}
@@ -1078,7 +1067,7 @@ const ChatPage: React.FC = () => {
           margin: "0 auto 40px",
           borderRadius: 0,
           background: "transparent",
-          padding: "0 0 90px",
+          padding: "0 0 16px", // 90px o‘rniga 16px
           position: "relative",
         }}
       >
@@ -1137,7 +1126,6 @@ const ChatPage: React.FC = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Инпут как в GPT – фиксирован внизу */}
         <div
           style={{
             position: "fixed",
