@@ -474,11 +474,10 @@ const ChatPage: React.FC = () => {
         fontFamily: "Manrope, Arial, sans-serif",
         background: "#f8fdff",
         minHeight: "100vh",
-        padding: "0 16px 16px", // 90px o‘rniga 16px
+        padding: "0 16px 16px",
         boxSizing: "border-box",
       }}
     >
-      {/* NAVBAR */}
       <header
         style={{
           position: "sticky",
@@ -591,7 +590,7 @@ const ChatPage: React.FC = () => {
                     border:
                       lang === lng
                         ? "1px solid #111827"
-                        : "1px solid "#e5e7eb",
+                        : "1px solid #e5e7eb",
                     background: lang === lng ? "#111827" : "#ffffff",
                     color: lang === lng ? "#f9fafb" : "#111827",
                     fontSize: 12,
@@ -609,7 +608,6 @@ const ChatPage: React.FC = () => {
         </div>
       </header>
 
-      {/* HERO */}
       <section
         style={{
           maxWidth: 960,
@@ -669,7 +667,6 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* Фото + категории */}
       <section
         ref={modelRef}
         style={{
@@ -681,7 +678,6 @@ const ChatPage: React.FC = () => {
           alignItems: "stretch",
         }}
       >
-        {/* ЛЕВЫЙ БЛОК – ФОТО */}
         <div
           style={{
             borderRadius: 22,
@@ -719,7 +715,6 @@ const ChatPage: React.FC = () => {
           </div>
         </div>
 
-        {/* ПРАВЫЙ БЛОК – параметры */}
         <div
           style={{
             borderRadius: 22,
@@ -854,7 +849,6 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* 4 строки: Имя, Шрифт, Цвет, Пример */}
       <section
         style={{
           maxWidth: 960,
@@ -1015,10 +1009,10 @@ const ChatPage: React.FC = () => {
           <div
             style={{
               width: "100%",
-              minHeight: 72, // 90 o‘rniga 72
+              minHeight: 72,
               borderRadius: 18,
               border: "1px solid #d1d5db",
-              padding: "10px 16px", // 14x20 o‘rniga ixchamroq
+              padding: "10px 16px",
               boxSizing: "border-box",
               background: "#f3f4f6",
               display: "flex",
@@ -1060,14 +1054,13 @@ const ChatPage: React.FC = () => {
         </div>
       </section>
 
-      {/* ЧАТ – как в GPT */}
       <section
         style={{
           maxWidth: 960,
           margin: "0 auto 40px",
           borderRadius: 0,
           background: "transparent",
-          padding: "0 0 16px", // 90px o‘rniga 16px
+          padding: "0 0 16px",
           position: "relative",
         }}
       >
